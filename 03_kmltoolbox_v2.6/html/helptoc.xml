@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<toc version="1.0">
+
+<tocitem target="kml.contents.html" image="HelpIcon.USER_GUIDE">KML Toolbox
+	<tocitem image="HelpIcon.FUNCTION">Useful functions
+		<tocitem image="HelpIcon.FUNCTION" target="kml.run.html">kml.run</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.save.html">kml.save</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.viewKML.html">kml.viewKML</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.clear.html">kml.clear</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.createFolder.html">kml.createFolder</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.useDegrees.html">kml.useDegrees</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.useRadians.html">kml.useRadians</tocitem>
+		<tocitem image="HelpIcon.RELEASE_NOTES" target="kml.icons.html">Icons alias for the markers</tocitem>
+	</tocitem>
+	<tocitem image="HelpIcon.FUNCTION">Plotting functions
+		<tocitem image="HelpIcon.FUNCTION" target="kml.plot.html">kml.plot</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.plot3.html">kml.plot3</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.point.html">kml.point</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.text.html">kml.text</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.scatter.html">kml.scatter</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.scatter3.html">kml.scatter3</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.contour.html">kml.contour</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.contour3.html">kml.contour3</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.poly.html">kml.poly</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.poly3.html">kml.poly3</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.overlay.html">kml.overlay</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.transfer.html">kml.transfer</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.model.html">kml.model</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.modelTour.html">kml.modelTour</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.quiver.html">kml.quiver</tocitem>
+		<tocitem image="HelpIcon.FUNCTION" target="kml.quiver3d.html">kml.quiver3d</tocitem>
+	</tocitem>
+</tocitem>
+</toc>

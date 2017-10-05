@@ -1,0 +1,121 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>kml.clear</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-08"><meta name="DC.source" content="help_clear.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>kml.clear</h1><!--introduction--><p>Clears the current kml file, removing any previous plots</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">Example</a></li></ul></div><h2>Syntax<a name="1"></a></h2><pre>k = kml('kml title here');
+--- any plot code here
+k.clear;
+--- new plot code here</pre><h2>Description<a name="2"></a></h2><p>kml.clear will delete any plot inside the current kml object, leaving it empty for future use. It will not delete any temporary file created on disk, such as images, nor will remove any .kml file previously saved.</p><h2>Example<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Create a new kml object</span>
+k = kml(<span class="string">'my kml file'</span>);
+
+<span class="comment">% Plot a sample curve to the kml, and open it in Google Earth</span>
+t = linspace(0,360,1000);
+k.plot(20*t, 30*cosd(t/2));
+k.run;
+
+<span class="comment">% Clear the previous contents</span>
+k.clear;
+
+<span class="comment">% Plot a new curve there, and open the new contents in Google Earth</span>
+k.plot(30*t, 90*cosd(t/2));
+k.run;
+</pre><pre class="codeoutput">This is the first plot
+</pre><img vspace="5" hspace="5" src="help_clear_01.jpg" alt=""> <pre class="codeoutput">This is the second plot after clearing the kml object
+</pre><img vspace="5" hspace="5" src="help_clear_02.jpg" alt=""> <p><i>This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (<a href="mailto:rafael@rafael.aero">rafael@rafael.aero</a>)</i></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% kml.clear
+% Clears the current kml file, removing any previous plots
+
+%% Syntax
+%  k = kml('kml title here');
+%  REPLACE_WITH_DASH_DASH- any plot code here
+%  k.clear;
+%  REPLACE_WITH_DASH_DASH- new plot code here
+
+%% Description
+% kml.clear will delete any plot inside the current kml object, leaving it
+% empty for future use. It will not delete any temporary file created on
+% disk, such as images, nor will remove any .kml file previously saved.
+
+%% Example
+
+% Create a new kml object
+k = kml('my kml file');
+
+% Plot a sample curve to the kml, and open it in Google Earth
+t = linspace(0,360,1000);
+k.plot(20*t, 30*cosd(t/2));
+k.run;
+
+% Clear the previous contents
+k.clear; 
+
+% Plot a new curve there, and open the new contents in Google Earth
+k.plot(30*t, 90*cosd(t/2));
+k.run;
+
+%%
+% _This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (rafael@rafael.aero)_
+##### SOURCE END #####
+--></body></html>
