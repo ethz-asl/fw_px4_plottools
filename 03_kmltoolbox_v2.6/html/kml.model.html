@@ -1,0 +1,162 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>kml.model</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-08"><meta name="DC.source" content="help_model.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>kml.model</h1><!--introduction--><p>Places a 3D model in the coordinates defined by longitude, latitude and altitude, and orientation given by heading, tilt and roll.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">Properties</a></li><li><a href="#5">Example</a></li></ul></div><h2>Syntax<a name="1"></a></h2><pre>kml.model(longitude, latitude, altitude, heading, tilt, roll)
+kml.model(...,'PropertyName',PropertyValue,...)</pre><h2>Description<a name="2"></a></h2><p>Places a 3D model in the coordinates defined by the inputs longitude, latitude and altitude, and orientation given by heading, tilt and roll. The 3D model should be specified by the property pair 'model', 'modelfile.dae' and should be located in the same path where the kml file will be saved.</p><p>The units for the angular values are normally given in degrees, but this can be changed by calling: <tt>kml.useDegrees;</tt> or <tt>kml.useRadians;</tt> before plotting. Altitude is always given in meters.</p><p>If the inputs are arrays of coordinates and orientations, a copy of the 3D model will be placed in every one of them.</p><p>Many user-generated models can be found in the <a href="http://sketchup.google.com/3dwarehouse/">Google 3D Warehouse</a> website.</p><p>It is possible to fine tune the point properties using name-value pairs:</p><p><tt>kml.model(...,'PropertyName',PropertyValue,...)</tt></p><h2>Properties<a name="3"></a></h2><p>
+<table cellspacing="0" cellpadding="4" border="2">
+<tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+<tr><td bgcolor="#F2F2F2">'model'           </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Path to the 3D model file. This is a required input.</td></tr>
+<tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the model inside the kml file</td></tr>
+<tr><td bgcolor="#F2F2F2">'id'              </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Internal id of this model inside the kml</td></tr>
+<tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the model represents</td></tr>
+<tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the model</td></tr>
+<tr><td bgcolor="#F2F2F2">'scale'           </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+<tr><td bgcolor="#F2F2F2">'scaleX'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the x-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+<tr><td bgcolor="#F2F2F2">'scaleY'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the y-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+<tr><td bgcolor="#F2F2F2">'scaleZ'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the z-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+<tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the model to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the model starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the model finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+</table>
+</p><h2>Example<a name="5"></a></h2><pre class="codeinput"><span class="comment">% Create a new kml object</span>
+k = kml(<span class="string">'my kml file'</span>);
+
+<span class="comment">% Places an Airbus A320 3D model in a flight trajectory over the atlantic.</span>
+N = 20;
+k.model(linspace(-53,8,N),linspace(-23,47,N),ones(1,N)*5e4,ones(1,N)*-145,zeros(1,N),zeros(1,N),<span class="string">'model'</span>,<span class="string">'A320.dae'</span>,<span class="string">'scale'</span>,10000)
+
+<span class="comment">% Save the kml and open it in Google Earth</span>
+k.run;
+
+</pre><pre class="codeoutput">This is the result of running this example:
+</pre><img vspace="5" hspace="5" src="help_model_01.jpg" alt=""> <p><i>This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (<a href="mailto:rafael@rafael.aero">rafael@rafael.aero</a>)</i></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% kml.model
+% Places a 3D model in the coordinates defined by longitude, latitude and altitude,
+% and orientation given by heading, tilt and roll.
+
+%% Syntax
+%  kml.model(longitude, latitude, altitude, heading, tilt, roll)
+%  kml.model(...,'PropertyName',PropertyValue,...) 
+
+%% Description
+% Places a 3D model in the coordinates defined by the inputs longitude,
+% latitude and altitude, and orientation given by heading, tilt and roll.
+% The 3D model should be specified by the property pair 'model', 'modelfile.dae'
+% and should be located in the same path where the kml file will be saved.
+%  
+% The units for the angular values are normally given in degrees, but this can be changed by calling:
+% |kml.useDegrees;| or |kml.useRadians;| before plotting. Altitude is always given in meters.
+%  
+% If the inputs are arrays of coordinates and orientations, a copy of the 3D 
+% model will be placed in every one of them.
+%  
+% Many user-generated models can be found in the <http://sketchup.google.com/3dwarehouse/ Google 3D Warehouse> website.  
+%
+% It is possible to fine tune the point properties using name-value pairs:
+%  
+% |kml.model(...,'PropertyName',PropertyValue,...)|
+%  
+%% Properties
+%%
+% 
+% <html>
+% <table cellspacing="0" cellpadding="4" border="2">
+% <tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+% <tr><td bgcolor="#F2F2F2">'model'           </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Path to the 3D model file. This is a required input.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the model inside the kml file</td></tr>
+% <tr><td bgcolor="#F2F2F2">'id'              </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Internal id of this model inside the kml</td></tr>
+% <tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the model represents</td></tr>
+% <tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the model</td></tr>
+% <tr><td bgcolor="#F2F2F2">'scale'           </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+% <tr><td bgcolor="#F2F2F2">'scaleX'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the x-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+% <tr><td bgcolor="#F2F2F2">'scaleY'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the y-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+% <tr><td bgcolor="#F2F2F2">'scaleZ'          </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the model in the z-axis. Can be one input for all models, or an array with the same size as Longitude, with the size of the model at each coordinate</td></tr>
+% <tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the model to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the model starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the model finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% </table>
+% </html>
+% 
+
+%% Example
+
+% Create a new kml object
+k = kml('my kml file');
+
+% Places an Airbus A320 3D model in a flight trajectory over the atlantic.
+N = 20;
+k.model(linspace(-53,8,N),linspace(-23,47,N),ones(1,N)*5e4,ones(1,N)*-145,zeros(1,N),zeros(1,N),'model','A320.dae','scale',10000)
+
+% Save the kml and open it in Google Earth
+k.run;
+
+
+%%
+% _This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (rafael@rafael.aero)_
+##### SOURCE END #####
+--></body></html>

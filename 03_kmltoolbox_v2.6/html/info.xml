@@ -1,0 +1,33 @@
+<productinfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="optional">
+<?xml-stylesheet type="text/xsl" href="optional"?>
+<matlabrelease>14</matlabrelease>
+<name>KML toolbox</name>
+<type>toolbox</type>
+<icon>./kmltoolbox.png</icon>
+<help_location>./</help_location>
+
+
+<list>
+
+<listitem>
+<label>Help</label>
+<callback>doc kml</callback>
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+<listitem>
+<label>Demos</label>
+<callback>edit RunTests.m</callback>
+<icon>$toolbox/matlab/icons/demoicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Product Page (Web)</label>
+<callback>web http://www.mathworks.com/matlabcentral/fileexchange/34694-kml-toolbox-plot-anything-to-google-earth -browser;</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem> 
+
+</list>
+
+
+</productinfo>

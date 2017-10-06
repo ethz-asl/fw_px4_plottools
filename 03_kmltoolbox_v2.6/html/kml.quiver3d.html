@@ -1,0 +1,156 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>kml.quiver3d</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-08"><meta name="DC.source" content="help_quiver3d.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>kml.quiver3d</h1><!--introduction--><p>Creates a quiver plot using 3D arrows, in the coordinates defined by longitude, latitude and altitude, and arrow sizes given by the speeds u, v and w. Similar to the built-in quiver3 function.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">Properties</a></li><li><a href="#5">Example</a></li></ul></div><h2>Syntax<a name="1"></a></h2><pre>kml.quiver3d(longitude, latitude, altitude, u, v, w)
+kml.quiver3d(...,'PropertyName',PropertyValue,...)</pre><h2>Description<a name="2"></a></h2><p>Creates a quiver plot using 3D arrows, such as the one supplied with the toolbox (arrow2d.dae). The arrows are created in the coordinates defined by longitude, latitude and altitude, and are scaled using the speeds u, v and w, and the size of the grid.</p><p>It is possible to use a different arrow model with the property pair 'model', 'modelfile.dae'</p><p>The units for the angular values are normally given in degrees, but this can be changed by calling: <tt>kml.useDegrees;</tt> or <tt>kml.useRadians;</tt> before plotting. Altitude is always given in meters.</p><p>It is possible to fine tune the point properties using name-value pairs:</p><p><tt>kml.quiver3d(...,'PropertyName',PropertyValue,...)</tt></p><h2>Properties<a name="3"></a></h2><p>
+<table cellspacing="0" cellpadding="4" border="2">
+<tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+<tr><td bgcolor="#F2F2F2">'model'           </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Path to a different 3D model file representing an arrow.</td></tr>
+<tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the quiver plot inside the kml file</td></tr>
+<tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the quiver plot represents</td></tr>
+<tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the quiver plot</td></tr>
+<tr><td bgcolor="#F2F2F2">'scale'           </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the whole quiver plot</td></tr>
+<tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the quiver plot to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the quiver plot starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the quiver plot finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+</table>
+</p><h2>Example<a name="5"></a></h2><pre class="codeinput"><span class="comment">% Create a new kml object</span>
+k = kml(<span class="string">'my kml file'</span>);
+
+<span class="comment">% Create a sample quiver plot in the kml file</span>
+[x,y] = meshgrid(-2:.2:2,-1:.15:1);
+z = x .* exp(-x.^2 - y.^2);
+[px,py] = gradient(z,.2,.15);
+
+k.quiver3d(10*x,10*y,1e5+x*0,1000*px,1000*py,-cosd(x)*1e2,<span class="string">'scale'</span>,1500)
+
+<span class="comment">% Save the kml and open it in Google Earth</span>
+k.run;
+
+</pre><pre class="codeoutput">This is the result of running this example:
+</pre><img vspace="5" hspace="5" src="help_quiver3d_01.jpg" alt=""> <p><i>This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (<a href="mailto:rafael@rafael.aero">rafael@rafael.aero</a>)</i></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% kml.quiver3d
+% Creates a quiver plot using 3D arrows, in the coordinates defined by longitude, latitude and altitude,
+% and arrow sizes given by the speeds u, v and w. Similar to the built-in quiver3 function. 
+
+%% Syntax
+%  kml.quiver3d(longitude, latitude, altitude, u, v, w)
+%  kml.quiver3d(...,'PropertyName',PropertyValue,...) 
+
+%% Description
+% Creates a quiver plot using 3D arrows, such as the one supplied with the toolbox (arrow2d.dae).
+% The arrows are created in the coordinates defined by longitude, latitude and altitude,
+% and are scaled using the speeds u, v and w, and the size of the grid.
+%  
+% It is possible to use a different arrow model with the property pair 'model', 'modelfile.dae'
+%  
+% The units for the angular values are normally given in degrees, but this can be changed by calling:
+% |kml.useDegrees;| or |kml.useRadians;| before plotting. Altitude is always given in meters.
+%  
+% It is possible to fine tune the point properties using name-value pairs:
+%  
+% |kml.quiver3d(...,'PropertyName',PropertyValue,...)|
+%  
+%% Properties
+%%
+% 
+% <html>
+% <table cellspacing="0" cellpadding="4" border="2">
+% <tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+% <tr><td bgcolor="#F2F2F2">'model'           </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Path to a different 3D model file representing an arrow.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the quiver plot inside the kml file</td></tr>
+% <tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the quiver plot represents</td></tr>
+% <tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the quiver plot</td></tr>
+% <tr><td bgcolor="#F2F2F2">'scale'           </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Defines a scale factor to be applied to the whole quiver plot</td></tr>
+% <tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the quiver plot to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the quiver plot starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the quiver plot finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% </table>
+% </html>
+% 
+
+%% Example
+
+% Create a new kml object
+k = kml('my kml file');
+
+% Create a sample quiver plot in the kml file
+[x,y] = meshgrid(-2:.2:2,-1:.15:1);
+z = x .* exp(-x.^2 - y.^2);
+[px,py] = gradient(z,.2,.15);
+
+k.quiver3d(10*x,10*y,1e5+x*0,1000*px,1000*py,-cosd(x)*1e2,'scale',1500)
+
+% Save the kml and open it in Google Earth
+k.run;
+
+
+%%
+% _This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (rafael@rafael.aero)_
+##### SOURCE END #####
+--></body></html>

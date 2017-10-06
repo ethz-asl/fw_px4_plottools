@@ -1,0 +1,199 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>kml.transfer</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-08"><meta name="DC.source" content="help_transfer.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>kml.transfer</h1><!--introduction--><p>Transfer one figure axes to kml file as an image overlay.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">Properties</a></li><li><a href="#5">Example</a></li></ul></div><h2>Syntax<a name="1"></a></h2><pre>kml.transfer(axisHandle)
+kml.transfer(...,'PropertyName',PropertyValue,...)</pre><h2>Description<a name="2"></a></h2><p><tt>kml.tranfer(axisHandle)</tt> will save the axis represented by the handle axisHandle as an image, and place this image as a ground overlay in the kml file, using the axis limits to position the overlay (x axis -&gt; longitude / y axis -&gt; latitude).</p><p>The axis units will normaly be treated as degrees, but this can be changed by calling: <tt>kml.useDegrees;</tt> or <tt>kml.useRadians;</tt> before transfering the axis.</p><p>To make the overlay transparent, change the alpha portion of the color parameter to a different hex value - eg.: 50% transparent, use <tt>kml.transfer(...,'color','80FFFFFF')</tt></p><p>It is possible to fine tune the overlay properties using name-value pairs:</p><p><tt>kml.transfer(...,'PropertyName',PropertyValue,...)</tt></p><h2>Properties<a name="3"></a></h2><p>
+<table cellspacing="0" cellpadding="4" border="2">
+<tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+<tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the overlay in the kml file</td></tr>
+<tr><td bgcolor="#F2F2F2">'id'              </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Internal id of this overlay inside the kml</td></tr>
+<tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the overlay represents</td></tr>
+<tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the overlay</td></tr>
+<tr><td bgcolor="#F2F2F2">'transparentBG'   </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Remove the background of the axis, in order to preserve only the plot.</td></tr>
+<tr><td bgcolor="#F2F2F2">'keepAxis'        </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">If set to true, keep the axes when saving the image. Otherwise, they are removed in the image</td></tr>
+<tr><td bgcolor="#F2F2F2">'inPlace'         </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">If set to true, the axes will not be cloned into a new figure before plotting. This can be useful if the plot to be transfered is too heavy, but be careful that plot will erased after calling kml.transfer</td></tr>
+<tr><td bgcolor="#F2F2F2">'color'           </td><td bgcolor="#F2F2F2">kml color string</td> <td bgcolor="#F2F2F2">Defines the color of the overlay. Must be a valid hex color string input, in the style AABBGGRR </td></tr>
+<tr><td bgcolor="#F2F2F2">'altitude'        </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Altitude where the overlay should be plotted. Input in meters.</td></tr>
+<tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+<tr><td bgcolor="#F2F2F2">'drawOrder'       </td><td bgcolor="#F2F2F2">double</td>           <td bgcolor="#F2F2F2">In case more than one overlay is placed in the same location, this input defines the order on which they should be draw.</td></tr>
+<tr><td bgcolor="#F2F2F2">'rotation'        </td><td bgcolor="#F2F2F2">double</td>           <td bgcolor="#F2F2F2">Specifies a rotation of the overlay about its center. Values can be ±180° or ±pi, depending on the active unit. The default is 0 (north). Rotations are specified in a counterclockwise direction.</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the polygon to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the polygon starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+<tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the polygon finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+</table>
+</p><h2>Example<a name="5"></a></h2><pre class="codeinput"><span class="comment">% Create a new kml object</span>
+k = kml(<span class="string">'my kml file'</span>);
+
+fh = figure;
+ax = gca;
+
+<span class="comment">%Plot the Butterfly curve, &lt;en.wikipedia.org/wiki/Butterfly_curve_(transcendental)&gt;</span>
+t = linspace(0,20*pi,10000);
+display(<span class="string">'This will transfer this plot in MATLAB, keeping the background and axes'</span>)
+ph = plot(ax,sin(t).*(exp(cos(t))-2*cos(4*t)-sin(t/12).^5) ,cos(t).*(exp(cos(t))-2*cos(4*t)-sin(t/12).^5));
+xlabel(<span class="string">'longitude'</span>);
+ylabel(<span class="string">'latitude'</span>);
+snapnow;
+k.transfer(ax,<span class="string">'keepAxis'</span>,true,<span class="string">'transparentBG'</span>,false)
+
+
+display(<span class="string">'and this one also, but without axes and a transparent background'</span>)
+set(ph,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'Marker'</span>,<span class="string">'o'</span>,<span class="string">'LineStyle'</span>,<span class="string">'none'</span>)
+set(ph,<span class="string">'XData'</span>, get(ph,<span class="string">'XData'</span>)+10)
+snapnow;
+k.transfer(ax,<span class="string">'keepAxis'</span>,false,<span class="string">'transparentBG'</span>,true,<span class="string">'altitudeMode'</span>,<span class="string">'absolute'</span>,<span class="string">'altitude'</span>,10000)
+
+close(fh);
+
+<span class="comment">% Save the kml and open it in Google Earth</span>
+k.run;
+
+</pre><pre class="codeoutput">This will transfer this plot in MATLAB, keeping the background and axes
+</pre><img vspace="5" hspace="5" src="help_transfer_01.jpg" alt=""> <pre class="codeoutput">and this one also, but without axes and a transparent background
+</pre><img vspace="5" hspace="5" src="help_transfer_02.jpg" alt=""> <pre class="codeoutput">This is the result of running this example:
+</pre><img vspace="5" hspace="5" src="help_transfer_03.jpg" alt=""> <p><i>This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (<a href="mailto:rafael@rafael.aero">rafael@rafael.aero</a>)</i></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% kml.transfer
+% Transfer one figure axes to kml file as an image overlay.
+
+%% Syntax
+%  kml.transfer(axisHandle)
+%  kml.transfer(...,'PropertyName',PropertyValue,...) 
+
+%% Description
+% |kml.tranfer(axisHandle)| will save the axis represented by the handle axisHandle
+% as an image, and place this image as a ground overlay in the kml file, using the
+% axis limits to position the overlay (x axis -> longitude / y axis -> latitude).
+%  
+% The axis units will normaly be treated as degrees, but this can be changed 
+% by calling: |kml.useDegrees;| or |kml.useRadians;| before transfering the axis.
+%  
+% To make the overlay transparent, change the alpha portion of the color parameter
+% to a different hex value - eg.: 50% transparent, use |kml.transfer(...,'color','80FFFFFF')|
+%  
+% It is possible to fine tune the overlay properties using name-value pairs:
+%  
+% |kml.transfer(...,'PropertyName',PropertyValue,...)|
+%  
+%% Properties
+%%
+% 
+% <html>
+% <table cellspacing="0" cellpadding="4" border="2">
+% <tr valign="top"><th bgcolor="#B2B2B2"><b>Property Name</b></th><th bgcolor="#B2B2B2"><b>Type</b></th><th bgcolor="#B2B2B2"><b>Description</b></th></tr>
+% <tr><td bgcolor="#F2F2F2">'name'            </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Name of the overlay in the kml file</td></tr>
+% <tr><td bgcolor="#F2F2F2">'id'              </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">Internal id of this overlay inside the kml</td></tr>
+% <tr><td bgcolor="#F2F2F2">'description'     </td><td bgcolor="#F2F2F2">string</td>           <td bgcolor="#F2F2F2">A short description of what the overlay represents</td></tr>
+% <tr><td bgcolor="#F2F2F2">'visibility'      </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Control the initial visibility of the overlay</td></tr>
+% <tr><td bgcolor="#F2F2F2">'transparentBG'   </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">Remove the background of the axis, in order to preserve only the plot.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'keepAxis'        </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">If set to true, keep the axes when saving the image. Otherwise, they are removed in the image</td></tr>
+% <tr><td bgcolor="#F2F2F2">'inPlace'         </td><td bgcolor="#F2F2F2">true/false</td>       <td bgcolor="#F2F2F2">If set to true, the axes will not be cloned into a new figure before plotting. This can be useful if the plot to be transfered is too heavy, but be careful that plot will erased after calling kml.transfer</td></tr>
+% <tr><td bgcolor="#F2F2F2">'color'           </td><td bgcolor="#F2F2F2">kml color string</td> <td bgcolor="#F2F2F2">Defines the color of the overlay. Must be a valid hex color string input, in the style AABBGGRR </td></tr>
+% <tr><td bgcolor="#F2F2F2">'altitude'        </td><td bgcolor="#F2F2F2">double </td>          <td bgcolor="#F2F2F2">Altitude where the overlay should be plotted. Input in meters.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'altitudeMode'    </td><td bgcolor="#F2F2F2">string </td>          <td bgcolor="#F2F2F2">Choose if the altitude value is absolute to the earth model, relative to the ground level, or should be clamped to the ground. Valid inputs: 'absolute', 'relativeToGround', 'clampToGround'</td></tr>
+% <tr><td bgcolor="#F2F2F2">'drawOrder'       </td><td bgcolor="#F2F2F2">double</td>           <td bgcolor="#F2F2F2">In case more than one overlay is placed in the same location, this input defines the order on which they should be draw.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'rotation'        </td><td bgcolor="#F2F2F2">double</td>           <td bgcolor="#F2F2F2">Specifies a rotation of the overlay about its center. Values can be ±180° or ±pi, depending on the active unit. The default is 0 (north). Rotations are specified in a counterclockwise direction.</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeStamp'       </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Associates the polygon to a moment in time. Should not be used together with timeSpan. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>)</td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanBegin'   </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the polygon starts to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% <tr><td bgcolor="#F2F2F2">'timeSpanEnd'     </td><td bgcolor="#F2F2F2">kml date string</td>  <td bgcolor="#F2F2F2">Defines the moment in time where the polygon finishes to exist. Should not be used together with timeStamp. Should be a string in the XML time format (more information available <a href=http://code.google.com/apis/kml/documentation/kmlreference.html#timestamp>here</a>) </td></tr>
+% </table>
+% </html>
+% 
+
+
+%% Example
+
+% Create a new kml object
+k = kml('my kml file');
+
+fh = figure;
+ax = gca;
+
+%Plot the Butterfly curve, <en.wikipedia.org/wiki/Butterfly_curve_(transcendental)>
+t = linspace(0,20*pi,10000);
+display('This will transfer this plot in MATLAB, keeping the background and axes')
+ph = plot(ax,sin(t).*(exp(cos(t))-2*cos(4*t)-sin(t/12).^5) ,cos(t).*(exp(cos(t))-2*cos(4*t)-sin(t/12).^5));
+xlabel('longitude');
+ylabel('latitude');
+snapnow;
+k.transfer(ax,'keepAxis',true,'transparentBG',false)
+
+
+display('and this one also, but without axes and a transparent background')
+set(ph,'Color','r','Marker','o','LineStyle','none')
+set(ph,'XData', get(ph,'XData')+10)
+snapnow;
+k.transfer(ax,'keepAxis',false,'transparentBG',true,'altitudeMode','absolute','altitude',10000)
+
+close(fh);
+
+% Save the kml and open it in Google Earth
+k.run;
+
+
+%%
+% _This file is part of the kml toolbox. Copyright 2012 Rafael Fernandes de Oliveira (rafael@rafael.aero)_
+##### SOURCE END #####
+--></body></html>
