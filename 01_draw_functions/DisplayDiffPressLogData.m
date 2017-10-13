@@ -9,7 +9,8 @@ function DisplayDiffPressLogData(sysvector, topics, plotvector)
 if plotvector.doPressureCorrection
     [dp_raw, dp_filtered, airspeed_indicated, airspeed_true,...
         airspeed_true_unfiltered] = AirspeedTubeCorrection(sysvector, ...
-        plotvector.pressureCorrectionD, plotvector.pressureCorrectionL);
+        plotvector.pressureCorrectionD, plotvector.pressureCorrectionL,...
+        plotvector.pressureCorrectionDPSensor, plotvector.pressureCorrectionMassflow);
     figure('Name', 'Pressure Tube Correction');
     hold on;
     plot(airspeed_indicated.Time, airspeed_indicated.Data);

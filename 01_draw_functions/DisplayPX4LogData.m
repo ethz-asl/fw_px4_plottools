@@ -59,12 +59,22 @@ plotvector.autostartGoogleEarth = false;
 % *********************
 % Differential Pressure Plot Settings
 % *********************
-
+% Indicates if the differential pressure and airspeed measurements should
+% be corrected by the tube pressure loss according to: https://goo.gl/2d3WGc
 plotvector.doPressureCorrection = true;
 
-plotvector.pressureCorrectionD = 0.0011; %1mm
+% Diameter of the pitot tube
+plotvector.pressureCorrectionD = 0.0015; % [m]
 
-plotvector.pressureCorrectionL = 0.07; % 11cm
+% Length of the pitot tube
+plotvector.pressureCorrectionL = 0.27; % [m]
+
+% DP reading of the sensor (101 for SDP3X, 62 for SDP600)
+plotvector.pressureCorrectionDPSensor = 101; % [Pa]
+
+% Massflow (4.79e-7 for SDP3X, 6.17e-7 for SDP600)
+plotvector.pressureCorrectionMassflow = 4.79e-7; % [kg/s]
+
 % *********************
 % Wind Plot Settings
 % *********************
