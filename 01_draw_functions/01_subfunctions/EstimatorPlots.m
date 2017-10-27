@@ -1,10 +1,10 @@
 %% ************************************************************************
-%  DisplayEstimatorLogData
+%  EstimatorPlots
 %  ************************************************************************
 %  Display the estimator data from the log file. Assumes that
 %  successfully estimator data was logged.
 
-function DisplayEstimatorLogData(sysvector, topics)
+function EstimatorPlots(sysvector, topics)
 if topics.vehicle_attitude.logged
     %Attitude Estimate
     figure('Name', 'Estimated Attitude');

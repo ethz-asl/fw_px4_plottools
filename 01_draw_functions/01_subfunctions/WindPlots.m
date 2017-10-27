@@ -1,4 +1,4 @@
-function DisplayWindData(sysvector, plotvector)
+function WindPlots(sysvector, plotvector)
 % Display the wind data.
 % TODO: - Add airspeed vector to the vectors plot if necessary
 

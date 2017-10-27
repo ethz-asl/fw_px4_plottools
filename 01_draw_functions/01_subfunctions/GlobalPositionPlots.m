@@ -1,5 +1,5 @@
 %% ************************************************************************
-%  DisplayGlobalPositionLogData
+%  GlobalPositionPlots
 %  ************************************************************************
 %  Display the global position estimate on a 3D plot and in Google Earth.
 %  Assumes that the global position estimate was logged. If available and
@@ -11,7 +11,7 @@
 %        - Add a callback to get position and extra information (airspeed,
 %          gps velocity from a certain point in the plot.
 
-function DisplayGlobalPositionLogData(sysvector, topics, plainFileName, ...
+function GlobalPositionPlots(sysvector, topics, plainFileName, ...
     fconv_gpsalt, fconv_gpslatlong, plotvector)
 
 % resample the position, commander state and gps to 10 Hz

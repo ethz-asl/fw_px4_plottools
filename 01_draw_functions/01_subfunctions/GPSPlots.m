@@ -1,5 +1,5 @@
 %% ************************************************************************
-%  DisplayGPSLogData (nested function)
+%  GPSPlots (nested function)
 %  ************************************************************************
 %  Display the gps data from the log file. Assumes that successfully GPS
 %  data was logged.
@@ -8,7 +8,7 @@
 %        - Add a callback to get position and extra information (airspeed,
 %          gps velocity from a certain point in the plot.
 
-function DisplayGPSLogData(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector)
+function GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector)
 % 3D plot of the gps position
 figure('Name', 'GPS Position 3D');
 

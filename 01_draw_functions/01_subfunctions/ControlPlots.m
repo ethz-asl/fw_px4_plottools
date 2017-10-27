@@ -1,4 +1,4 @@
-function DisplayControlData(sysvector, fconv_gpsalt)
+function ControlPlots(sysvector, fconv_gpsalt)
 % Display the low level controller data.
 
 % cut rate and attitude setpoints

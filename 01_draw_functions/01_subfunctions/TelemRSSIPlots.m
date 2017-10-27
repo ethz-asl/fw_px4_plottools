@@ -1,4 +1,4 @@
-function DisplayTelemRSSIData(sysvector)
+function TelemRSSIPlots(sysvector)
 % Display telemetry and rc input connection data
 % TODO: - Add the 3D rc loss position plot
 

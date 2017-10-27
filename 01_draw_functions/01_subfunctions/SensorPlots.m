@@ -1,10 +1,10 @@
 %% ************************************************************************
-%  DisplayGPSLogData (nested function)
+%  SensorPlots (nested function)
 %  ************************************************************************
 %  Display the sensor data from the log file. Assumes that successfully
 %  sensor data was logged.
 
-function DisplaySensorLogData(sysvector, topics, fconv_gpsalt)
+function SensorPlots(sysvector, topics, fconv_gpsalt)
     figure('Name', 'Sensor Data');
     raw(1)=subplot(4,1,1);
     hold on;

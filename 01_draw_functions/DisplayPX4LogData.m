@@ -67,10 +67,10 @@ plotvector.doPressureCorrection = true;
 plotvector.pressureCorrectionD = 0.0015; % [m]
 
 % Length of the pitot tube
-plotvector.pressureCorrectionL = 0.27; % [m]
+plotvector.pressureCorrectionL = 0.220; % [m]
 
 % DP reading of the sensor (101 for SDP3X, 62 for SDP600)
-plotvector.pressureCorrectionDPSensor = 101; % [Pa]
+plotvector.pressureCorrectionDPSensor = 59.3314; % [Pa]
 
 % Massflow (4.79e-7 for SDP3X, 6.17e-7 for SDP600)
 plotvector.pressureCorrectionMassflow = 4.79e-7; % [kg/s]
@@ -92,35 +92,36 @@ plotvector.plotGroundSpeedVector = false;
 
 % display GPS data if it was logged
 if topics.vehicle_gps_position.logged && plotvector.gpsPlots
-    DisplayGPSLogData(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector);
+    GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector);
 end
 
 % display sensor data if it was logged
 if topics.sensor_combined.logged && plotvector.sensorPlots
-    DisplaySensorLogData(sysvector, topics, fconv_gpsalt);
+    SensorPlots(sysvector, topics, fconv_gpsalt);
 end
 
 % display differential pressure data if it was logged
-if topics.differential_pressure.logged && plotvector.differentialPressurePlots
-    DisplayDiffPressLogData(sysvector, topics, plotvector);
+if topics.differential_pressure.logged && topics.airspeed.logged...
+        && plotvector.differentialPressurePlots
+    DiffPressPlots(sysvector, topics, plotvector);
 end
 
 % display estimator data if it was logged
 if (topics.estimator_status.logged || topics.ekf2_timestamps.logged ||...
         topics.ekf2_innovations.logged || topics.vehicle_attitude.logged) && plotvector.estimatorPlots
-    DisplayEstimatorLogData(sysvector, topics);
+    EstimatorPlots(sysvector, topics);
 end
 
 % display gps and estimate on a map
 if (topics.vehicle_gps_position.logged || topics.vehicle_global_position.logged) && plotvector.globalPositionPlots
-    DisplayGlobalPositionLogData(sysvector, topics, plainFileName, fconv_gpsalt,...
+    GlobalPositionPlots(sysvector, topics, plainFileName, fconv_gpsalt,...
         fconv_gpslatlong, plotvector);
 end
 
 % display extended wind estimate
 if (topics.vehicle_gps_position.logged && topics.vehicle_local_position.logged &&...
         topics.wind_estimate.logged && plotvector.windPlots)
-    DisplayWindData(sysvector, plotvector);
+    WindPlots(sysvector, plotvector);
 end
 
 % display the controller data
@@ -128,11 +129,11 @@ if (topics.vehicle_attitude.logged && topics.vehicle_attitude_setpoint.logged &&
         topics.vehicle_rates_setpoint.logged && topics.airspeed.logged &&...
         topics.tecs_status.logged && topics.vehicle_gps_position.logged &&...
         plotvector.controllerPlots)
-    DisplayControlData(sysvector, fconv_gpsalt);
+    ControlPlots(sysvector, fconv_gpsalt);
 end
 
 if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
         topics.input_rc.logged && topics.vehicle_attitude.logged && ...
         plotvector.telemRSSIPlots)
-    DisplayTelemRSSIData(sysvector)
+    TelemRSSIPlots(sysvector)
 end
