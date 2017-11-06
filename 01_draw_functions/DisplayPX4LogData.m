@@ -12,14 +12,15 @@ function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv
 % *********************
 % Enable/Disable Plots
 % *********************
-plotvector.gpsPlots = true;
-plotvector.sensorPlots = true;
-plotvector.differentialPressurePlots = true;
-plotvector.estimatorPlots = true;
-plotvector.globalPositionPlots = true;
-plotvector.windPlots = true;
-plotvector.controllerPlots = true;
-plotvector.telemRSSIPlots = true;
+plotvector.gpsPlots = false;
+plotvector.sensorPlots = false;
+plotvector.differentialPressurePlots = false;
+plotvector.estimatorPlots = false;
+plotvector.globalPositionPlots = false;
+plotvector.windPlots = false;
+plotvector.controllerPlots = false;
+plotvector.telemRSSIPlots = false;
+plotvector.rawSensorPlots = true;
 
 
 % *********************
@@ -138,5 +139,9 @@ end
 if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
         topics.input_rc.logged && topics.vehicle_attitude.logged && ...
         plotvector.telemRSSIPlots)
-    TelemRSSIPlots(sysvector)
+    TelemRSSIPlots(sysvector);
+end
+
+if plotvector.rawSensorPlots
+   RawSensorPlots(sysvector, topics, fconv_gpsalt);
 end
