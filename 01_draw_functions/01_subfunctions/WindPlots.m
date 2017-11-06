@@ -1,16 +1,19 @@
 function WindPlots(sysvector, plotvector)
 % Display the wind data.
-% TODO: - Add airspeed vector to the vectors plot if necessary
 
 figure('Name', 'Estimated Wind 3D');
 % synchronise the data
 dt = plotvector.dtWindPlot;
 min_time = max([sysvector('wind_estimate.east').Time(1),...
     sysvector('vehicle_local_position.x').Time(1),...
-    sysvector('vehicle_gps_position.vel_n').Time(1)]);
+    sysvector('vehicle_gps_position.vel_n').Time(1),...
+    sysvector('airspeed.true_airspeed').Time(1),...
+    sysvector('vehicle_attitude.q_0').Time(1)]);
 max_time = min([sysvector('wind_estimate.east').Time(end),...
     sysvector('vehicle_local_position.x').Time(end),...
-    sysvector('vehicle_gps_position.vel_n').Time(end)]);
+    sysvector('vehicle_gps_position.vel_n').Time(end),...
+    sysvector('airspeed.true_airspeed').Time(end),...
+    sysvector('vehicle_attitude.q_0').Time(end)]);
 time_resampled = min_time:dt:max_time;
 
 pos_x = resample(sysvector('vehicle_local_position.x'), time_resampled);
@@ -21,6 +24,11 @@ wind_n = resample(sysvector('wind_estimate.north'), time_resampled);
 vel_n = resample(sysvector('vehicle_gps_position.vel_n'), time_resampled);
 vel_e = resample(sysvector('vehicle_gps_position.vel_e'), time_resampled);
 vel_d = resample(sysvector('vehicle_gps_position.vel_d'), time_resampled);
+airspeed = resample(sysvector('airspeed.true_airspeed'), time_resampled);
+q_0 = resample(sysvector('vehicle_attitude.q_0'), time_resampled);
+q_1 = resample(sysvector('vehicle_attitude.q_1'), time_resampled);
+q_2 = resample(sysvector('vehicle_attitude.q_2'), time_resampled);
+q_3 = resample(sysvector('vehicle_attitude.q_3'), time_resampled);
 
 % make z up
 pos_z.Data = -pos_z.Data;
@@ -38,15 +46,24 @@ for i=1:20
     text(pos_x.Data(i*distep),pos_y.Data(i*distep),pos_z.Data(i*distep),num2str(pos_x.Time(i*distep,1)));
 end
 
+quiver3(pos_x.Data, pos_y.Data, pos_z.Data,...
+        wind_n.Data, wind_e.Data, zeros(size(wind_n.Data)), 0);
 if plotvector.plotGroundSpeedVector
     quiver3(pos_x.Data, pos_y.Data, pos_z.Data,...
             vel_n.Data, vel_e.Data, vel_d.Data, 0);
 end
-quiver3(pos_x.Data, pos_y.Data, pos_z.Data,...
-        wind_n.Data, wind_e.Data, zeros(size(wind_n.Data)), 0);
-%TODO add 3D airspeed here if it is required
-if plotvector.plotGroundSpeedVector
-    legend('pos','v_{gnd}','v_{wind}');
+if plotvector.plotAirSpeedVector
+    [vair_x, vair_y, vair_z] = RotateVector(q_0.Data, q_1.Data, q_2.Data,...
+        q_3.Data, airspeed.Data, airspeed.Data*0.0, airspeed.Data*0.0);
+    quiver3(pos_x.Data, pos_y.Data, pos_z.Data,...
+            vair_x, vair_y, -vair_z, 0);
+end
+if plotvector.plotGroundSpeedVector && plotvector.plotAirSpeedVector
+    legend('pos','v_{wind}','v_{gnd}', 'v_{air}');
+elseif plotvector.plotGroundSpeedVector
+    legend('pos','v_{wind}','v_{gnd}');
+elseif plotvector.plotAirSpeedVector
+    legend('pos','v_{wind}','v_{air}');
 else
     legend('pos','v_{wind}');
 end
