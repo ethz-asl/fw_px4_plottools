@@ -12,14 +12,14 @@ function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv
 % *********************
 % Enable/Disable Plots
 % *********************
-plotvector.gpsPlots = false;
-plotvector.sensorPlots = false;
-plotvector.differentialPressurePlots = false;
-plotvector.estimatorPlots = false;
-plotvector.globalPositionPlots = false;
-plotvector.windPlots = false;
-plotvector.controllerPlots = false;
-plotvector.telemRSSIPlots = false;
+plotvector.gpsPlots = true;
+plotvector.sensorPlots = true;
+plotvector.differentialPressurePlots = true;
+plotvector.estimatorPlots = true;
+plotvector.globalPositionPlots = true;
+plotvector.windPlots = true;
+plotvector.controllerPlots = true;
+plotvector.telemRSSIPlots = true;
 plotvector.rawSensorPlots = true;
 
 
