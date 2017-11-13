@@ -32,7 +32,7 @@ else
         title('GPS Position Data (Colored by the GPS velocity [m/s])');
     elseif plotvector.colorModeGPS == 4
         if ~topics.airspeed.logged
-           error("The airspeed topic is not logged which is required for plotvector.colorModeGPS == 4")
+           error('The airspeed topic is not logged which is required for plotvector.colorModeGPS == 4')
         end
         
         title('GPS Position Data (Colored by the GPS velocity [m/s])');
