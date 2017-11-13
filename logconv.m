@@ -75,7 +75,7 @@ t_end = 0.0;
 % ******************
 
 % get the file name without the file ending
-plainFileName = extractBefore(fileName,'.');
+plainFileName = char(extractBefore(fileName,'.'));
 
 % conversion factors
 fconv_timestamp=1E-6;    % [microseconds] to [seconds]
@@ -380,7 +380,7 @@ function ImportPX4LogData()
     for idx_topics = 1:numel(topic_fields)
         csv_file = ...
             [plainFileName '_' topics.(topic_fields{idx_topics}).topic_name...
-            '_' num2str(vehicleID) '.csv'];
+            '_' char(num2str(vehicleID)) '.csv'];
         if exist(csv_file, 'file') == 2
             try
                 csv_data = tdfread(csv_file, ',');
