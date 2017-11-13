@@ -364,12 +364,17 @@ function ImportPX4LogData()
     % convert the log file to csv files
     % *********************************
     if (loadingMode~=1) && (loadingMode~=2)
+        tic;
         system(sprintf('ulog2csv 04_log_files%s%s -o 05_csv_files', pathDelimiter, fileName));
+        time_csv_conversion = toc;
+        disp(['INFO: Converting the ulog file to csv took ' char(num2str(time_csv_conversion)) ' s.'])
     end
     
     % *********************************
     % unpack the csv files
     % *********************************
+    disp('INFO: Starting to import the csv data into matlab.')
+    tic;
     topic_fields = fieldnames(topics);
     
     if numel(topic_fields) == 0
@@ -426,6 +431,9 @@ function ImportPX4LogData()
        ts_temp.Name = 'commander_state.main_state';
        sysvector('commander_state.main_state') = ts_temp;
     end
+
+    time_csv_import = toc;
+    disp(['INFO: Importing the csv data to matlab took ' char(num2str(time_csv_import)) ' s.'])
 
     % check that we have a nonempy sysvector
     if (loadingMode~=1) && (loadingMode~=2)
