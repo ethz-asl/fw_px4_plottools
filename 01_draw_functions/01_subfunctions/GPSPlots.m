@@ -88,22 +88,30 @@ grid on;
 
 fig3 = figure(3);
 fig3.Name = 'GPS Accuracy/DOP';
-raw(1)=subplot(4,1,1);
+raw(1)=subplot(6,1,1);
 plot(sysvector('vehicle_gps_position.eph').Time,sysvector('vehicle_gps_position.eph').Data);
 title('GPS horizontal position accuracy (eph) [m]');
 
-raw(2)=subplot(4,1,2);
+raw(2)=subplot(6,1,2);
 plot(sysvector('vehicle_gps_position.epv').Time,sysvector('vehicle_gps_position.epv').Data);
 title('GPS vertical position accuracy (epv) [m]');
 
-raw(3)=subplot(4,1,3);
+raw(3)=subplot(6,1,3);
 plot(sysvector('vehicle_gps_position.hdop').Time,sysvector('vehicle_gps_position.hdop').Data);
 title('Horizontal dilution of precision (hdop)');
 
-raw(4)=subplot(4,1,4);
+raw(4)=subplot(6,1,4);
 plot(sysvector('vehicle_gps_position.vdop').Time,sysvector('vehicle_gps_position.vdop').Data);
 title('Vertical dilution of precision (vdop)');
 
-linkaxes([raw(1) raw(2) raw(3) raw(4)],'x');
+raw(5)=subplot(6,1,5);
+plot(sysvector('vehicle_gps_position.fix_type').Time,sysvector('vehicle_gps_position.fix_type').Data);
+title('GPS fix type');
+
+raw(6)=subplot(6,1,6);
+plot(sysvector('vehicle_gps_position.satellites_used').Time,sysvector('vehicle_gps_position.satellites_used').Data);
+title('GPS number of used satellites');
+
+linkaxes([raw(1) raw(2) raw(3) raw(4) raw(5) raw(6)],'x');
 set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');   
 end
