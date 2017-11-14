@@ -5,7 +5,8 @@
 %  sensor data was logged.
 
 function SensorPlots(sysvector, topics, fconv_gpsalt)
-    figure('Name', 'Sensor Data');
+    fig4 = figure(4);
+    fig4.Name = 'Sensor Data';
     raw(1)=subplot(4,1,1);
     hold on;
     plot(sysvector('sensor_combined.mag_0').Time,sysvector('sensor_combined.mag_0').Data);

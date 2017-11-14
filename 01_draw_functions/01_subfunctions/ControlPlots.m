@@ -22,7 +22,8 @@ yawRef = getsampleusingtime(sysvector('vehicle_attitude_setpoint.yaw_body'),...
     sysvector('vehicle_attitude.yawspeed').Time(1), sysvector('vehicle_attitude.yawspeed').Time(end));
 yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
-figure('Name', 'Attitude and Rate Control');
+fig16 = figure(16);
+fig16.Name = 'Attitude and Rate Control';
 % rates plot
 control(1) = subplot(4,1,1);
 hold on;
@@ -75,7 +76,8 @@ linkaxes(control(:),'x');
 set(control(:),'XGrid','on','YGrid','on','ZGrid','on');
 
 
-figure('Name', 'Airspeed Control');
+fig17 = figure(17);
+fig17.Name = 'Airspeed Control';
 % altitude plot
 hold on;
 plot(sysvector('vehicle_global_position.alt').Time, sysvector('vehicle_global_position.alt').Data);

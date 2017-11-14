@@ -24,6 +24,17 @@ plotvector.rawSensorPlots = true;
 
 
 % *********************
+% Link the Figure Axis Settings
+% *********************
+% Link the axes of different figure
+plotvector.linkAxes = true;
+
+% The figures for which the axes should be linked specified by the figure
+% number
+plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18 ,19];
+
+
+% *********************
 % GPS Plot Settings
 % *********************
 % Color mode for the 3D gps plot
@@ -136,12 +147,18 @@ if (topics.vehicle_attitude.logged && topics.vehicle_attitude_setpoint.logged &&
     ControlPlots(sysvector, fconv_gpsalt);
 end
 
+% display the telemetry data
 if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
         topics.input_rc.logged && topics.vehicle_attitude.logged && ...
         plotvector.telemRSSIPlots)
     TelemRSSIPlots(sysvector);
 end
 
+% display the raw sensor data
 if plotvector.rawSensorPlots
    RawSensorPlots(sysvector, topics, fconv_gpsalt);
+end
+
+if plotvector.linkAxes
+   LinkFigureAxes(plotvector);
 end

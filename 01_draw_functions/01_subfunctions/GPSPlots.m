@@ -10,7 +10,8 @@
 
 function GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector)
 % 3D plot of the gps position
-figure('Name', 'GPS Position 3D');
+fig1 = figure(1);
+fig1.Name = 'GPS Position 3D';
 
 if plotvector.colorModeGPS == 2
     plot3(double(sysvector('vehicle_gps_position.lat').Data)*fconv_gpslatlong, ...
@@ -74,7 +75,8 @@ axis([min_lat+0.5*(max_lat-min_lat-diff_plot) min_lat+0.5*(max_lat-min_lat+diff_
     min_lon+0.5*(max_lon-min_lon-diff_plot) min_lon+0.5*(max_lon-min_lon+diff_plot) -inf inf])
 
 % GPS velocity plot
-figure('Name', 'GPS Velocity');
+fig2 = figure(2);
+fig2.Name = 'GPS Velocity';
 hold on;
 plot(sysvector('vehicle_gps_position.vel_n').Time,sysvector('vehicle_gps_position.vel_n').Data);
 plot(sysvector('vehicle_gps_position.vel_e').Time,sysvector('vehicle_gps_position.vel_e').Data);
@@ -84,7 +86,8 @@ title('GPS Velocity (NED frame) [m/sec]');
 legend('V_N','V_E','V_D');
 grid on;
 
-figure('Name', 'GPS Accuracy/DOP');
+fig3 = figure(3);
+fig3.Name = 'GPS Accuracy/DOP';
 raw(1)=subplot(4,1,1);
 plot(sysvector('vehicle_gps_position.eph').Time,sysvector('vehicle_gps_position.eph').Data);
 title('GPS horizontal position accuracy (eph) [m]');

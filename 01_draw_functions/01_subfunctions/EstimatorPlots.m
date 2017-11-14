@@ -7,7 +7,8 @@
 function EstimatorPlots(sysvector, topics)
 if topics.vehicle_attitude.logged
     %Attitude Estimate
-    figure('Name', 'Estimated Attitude');
+    fig9 = figure(9);
+    fig9.Name = 'Estimated Attitude';
     [pitch, roll, yaw] = ...
         QuaternionToEuler(sysvector('vehicle_attitude.q_0'), sysvector('vehicle_attitude.q_1'),...
         sysvector('vehicle_attitude.q_2'), sysvector('vehicle_attitude.q_3'));
@@ -24,7 +25,8 @@ end
 
 if topics.estimator_status.logged
     % States
-    figure('Name', 'Estimated States');
+    fig10 = figure(10);
+    fig10.Name = 'Estimated States';
     state(1) = subplot(3,3,1);
     hold on;
     plot(sysvector('estimator_status.states_7').Time,sysvector('estimator_status.states_7').Data);
@@ -86,7 +88,8 @@ if topics.estimator_status.logged
     set(state(:),'XGrid','on','YGrid','on','ZGrid','on');
 
     % Covariances
-    figure('Name', 'Estimated Covariances');
+    fig11 = figure(11);
+    fig11.Name = 'Estimated Covariances';
     state(1) = subplot(3,3,1);
     hold on;
     plot(sysvector('estimator_status.covar_7').Time,sysvector('estimator_status.covar_7').Data);
@@ -150,7 +153,8 @@ end
 
 % plot the relative timestamps
 if topics.ekf2_timestamps.logged
-    figure('Name', 'Estimator Relative Timestamps');
+    fig12 = figure(12);
+    fig12.Name = 'Estimator Relative Timestamps';
     timestamp_rel(1) = subplot(3,2,1);
     plot(sysvector('ekf2_timestamps.airspeed_timestamp_rel').Time,...
         sysvector('ekf2_timestamps.airspeed_timestamp_rel').Data*0.1);
