@@ -31,7 +31,7 @@ if topics.commander_state.logged && (plotvector.colorModeGlobalPosition == 0)
 end
 time_resampled = min_time:0.1:max_time;
 
-if topics.vehicle_gps_position.logged && plotvector.plotGPSReference
+if topics.vehicle_gps_position.logged
     gps_lat = resample(sysvector('vehicle_gps_position.lat')*fconv_gpslatlong, time_resampled);
     gps_lon = resample(sysvector('vehicle_gps_position.lon')*fconv_gpslatlong, time_resampled);
     gps_alt = resample(sysvector('vehicle_gps_position.alt')*fconv_gpsalt, time_resampled);
@@ -105,7 +105,8 @@ end
 
 % 3D plot of the global position estimate
 if topics.vehicle_global_position.logged
-    figure('Name', 'Estimated Position 3D Plot');
+    fig13 = figure(13);
+    fig13.Name = 'Estimated Position 3D Plot';
     switch(plotvector.colorModeGlobalPosition)
         case 0
             % plot global position estimate
@@ -290,6 +291,37 @@ if plotvector.autostartGoogleEarth
     catch
         warning('Could not open the generated .kmz file in Google Earth, is it installed?')
     end
+end
+
+
+if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
+    fig20 = figure(20);
+    fig20.Name = 'Estimated Position 2D Plot';
+    pos(1) = subplot(3,1,1);
+    hold on;
+    plot(pos_lat.Time,pos_lat.Data);
+    plot(gps_lat.Time,gps_lat.Data);
+    hold off;
+    legend('Estimated','GPS');
+    title('Pos lat [m]');
+    pos(2) = subplot(3,1,2);
+    hold on;
+    plot(pos_lon.Time,pos_lon.Data);
+    plot(gps_lon.Time,gps_lon.Data);
+    hold off;
+    legend('Estimated','GPS');
+    title('Pos lon [m]');
+    pos(3) = subplot(3,1,3);
+    hold on;
+    plot(pos_alt.Time,pos_alt.Data);
+    plot(gps_alt.Time,gps_alt.Data);
+    hold off;
+    legend('Estimated','GPS');
+    title('Pos alt [m]');
+
+    linkaxes(pos(:),'x');
+    set(pos(:),'XGrid','on','YGrid','on','ZGrid','on');
+
 end
 
 % move kml file to appropriate folder

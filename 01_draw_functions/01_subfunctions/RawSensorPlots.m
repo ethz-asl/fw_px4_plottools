@@ -1,9 +1,8 @@
 function RawSensorPlots(sysvector, topics, fconv_gpsalt)
 % Display the raw sensor measurements
 
-
-figure('Name', 'Raw Sensor Data');
-    figure('Name', 'Sensor Data');
+    fig19 = figure(19);
+    fig19.Name = 'Raw Sensor Data';
     raw(1)=subplot(4,1,1);
     if topics.sensor_mag.logged
         hold on;
@@ -35,8 +34,8 @@ figure('Name', 'Raw Sensor Data');
     title('Gyroscopes [rad/s]');
     legend('x','y','z');
     raw(4)=subplot(4,1,4);
-    hold on;
-    if topics.sensor_baro.logged 
+    if topics.sensor_baro.logged
+        hold on;
         plot(sysvector('sensor_combined.baro_alt').Time,sysvector('sensor_combined.baro_alt').Data);
         if topics.vehicle_gps_position.logged
             plot(sysvector('vehicle_gps_position.alt').Time,double(sysvector('vehicle_gps_position.alt').Data)*fconv_gpsalt,'color','red');
