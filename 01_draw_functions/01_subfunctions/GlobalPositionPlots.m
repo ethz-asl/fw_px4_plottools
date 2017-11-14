@@ -46,7 +46,7 @@ end
 switch(plotvector.colorModeGlobalPosition)
     case 0
         if ~topics.commander_state.logged
-            error("DisplayGlobalPositionLogData: The commander_state topic needs to be logged for using plotvector.colorModeGlobalPosition = 0")
+            error('DisplayGlobalPositionLogData: The commander_state topic needs to be logged for using plotvector.colorModeGlobalPosition = 0')
         end
         % define colors for plotting
         colors_rgb = 1/255.0 * ...
@@ -84,7 +84,7 @@ switch(plotvector.colorModeGlobalPosition)
         color = sqrt(vel_n.Data.^2+vel_e.Data.^2+vel_d.Data.^2);
     case 4
         if (~topics.airspeed.logged) || (~topics.vehicle_global_position.logged)
-           error("The airspeed and global position topic are required for plotvector.colorModeGlobalPosition == 4")
+           error('The airspeed and global position topic are required for plotvector.colorModeGlobalPosition == 4')
         end
         
         % interpolate airspeed
@@ -100,7 +100,7 @@ switch(plotvector.colorModeGlobalPosition)
         airspeed = resample(airspeed, pos_lat.Time);
         color = airspeed.Data;
     otherwise
-        error("DisplayGlobalPositionLogData: Invalid plotvector.colorModeGlobalPosition.")
+        error('DisplayGlobalPositionLogData: Invalid plotvector.colorModeGlobalPosition.')
 end
 
 % 3D plot of the global position estimate
