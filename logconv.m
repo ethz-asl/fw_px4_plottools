@@ -23,7 +23,7 @@ path(path,'07_kmz_files');
 % ************************************************************************
 
 % set the path to your log file here file here
-fileName = '13_35_39.ulg';
+fileName = 'log001.ulg';
 
 % the source from which the data is imported
 % 0: converting the ulog to csv files and then parsing the csv files
@@ -33,7 +33,7 @@ fileName = '13_35_39.ulg';
 % 2: import the data from the .mat file
 %    (requires the generated .mat file)
 % else: Defaults to 0
-loadingMode = 2;
+loadingMode = 0;
 
 % Print information while converting/loading the log file in mode 0 or 1.
 % Helpfull to identify field missmatchs.
@@ -61,8 +61,8 @@ generatePlots = true;
 
 % only plot the logged data from t_start to t_end. If both are set to 0.0
 % all the logged data is plotted.
-t_start = 640.0;
-t_end = 650.0;
+t_start = 0.0;
+t_end = 0.0;
 
 % change topic names or add new topics in the setupTopics function.
 
