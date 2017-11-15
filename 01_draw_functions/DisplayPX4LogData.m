@@ -16,6 +16,7 @@ plotvector.gpsPlots = true;
 plotvector.sensorPlots = true;
 plotvector.differentialPressurePlots = true;
 plotvector.estimatorPlots = true;
+plotvector.estimatorStatusPlots = true;
 plotvector.globalPositionPlots = true;
 plotvector.windPlots = true;
 plotvector.controllerPlots = true;
@@ -31,7 +32,8 @@ plotvector.linkAxes = true;
 
 % The figures for which the axes should be linked specified by the figure
 % number
-plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18 ,19, 20];
+plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ...
+    15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26];
 
 
 % *********************
@@ -159,6 +161,12 @@ if plotvector.rawSensorPlots
    RawSensorPlots(sysvector, topics, fconv_gpsalt);
 end
 
+% display estimator status data if it was logged
+if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
+    EstimatorStatusPlots(sysvector, topics);
+end
+
+% link the axes of the different figures
 if plotvector.linkAxes
    LinkFigureAxes(plotvector);
 end
