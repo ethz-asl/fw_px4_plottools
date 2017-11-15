@@ -12,5 +12,5 @@ function LinkFigureAxes(plotvector)
             % do nothing (could display here that figure does not exist)
         end
     end
-    linkaxes(ax);
+    linkaxes(ax, 'x');
 end
