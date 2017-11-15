@@ -303,14 +303,14 @@ if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
     plot(gps_lat.Time,gps_lat.Data);
     hold off;
     legend('Estimated','GPS');
-    title('Pos lat [m]');
+    title('Pos lat [deg]');
     pos(2) = subplot(3,1,2);
     hold on;
     plot(pos_lon.Time,pos_lon.Data);
     plot(gps_lon.Time,gps_lon.Data);
     hold off;
     legend('Estimated','GPS');
-    title('Pos lon [m]');
+    title('Pos lon [deg]');
     pos(3) = subplot(3,1,3);
     hold on;
     plot(pos_alt.Time,pos_alt.Data);
