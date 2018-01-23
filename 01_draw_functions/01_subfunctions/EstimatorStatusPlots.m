@@ -48,7 +48,7 @@ if topics.estimator_status.logged
     set(gps_check(:), 'XGrid','on','YGrid','on','ZGrid','on');
     
     % control_mode_flags
-    control_mode_bits = de2bi(sysvector('estimator_status.control_mode_flags').Data,19);
+    control_mode_bits = de2bi(sysvector('estimator_status.control_mode_flags').Data,20);
     fig23 = figure(23);
     fig23.Name = 'Control Mode Flags';
     
@@ -60,9 +60,9 @@ if topics.estimator_status.logged
         string('LPOS from Ext Vision Fused'), string('Yaw from Ext Vision Fused'),...
         string('Height from Ext Vision Fused'), string('Synthetic Sideslip Fused'),...
         string('Magnetometer updates only Mag States'), string('Fixed Wing'),...
-        string('Mag Fault')];
+        string('Mag Fault'), string('Airspeed Fused')];
     
-    for i = 1:19
+    for i = 1:20
         control_modes(i) = subplot(5,4,i);
         plot(sysvector('estimator_status.control_mode_flags').Time,control_mode_bits(:,i));
         title(titles(i))
