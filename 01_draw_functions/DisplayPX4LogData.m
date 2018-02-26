@@ -19,7 +19,7 @@ plotvector.estimatorPlots = true;
 plotvector.estimatorStatusPlots = true;
 plotvector.globalPositionPlots = true;
 plotvector.windPlots = true;
-plotvector.controllerPlots = true;
+plotvector.controlPlots = true;
 plotvector.telemRSSIPlots = true;
 plotvector.rawSensorPlots = true;
 plotvector.cpuLoadPlots = true;
@@ -136,6 +136,11 @@ if (topics.estimator_status.logged || topics.ekf2_timestamps.logged ||...
     EstimatorPlots(sysvector, topics);
 end
 
+% display estimator status data if it was logged
+if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
+    EstimatorStatusPlots(sysvector, topics);
+end
+
 % display gps and estimate on a map
 if (topics.vehicle_gps_position.logged || topics.vehicle_global_position.logged) && plotvector.globalPositionPlots
     GlobalPositionPlots(sysvector, topics, plainFileName, fconv_gpsalt,...
@@ -152,7 +157,7 @@ end
 if (topics.vehicle_attitude.logged && topics.vehicle_attitude_setpoint.logged &&...
         topics.vehicle_rates_setpoint.logged && topics.airspeed.logged &&...
         topics.tecs_status.logged && topics.vehicle_gps_position.logged &&...
-        plotvector.controllerPlots)
+        plotvector.controlPlots)
     ControlPlots(sysvector, fconv_gpsalt);
 end
 
@@ -166,11 +171,6 @@ end
 % display the raw sensor data
 if plotvector.rawSensorPlots
    RawSensorPlots(sysvector, topics, fconv_gpsalt);
-end
-
-% display estimator status data if it was logged
-if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
-    EstimatorStatusPlots(sysvector, topics);
 end
 
 % cpu load plots

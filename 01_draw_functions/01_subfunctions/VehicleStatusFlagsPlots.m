@@ -5,67 +5,67 @@ fig30 = figure(30);
 fig30.Name = 'Condition Vehicle Status Flags';
 
 condition_flags(1) = subplot(7,2,1);
-plot(sysvector('vehicle_status_flags.condition_calibration_enabled'));
+plot(sysvector('vehicle_status_flags_0.condition_calibration_enabled'));
 ylabel(' ')
 title('Calibration Enabled')
 
 condition_flags(2) = subplot(7,2,2);
-plot(sysvector('vehicle_status_flags.condition_system_sensors_initialized'));
+plot(sysvector('vehicle_status_flags_0.condition_system_sensors_initialized'));
 ylabel(' ')
 title('System Sensor Initialzed')
 
 condition_flags(3) = subplot(7,2,3);
-plot(sysvector('vehicle_status_flags.condition_system_prearm_error_reported'));
+plot(sysvector('vehicle_status_flags_0.condition_system_prearm_error_reported'));
 ylabel(' ')
 title('Prearm Error Reported')
 
 condition_flags(4) = subplot(7,2,4);
-plot(sysvector('vehicle_status_flags.condition_system_hotplug_timeout'));
+plot(sysvector('vehicle_status_flags_0.condition_system_hotplug_timeout'));
 ylabel(' ')
 title('Hotplug Timeout')
 
 condition_flags(5) = subplot(7,2,5);
-plot(sysvector('vehicle_status_flags.condition_system_returned_to_home'));
+plot(sysvector('vehicle_status_flags_0.condition_system_returned_to_home'));
 ylabel(' ')
 title('Return to Home')
 
 condition_flags(6) = subplot(7,2,6);
-plot(sysvector('vehicle_status_flags.condition_auto_mission_available'));
+plot(sysvector('vehicle_status_flags_0.condition_auto_mission_available'));
 ylabel(' ')
 title('Auto Mission Available')
 
 condition_flags(7) = subplot(7,2,7);
-plot(sysvector('vehicle_status_flags.condition_global_position_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_global_position_valid'));
 ylabel(' ')
 title('Global Position Valid')
 
 condition_flags(8) = subplot(7,2,8);
-plot(sysvector('vehicle_status_flags.condition_global_velocity_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_global_velocity_valid'));
 ylabel(' ')
 title('Global Velocity Valid')
 
 condition_flags(9) = subplot(7,2,9);
-plot(sysvector('vehicle_status_flags.condition_home_position_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_home_position_valid'));
 ylabel(' ')
 title('Home Position Valid')
 
 condition_flags(10) = subplot(7,2,10);
-plot(sysvector('vehicle_status_flags.condition_local_position_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_local_position_valid'));
 ylabel(' ')
 title('Local Position Valid')
 
 condition_flags(11) = subplot(7,2,11);
-plot(sysvector('vehicle_status_flags.condition_local_velocity_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_local_velocity_valid'));
 ylabel(' ')
 title('Local Velicity Valid')
 
 condition_flags(12) = subplot(7,2,12);
-plot(sysvector('vehicle_status_flags.condition_local_altitude_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_local_altitude_valid'));
 ylabel(' ')
 title('Local Altitude Valid')
 
 condition_flags(12) = subplot(7,2,12);
-plot(sysvector('vehicle_status_flags.condition_power_input_valid'));
+plot(sysvector('vehicle_status_flags_0.condition_power_input_valid'));
 ylabel(' ')
 title('Power Input Valid')
 
@@ -76,37 +76,37 @@ fig31 = figure(31);
 fig31.Name = 'Circuit Breaker Vehicle Status Flags';
 
 cbk_flags(1) = subplot(4,2,1);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_power_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_power_check'));
 ylabel(' ')
 title('Power Check')
 
 cbk_flags(2) = subplot(4,2,2);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_airspd_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_airspd_check'));
 ylabel(' ')
 title('Airspeed Check')
 
 cbk_flags(3) = subplot(4,2,3);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_enginefailure_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_enginefailure_check'));
 ylabel(' ')
 title('Engine Failure Check')
 
 cbk_flags(4) = subplot(4,2,4);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_gpsfailure_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_gpsfailure_check'));
 ylabel(' ')
 title('GPS Failure Check')
 
 cbk_flags(5) = subplot(4,2,5);
-plot(sysvector('vehicle_status_flags.circuit_breaker_flight_termination_disabled'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_flight_termination_disabled'));
 ylabel(' ')
 title('Flight Termination Disabled')
 
 cbk_flags(6) = subplot(4,2,6);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_usb_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_usb_check'));
 ylabel(' ')
 title('USB Check')
 
 cbk_flags(7) = subplot(4,2,7);
-plot(sysvector('vehicle_status_flags.circuit_breaker_engaged_posfailure_check'));
+plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_posfailure_check'));
 ylabel(' ')
 title('Position Failure Check')
 
@@ -117,42 +117,42 @@ fig32 = figure(32);
 fig32.Name = 'Other Vehicle Status Flags';
 
 other_flags(1) = subplot(4,2,1);
-plot(sysvector('vehicle_status_flags.offboard_control_signal_found_once'));
+plot(sysvector('vehicle_status_flags_0.offboard_control_signal_found_once'));
 ylabel(' ')
 title('Offboard Control Signal Found Once')
 
 other_flags(2) = subplot(4,2,2);
-plot(sysvector('vehicle_status_flags.offboard_control_signal_lost'));
+plot(sysvector('vehicle_status_flags_0.offboard_control_signal_lost'));
 ylabel(' ')
 title('Offboard Control Signal Lost')
 
 other_flags(3) = subplot(4,2,3);
-plot(sysvector('vehicle_status_flags.offboard_control_set_by_command'));
+plot(sysvector('vehicle_status_flags_0.offboard_control_set_by_command'));
 ylabel(' ')
 title('Offboard Control Set by Command')
 
 other_flags(4) = subplot(4,2,4);
-plot(sysvector('vehicle_status_flags.offboard_control_loss_timeout'));
+plot(sysvector('vehicle_status_flags_0.offboard_control_loss_timeout'));
 ylabel(' ')
 title('Offboard Control Loss Timeout')
 
 other_flags(5) = subplot(4,2,5);
-plot(sysvector('vehicle_status_flags.rc_signal_found_once'));
+plot(sysvector('vehicle_status_flags_0.rc_signal_found_once'));
 ylabel(' ')
 title('RC Signal Found Once')
 
 other_flags(6) = subplot(4,2,6);
-plot(sysvector('vehicle_status_flags.rc_input_blocked'));
+plot(sysvector('vehicle_status_flags_0.rc_input_blocked'));
 ylabel(' ')
 title('RC Input Blocked')
 
 other_flags(7) = subplot(4,2,7);
-plot(sysvector('vehicle_status_flags.vtol_transition_failure'));
+plot(sysvector('vehicle_status_flags_0.vtol_transition_failure'));
 ylabel(' ')
 title('VTOL Transition Failure')
 
 other_flags(8) = subplot(4,2,8);
-plot(sysvector('vehicle_status_flags.usb_connected'));
+plot(sysvector('vehicle_status_flags_0.usb_connected'));
 ylabel(' ')
 title('USB Connected')
 

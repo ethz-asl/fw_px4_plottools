@@ -5,8 +5,9 @@ fig27 = figure(27);
 fig27.Name = 'CPU Load';
 
 hold on;
-plot(sysvector('cpuload.load').Time, sysvector('cpuload.load').Data); 
-plot(sysvector('cpuload.ram_usage').Time, sysvector('cpuload.ram_usage').Data);
+plot(sysvector('cpuload_0.load')); 
+plot(sysvector('cpuload_0.ram_usage'));
+xlabel('time [s]')
 hold off;
 ylim([0, 1]);
 legend('CPU Load', 'RAM');
