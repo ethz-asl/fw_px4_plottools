@@ -1,5 +1,9 @@
 % This Matlab Script can be used to import the binary logged values of the
 % PX4FMU into data that can be plotted and analyzed.
+% TODO:
+% - propper multi id printing
+% - properly handle if a topic is not logged
+% - Improve parsing the csv files and get rid of the topics mapping
 
 %% ************************************************************************
 % logconv: Main function
@@ -40,6 +44,7 @@ loadingMode = 0;
 % 0: mapping for the latest master
 % 1: mapping for the 1.65 release
 % 2: mapping for the master at 2017.11.22
+% 3: mapping for the master at 2018.02.23
 topicMapping = 0;
 
 % Print information while converting/loading the log file in mode 0 or 1.
@@ -53,8 +58,8 @@ saveMatlabData = true;
 % delete the csv file after a run of the script
 deleteCSVFiles = true;
 
-% id of the vehicle (note displaying the logs multiple vehicles at the same
-% time is not supported yet)
+% id of the vehicle (wrong, this is the multi id and should be removed and
+%   properly handled in the script)
 vehicleID = 0;
 
 % delimiter for the path
@@ -109,6 +114,8 @@ else
             topics = setupTopicsV1p65();
         case 2
             topics = setupTopics20171122();
+        case 3
+            topics = setupTopics20180224();
         otherwise
             error('Invalid topicMapping value')
     end

@@ -22,6 +22,12 @@ plotvector.windPlots = true;
 plotvector.controllerPlots = true;
 plotvector.telemRSSIPlots = true;
 plotvector.rawSensorPlots = true;
+plotvector.cpuLoadPlots = true;
+plotvector.distanceSensorPlots = true;
+plotvector.missionResultPlots = true;
+plotvector.vehicleStatusFlags = true;
+plotvector.magVsThrustPlots = true;
+plotvector.powerPlots = true;
 
 
 % *********************
@@ -33,7 +39,8 @@ plotvector.linkAxes = true;
 % The figures for which the axes should be linked specified by the figure
 % number
 plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ...
-    15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26];
+    15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,...
+    32, 33, 34];
 
 
 % *********************
@@ -164,6 +171,36 @@ end
 % display estimator status data if it was logged
 if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
     EstimatorStatusPlots(sysvector, topics);
+end
+
+% cpu load plots
+if (topics.cpuload.logged && plotvector.cpuLoadPlots)
+    CpuLoadPlots(sysvector);
+end
+
+% distance sensor plots
+if (topics.distance_sensor.logged && plotvector.distanceSensorPlots)
+    DistanceSensorPlots(sysvector);
+end
+
+% mission result plots
+if (topics.mission_result.logged && plotvector.missionResultPlots)
+    MissionResultPlots(sysvector);
+end
+
+% vehicle status flags
+if (topics.vehicle_status_flags.logged && plotvector.vehicleStatusFlags)
+    VehicleStatusFlagsPlots(sysvector);
+end
+
+% mag norm versus thrust plot
+if (topics.actuator_controls.logged && topics.sensor_mag.logged && plotvector.magVsThrustPlots)
+    MagVsThrustPlots(sysvector);
+end
+
+% power plots
+if (topics.battery_status.logged && plotvector.powerPlots)
+    PowerPlots(sysvector);
 end
 
 % link the axes of the different figures
