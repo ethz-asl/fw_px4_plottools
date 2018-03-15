@@ -16,21 +16,22 @@ function logconv()
 clc;
 clear all;
 close all;
-path(path,'01_draw_functions');
-path(path,'01_draw_functions/01_subfunctions');
-path(path,'02_helper_functions');
-path(path,'02_helper_functions/01_topics_mapping');
-path(path,'03_kmltoolbox_v2.6');
-path(path,'04_log_files');
-path(path,'05_csv_files');
-path(path,'06_mat_files');
-path(path,'07_kmz_files');
+
+addpath(genpath('01_draw_functions'));
+addpath(genpath('02_helper_functions'));
+addpath(genpath('03_kmltoolbox_v2.6'));
+addpath(genpath('04_log_files'));
+addpath(genpath('05_csv_files'));
+addpath(genpath('06_mat_files'));
+addpath(genpath('07_kmz_files'));
 
 % ************************************************************************
 % SETTINGS (modify necessary parameter)
 % ************************************************************************
 
-% set the path to your log file here file here
+% set the path to your log file here file here, the log file must be in the
+% 04_log_files or one of its subfolders. If it is located in a subfolder
+% the path from the level of the 04_log_files needs to be specified here.
 fileName = 'log001.ulg';
 
 % the source from which the data is imported
@@ -78,8 +79,14 @@ t_end = 0.0;
 % Import the data
 % ******************
 
-% get the file name without the file ending
-plainFileName = char(extractBefore(fileName,'.'));
+% get the file name without the file ending and path
+plainFileName = fileName;
+
+while (contains(plainFileName, pathDelimiter))
+    plainFileName = extractAfter(plainFileName, pathDelimiter);
+end
+
+plainFileName = char(extractBefore(plainFileName,'.'));
 
 % conversion factors
 fconv_timestamp=1E-6;    % [microseconds] to [seconds]
@@ -135,7 +142,7 @@ function ImportPX4LogData()
     disp('INFO: Start importing the log data.')
     
     if exist(fileName, 'file') ~= 2
-        error('Log file does not exist.')
+        error('Log file does not exist: %s', fileName)
     end
 
     % *********************************
