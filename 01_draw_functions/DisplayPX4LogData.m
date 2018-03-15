@@ -165,7 +165,7 @@ end
 if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
         topics.input_rc.logged && topics.vehicle_attitude.logged && ...
         plotvector.telemRSSIPlots)
-    TelemRSSIPlots(sysvector);
+    TelemRSSIPlots(sysvector, topics);
 end
 
 % display the raw sensor data

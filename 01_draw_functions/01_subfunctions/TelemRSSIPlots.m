@@ -1,4 +1,4 @@
-function TelemRSSIPlots(sysvector)
+function TelemRSSIPlots(sysvector, topics)
 % Display telemetry and rc input connection data
 % TODO: - Add the 3D rc loss position plot
 
@@ -21,8 +21,16 @@ plot(sysvector('telemetry_status_0.rssi').Time, sysvector('telemetry_status_0.rs
 plot(sysvector('telemetry_status_0.remote_rssi').Time, sysvector('telemetry_status_0.remote_rssi').Data);
 plot(sysvector('telemetry_status_0.noise').Time, sysvector('telemetry_status_0.noise').Data);
 plot(sysvector('telemetry_status_0.remote_noise').Time, sysvector('telemetry_status_0.remote_noise').Data);
+if topics.telemetry_status.num_instances > 1
+    plot(sysvector('telemetry_status_1.rssi').Time, sysvector('telemetry_status_1.rssi').Data);
+    plot(sysvector('telemetry_status_1.remote_rssi').Time, sysvector('telemetry_status_1.remote_rssi').Data);
+    plot(sysvector('telemetry_status_1.noise').Time, sysvector('telemetry_status_1.noise').Data);
+    plot(sysvector('telemetry_status_1.remote_noise').Time, sysvector('telemetry_status_1.remote_noise').Data);
+    legend('TEL0 RSSI','TEL0 Remote RSSI', 'TEL0 Noise', 'TEL0 Remote Noise', 'TEL1 RSSI','TEL1 Remote RSSI', 'TEL1 Noise', 'TEL1 Remote Noise');
+else
+    legend('TEL0 RSSI','TEL0 Remote RSSI', 'TEL0 Noise', 'TEL0 Remote Noise');
+end
 hold off;
-legend('TEL0 RSSI','TEL0 Remote RSSI', 'TEL0 Noise', 'TEL0 Remote Noise');
 xlabel('Time [s]');
 
 % rc data
