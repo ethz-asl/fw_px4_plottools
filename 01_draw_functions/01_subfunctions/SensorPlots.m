@@ -9,33 +9,33 @@ function SensorPlots(sysvector, topics, fconv_gpsalt)
     fig4.Name = 'Sensor Data';
     raw(1)=subplot(4,1,1);
     hold on;
-    plot(sysvector('sensor_combined.mag_0').Time,sysvector('sensor_combined.mag_0').Data);
-    plot(sysvector('sensor_combined.mag_1').Time,sysvector('sensor_combined.mag_1').Data);
-    plot(sysvector('sensor_combined.mag_2').Time,sysvector('sensor_combined.mag_2').Data);
+    plot(sysvector('sensor_combined_0.magnetometer_ga_0').Time,sysvector('sensor_combined_0.magnetometer_ga_0').Data);
+    plot(sysvector('sensor_combined_0.magnetometer_ga_1').Time,sysvector('sensor_combined_0.magnetometer_ga_1').Data);
+    plot(sysvector('sensor_combined_0.magnetometer_ga_2').Time,sysvector('sensor_combined_0.magnetometer_ga_2').Data);
     hold off
     title('Magnetometers [Gauss]');
     legend('x','y','z');
     raw(2)=subplot(4,1,2);
     hold on;
-    plot(sysvector('sensor_combined.acc_0').Time,sysvector('sensor_combined.acc_0').Data);
-    plot(sysvector('sensor_combined.acc_1').Time,sysvector('sensor_combined.acc_1').Data);
-    plot(sysvector('sensor_combined.acc_2').Time,sysvector('sensor_combined.acc_2').Data);
+    plot(sysvector('sensor_combined_0.accelerometer_m_s2_0').Time,sysvector('sensor_combined_0.accelerometer_m_s2_0').Data);
+    plot(sysvector('sensor_combined_0.accelerometer_m_s2_1').Time,sysvector('sensor_combined_0.accelerometer_m_s2_1').Data);
+    plot(sysvector('sensor_combined_0.accelerometer_m_s2_2').Time,sysvector('sensor_combined_0.accelerometer_m_s2_2').Data);
     hold off
     title('Accelerometers [m/s²]');
     legend('x','y','z');
     raw(3)=subplot(4,1,3);
     hold on;
-    plot(sysvector('sensor_combined.gyro_0').Time,sysvector('sensor_combined.gyro_0').Data);
-    plot(sysvector('sensor_combined.gyro_1').Time,sysvector('sensor_combined.gyro_1').Data);
-    plot(sysvector('sensor_combined.gyro_2').Time,sysvector('sensor_combined.gyro_2').Data);
+    plot(sysvector('sensor_combined_0.gyro_rad_0').Time,sysvector('sensor_combined_0.gyro_rad_0').Data);
+    plot(sysvector('sensor_combined_0.gyro_rad_1').Time,sysvector('sensor_combined_0.gyro_rad_1').Data);
+    plot(sysvector('sensor_combined_0.gyro_rad_2').Time,sysvector('sensor_combined_0.gyro_rad_2').Data);
     hold off
     title('Gyroscopes [rad/s]');
     legend('x','y','z');
     raw(4)=subplot(4,1,4);
     hold on;
-    plot(sysvector('sensor_combined.baro_alt').Time,sysvector('sensor_combined.baro_alt').Data);
+    plot(sysvector('sensor_combined_0.baro_alt_meter').Time,sysvector('sensor_combined_0.baro_alt_meter').Data);
     if topics.vehicle_gps_position.logged
-        plot(sysvector('vehicle_gps_position.alt').Time,double(sysvector('vehicle_gps_position.alt').Data)*fconv_gpsalt,'color','red');
+        plot(sysvector('vehicle_gps_position_0.alt').Time,double(sysvector('vehicle_gps_position_0.alt').Data)*fconv_gpsalt,'color','red');
         legend('Barometric Altitude [m]','GPS Altitude [m]');
     else
         legend('Barometric Altitude [m]');

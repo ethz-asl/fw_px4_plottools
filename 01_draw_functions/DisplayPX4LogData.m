@@ -19,9 +19,15 @@ plotvector.estimatorPlots = true;
 plotvector.estimatorStatusPlots = true;
 plotvector.globalPositionPlots = true;
 plotvector.windPlots = true;
-plotvector.controllerPlots = true;
+plotvector.controlPlots = true;
 plotvector.telemRSSIPlots = true;
 plotvector.rawSensorPlots = true;
+plotvector.cpuLoadPlots = true;
+plotvector.distanceSensorPlots = true;
+plotvector.missionResultPlots = true;
+plotvector.vehicleStatusFlags = true;
+plotvector.magVsThrustPlots = true;
+plotvector.powerPlots = true;
 
 
 % *********************
@@ -33,7 +39,8 @@ plotvector.linkAxes = true;
 % The figures for which the axes should be linked specified by the figure
 % number
 plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ...
-    15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26];
+    15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,...
+    32, 33, 34];
 
 
 % *********************
@@ -129,6 +136,11 @@ if (topics.estimator_status.logged || topics.ekf2_timestamps.logged ||...
     EstimatorPlots(sysvector, topics);
 end
 
+% display estimator status data if it was logged
+if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
+    EstimatorStatusPlots(sysvector, topics);
+end
+
 % display gps and estimate on a map
 if (topics.vehicle_gps_position.logged || topics.vehicle_global_position.logged) && plotvector.globalPositionPlots
     GlobalPositionPlots(sysvector, topics, plainFileName, fconv_gpsalt,...
@@ -145,7 +157,7 @@ end
 if (topics.vehicle_attitude.logged && topics.vehicle_attitude_setpoint.logged &&...
         topics.vehicle_rates_setpoint.logged && topics.airspeed.logged &&...
         topics.tecs_status.logged && topics.vehicle_gps_position.logged &&...
-        plotvector.controllerPlots)
+        plotvector.controlPlots)
     ControlPlots(sysvector, fconv_gpsalt);
 end
 
@@ -153,7 +165,7 @@ end
 if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
         topics.input_rc.logged && topics.vehicle_attitude.logged && ...
         plotvector.telemRSSIPlots)
-    TelemRSSIPlots(sysvector);
+    TelemRSSIPlots(sysvector, topics);
 end
 
 % display the raw sensor data
@@ -161,9 +173,34 @@ if plotvector.rawSensorPlots
    RawSensorPlots(sysvector, topics, fconv_gpsalt);
 end
 
-% display estimator status data if it was logged
-if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
-    EstimatorStatusPlots(sysvector, topics);
+% cpu load plots
+if (topics.cpuload.logged && plotvector.cpuLoadPlots)
+    CpuLoadPlots(sysvector);
+end
+
+% distance sensor plots
+if (topics.distance_sensor.logged && plotvector.distanceSensorPlots)
+    DistanceSensorPlots(sysvector);
+end
+
+% mission result plots
+if (topics.mission_result.logged && plotvector.missionResultPlots)
+    MissionResultPlots(sysvector);
+end
+
+% vehicle status flags
+if (topics.vehicle_status_flags.logged && plotvector.vehicleStatusFlags)
+    VehicleStatusFlagsPlots(sysvector);
+end
+
+% mag norm versus thrust plot
+if (topics.actuator_controls.logged && topics.sensor_mag.logged && plotvector.magVsThrustPlots)
+    MagVsThrustPlots(sysvector);
+end
+
+% power plots
+if (topics.battery_status.logged && plotvector.powerPlots)
+    PowerPlots(sysvector);
 end
 
 % link the axes of the different figures

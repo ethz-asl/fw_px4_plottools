@@ -1,5 +1,12 @@
 % This Matlab Script can be used to import the binary logged values of the
 % PX4FMU into data that can be plotted and analyzed.
+% A maximum of 6 instances per topics are supported while converting. For
+% plotting most plots only display the first instance.
+% The script assumes that the topics instances exist in increasing order
+% starting from 0.
+% TODO:
+% - properly catch all cases of a missing topic
+% - properly support multi instance topics
 
 %% ************************************************************************
 % logconv: Main function
@@ -9,21 +16,22 @@ function logconv()
 clc;
 clear all;
 close all;
-path(path,'01_draw_functions');
-path(path,'01_draw_functions/01_subfunctions');
-path(path,'02_helper_functions');
-path(path,'02_helper_functions/01_topics_mapping');
-path(path,'03_kmltoolbox_v2.6');
-path(path,'04_log_files');
-path(path,'05_csv_files');
-path(path,'06_mat_files');
-path(path,'07_kmz_files');
+
+addpath(genpath('01_draw_functions'));
+addpath(genpath('02_helper_functions'));
+addpath(genpath('03_kmltoolbox_v2.6'));
+addpath(genpath('04_log_files'));
+addpath(genpath('05_csv_files'));
+addpath(genpath('06_mat_files'));
+addpath(genpath('07_kmz_files'));
 
 % ************************************************************************
 % SETTINGS (modify necessary parameter)
 % ************************************************************************
 
-% set the path to your log file here file here
+% set the path to your log file here file here, the log file must be in the
+% 04_log_files or one of its subfolders. If it is located in a subfolder
+% the path from the level of the 04_log_files needs to be specified here.
 fileName = 'log001.ulg';
 
 % the source from which the data is imported
@@ -36,12 +44,6 @@ fileName = 'log001.ulg';
 % else: Defaults to 0
 loadingMode = 0;
 
-% setting for the topic mapping
-% 0: mapping for the latest master
-% 1: mapping for the 1.65 release
-% 2: mapping for the master at 2017.11.22
-topicMapping = 0;
-
 % Print information while converting/loading the log file in mode 0 or 1.
 % Helpfull to identify field missmatchs.
 loadingVerbose = false;
@@ -52,10 +54,6 @@ saveMatlabData = true;
 
 % delete the csv file after a run of the script
 deleteCSVFiles = true;
-
-% id of the vehicle (note displaying the logs multiple vehicles at the same
-% time is not supported yet)
-vehicleID = 0;
 
 % delimiter for the path
 %   '/' for ubuntu
@@ -81,8 +79,14 @@ t_end = 0.0;
 % Import the data
 % ******************
 
-% get the file name without the file ending
-plainFileName = char(extractBefore(fileName,'.'));
+% get the file name without the file ending and path
+plainFileName = fileName;
+
+while (contains(plainFileName, pathDelimiter))
+    plainFileName = extractAfter(plainFileName, pathDelimiter);
+end
+
+plainFileName = char(extractBefore(plainFileName,'.'));
 
 % conversion factors
 fconv_timestamp=1E-6;    % [microseconds] to [seconds]
@@ -102,17 +106,8 @@ if loadingMode==2
     end
 else
     % setup the topics which could have been logged
-    switch topicMapping
-        case 0
-            topics = setupTopicsMaster();
-        case 1
-            topics = setupTopicsV1p65();
-        case 2
-            topics = setupTopics20171122();
-        otherwise
-            error('Invalid topicMapping value')
-    end
-    
+    topics = setupTopics();
+
     % import the data
     sysvector = containers.Map();
     ImportPX4LogData();
@@ -147,7 +142,7 @@ function ImportPX4LogData()
     disp('INFO: Start importing the log data.')
     
     if exist(fileName, 'file') ~= 2
-        error('Log file does not exist.')
+        error('Log file does not exist: %s', fileName)
     end
 
     % *********************************
@@ -171,55 +166,56 @@ function ImportPX4LogData()
         error('No topics specified in the setupTopics() function.') 
     end
     
-    force_debug = false;
     for idx_topics = 1:numel(topic_fields)
-        csv_file = ...
-            [plainFileName '_' topics.(topic_fields{idx_topics}).topic_name...
-            '_' char(num2str(vehicleID)) '.csv'];
-        if exist(csv_file, 'file') == 2
-            try
-                csv_data = tdfread(csv_file, ',');
-                csv_fields = fieldnames(csv_data);
-                
-                if ((numel(fieldnames(csv_data))-1) ~= numel(topics.(topic_fields{idx_topics}).fields))
-                    disp(['The number of data fields in the csv file is not equal to' ...
-                        ' the ones specified in the topics struct for '...
-                        topic_fields{idx_topics} '. Check that the mapping is correct']);
-                    force_debug = true;
-                end
+        for idx_instance = 0:5
+            csv_file = ...
+                [plainFileName '_' topics.(topic_fields{idx_topics}).topic_name...
+                '_' char(num2str(idx_instance)) '.csv'];
+            if exist(csv_file, 'file') == 2
+                try
+                    csv_data = tdfread(csv_file, ',');
+                    csv_fields = fieldnames(csv_data);
 
-                for idx = 2:numel(csv_fields)
-                    ts = timeseries(csv_data.(csv_fields{idx}), ...
-                        csv_data.timestamp*fconv_timestamp, ...
-                        'Name', [topic_fields{idx_topics} '.' char(topics.(topic_fields{idx_topics}).fields(idx-1))]);
-                    ts.DataInfo.Interpolation = tsdata.interpolation('zoh');
-                    sysvector([topic_fields{idx_topics} '.' char(topics.(topic_fields{idx_topics}).fields(idx-1))]) = ts;
+                    for idx = 2:numel(csv_fields)
+                        field_name = strrep(csv_fields(idx), '0x5B', '_');
+                        field_name = strrep(field_name, '0x5D', '');
 
-                    if loadingVerbose || force_debug
-                        str = sprintf('%s \t\t\t %s',...
-                            topics.(topic_fields{idx_topics}).fields(idx-1),...
-                            string(csv_fields{idx}));
-                        disp(str)
+                        ts = timeseries(csv_data.(csv_fields{idx}), ...
+                            csv_data.timestamp*fconv_timestamp, ...
+                            'Name', [topic_fields{idx_topics} '.' char(field_name)]);
+                        ts.DataInfo.Interpolation = tsdata.interpolation('zoh');
+                        sysvector([topic_fields{idx_topics} '_' char(num2str(idx_instance)) '.' char(field_name)]) = ts;
+
+                        if loadingVerbose
+                            str = sprintf('%s', string(field_name));
+                            fprintf(str)
+                        end
                     end
-                end
 
-                topics.(topic_fields{idx_topics}).logged = true;
-            catch
-                disp(['Could not process the topic: ' char(topic_fields{idx_topics})]);
+                    % this update avoids that not subsequent instances are
+                    % counted
+                    if (topics.(topic_fields{idx_topics}).num_instances == idx_instance)
+                        topics.(topic_fields{idx_topics}).num_instances = idx_instance + 1;
+                        topics.(topic_fields{idx_topics}).logged = true;
+                    end
+                catch
+                    disp(['Could not process the topic: ' char(topic_fields{idx_topics})]);
+                end
+            else
+                break;
             end
         end
-        force_debug = false;
     end
     
     % manually add a value for the commander state with the timestamp of
     % the latest global position estimate as they are used together
     if topics.commander_state.logged && topics.vehicle_global_position.logged
-       ts_temp = append(sysvector('commander_state.main_state'),...
-           timeseries(sysvector('commander_state.main_state').Data(end),...
-           sysvector('vehicle_global_position.lon').Time(end)));
+       ts_temp = append(sysvector('commander_state_0.main_state'),...
+           timeseries(sysvector('commander_state_0.main_state').Data(end),...
+           sysvector('vehicle_global_position_0.lon').Time(end)));
        ts_temp.DataInfo.Interpolation = tsdata.interpolation('zoh');
-       ts_temp.Name = 'commander_state.main_state';
-       sysvector('commander_state.main_state') = ts_temp;
+       ts_temp.Name = 'commander_state_0.main_state';
+       sysvector('commander_state_0.main_state') = ts_temp;
     end
 
     time_csv_import = toc;

@@ -16,8 +16,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     hold on;
     plot(airspeed_indicated.Time, airspeed_indicated.Data);
     plot(airspeed_true.Time, airspeed_true.Data);
-    plot(sysvector('airspeed.indicated_airspeed').Time, sysvector('airspeed.indicated_airspeed').Data);
-    plot(sysvector('airspeed.true_airspeed').Time, sysvector('airspeed.true_airspeed').Data);
+    plot(sysvector('airspeed_0.indicated_airspeed_m_s').Time, sysvector('airspeed_0.indicated_airspeed_m_s').Data);
+    plot(sysvector('airspeed_0.true_airspeed_m_s').Time, sysvector('airspeed_0.true_airspeed_m_s').Data);
     legend('Indicated Airspeed (IAS) corrected','True Airspeed (TAS) corrected', ...
         'Indicated Airspeed (IAS) uncorrected','True Airspeed (TAS) uncorrected');
     title('Airspeed (Tube Correction) [m/s]');
@@ -26,8 +26,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
 
     fig6 = figure(6);
     fig6.Name = 'Pressure Tube Correction Difference';
-    diff_true_airspeed = TimeseriesSubtraction(airspeed_true, sysvector('airspeed.true_airspeed'), 0.05);
-    diff_indicated_airspeed = TimeseriesSubtraction(airspeed_indicated, sysvector('airspeed.indicated_airspeed'), 0.05);
+    diff_true_airspeed = TimeseriesSubtraction(airspeed_true, sysvector('airspeed_0.true_airspeed_m_s'), 0.05);
+    diff_indicated_airspeed = TimeseriesSubtraction(airspeed_indicated, sysvector('airspeed_0.indicated_airspeed_m_s'), 0.05);
     hold on;
     plot(diff_true_airspeed.Time, diff_true_airspeed.Data);
     plot(diff_indicated_airspeed.Time, diff_indicated_airspeed.Data);
@@ -38,26 +38,26 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     fig7 = figure(7);
     fig7.Name = 'Pressure Tube Correction Raw Data';
     raw_corr(1) = subplot(3,1,1);
-    plot(sysvector('sensor_baro.pressure').Time, sysvector('sensor_baro.pressure').Data);
+    plot(sysvector('sensor_baro_0.pressure').Time, sysvector('sensor_baro_0.pressure').Data);
     title('Raw ambient pressure [mbar]');
 
     raw_corr(2) = subplot(3,1,2);
-    plot(sysvector('differential_pressure.differential_pressure_raw').Time,...
-        sysvector('differential_pressure.differential_pressure_raw').Data);
+    plot(sysvector('differential_pressure_0.differential_pressure_raw_pa').Time,...
+        sysvector('differential_pressure_0.differential_pressure_raw_pa').Data);
     title('Raw differential pressure [pa]');
 
     raw_corr(3) = subplot(3,1,3);
-    plot(sysvector('differential_pressure.temperature').Time,...
-        sysvector('differential_pressure.temperature').Data);
+    plot(sysvector('differential_pressure_0.temperature').Time,...
+        sysvector('differential_pressure_0.temperature').Data);
     title('Raw ambient temperature [C]');
     linkaxes([raw_corr(1) raw_corr(2) raw_corr(3)],'x');
     set(raw_corr(:),'XGrid','on','YGrid','on','ZGrid','on');
 else
-    dp_raw = sysvector('differential_pressure.differential_pressure_raw');
-    dp_filtered = sysvector('differential_pressure.differential_pressure_filtered');
-    airspeed_indicated = sysvector('airspeed.indicated_airspeed');
-    airspeed_true = sysvector('airspeed.true_airspeed');
-    airspeed_true_unfiltered = sysvector('airspeed.true_airspeed_unfiltered');
+    dp_raw = sysvector('differential_pressure_0.differential_pressure_raw_pa');
+    dp_filtered = sysvector('differential_pressure_0.differential_pressure_filtered_pa');
+    airspeed_indicated = sysvector('airspeed_0.indicated_airspeed_m_s');
+    airspeed_true = sysvector('airspeed_0.true_airspeed_m_s');
+    airspeed_true_unfiltered = sysvector('airspeed_0.true_airspeed_unfiltered_m_s');
 end
 
 if plotvector.doPressureCorrection && (~topics.sensor_baro.logged)

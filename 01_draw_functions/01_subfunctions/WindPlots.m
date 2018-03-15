@@ -5,31 +5,31 @@ fig14 = figure(14);
 fig14.Name = 'Estimated Wind 3D';
 % synchronise the data
 dt = plotvector.dtWindPlot;
-min_time = max([sysvector('wind_estimate.east').Time(1),...
-    sysvector('vehicle_local_position.x').Time(1),...
-    sysvector('vehicle_gps_position.vel_n').Time(1),...
-    sysvector('airspeed.true_airspeed').Time(1),...
-    sysvector('vehicle_attitude.q_0').Time(1)]);
-max_time = min([sysvector('wind_estimate.east').Time(end),...
-    sysvector('vehicle_local_position.x').Time(end),...
-    sysvector('vehicle_gps_position.vel_n').Time(end),...
-    sysvector('airspeed.true_airspeed').Time(end),...
-    sysvector('vehicle_attitude.q_0').Time(end)]);
+min_time = max([sysvector('wind_estimate_0.windspeed_east').Time(1),...
+    sysvector('vehicle_local_position_0.x').Time(1),...
+    sysvector('vehicle_gps_position_0.vel_n_m_s').Time(1),...
+    sysvector('airspeed_0.true_airspeed_m_s').Time(1),...
+    sysvector('vehicle_attitude_0.q_0').Time(1)]);
+max_time = min([sysvector('wind_estimate_0.windspeed_east').Time(end),...
+    sysvector('vehicle_local_position_0.x').Time(end),...
+    sysvector('vehicle_gps_position_0.vel_n_m_s').Time(end),...
+    sysvector('airspeed_0.true_airspeed_m_s').Time(end),...
+    sysvector('vehicle_attitude_0.q_0').Time(end)]);
 time_resampled = min_time:dt:max_time;
 
-pos_x = resample(sysvector('vehicle_local_position.x'), time_resampled);
-pos_y = resample(sysvector('vehicle_local_position.y'), time_resampled);
-pos_z = resample(sysvector('vehicle_local_position.z'), time_resampled);
-wind_e = resample(sysvector('wind_estimate.east'), time_resampled);
-wind_n = resample(sysvector('wind_estimate.north'), time_resampled);
-vel_n = resample(sysvector('vehicle_gps_position.vel_n'), time_resampled);
-vel_e = resample(sysvector('vehicle_gps_position.vel_e'), time_resampled);
-vel_d = resample(sysvector('vehicle_gps_position.vel_d'), time_resampled);
-airspeed = resample(sysvector('airspeed.true_airspeed'), time_resampled);
-q_0 = resample(sysvector('vehicle_attitude.q_0'), time_resampled);
-q_1 = resample(sysvector('vehicle_attitude.q_1'), time_resampled);
-q_2 = resample(sysvector('vehicle_attitude.q_2'), time_resampled);
-q_3 = resample(sysvector('vehicle_attitude.q_3'), time_resampled);
+pos_x = resample(sysvector('vehicle_local_position_0.x'), time_resampled);
+pos_y = resample(sysvector('vehicle_local_position_0.y'), time_resampled);
+pos_z = resample(sysvector('vehicle_local_position_0.z'), time_resampled);
+wind_e = resample(sysvector('wind_estimate_0.windspeed_east'), time_resampled);
+wind_n = resample(sysvector('wind_estimate_0.windspeed_north'), time_resampled);
+vel_n = resample(sysvector('vehicle_gps_position_0.vel_n_m_s'), time_resampled);
+vel_e = resample(sysvector('vehicle_gps_position_0.vel_e_m_s'), time_resampled);
+vel_d = resample(sysvector('vehicle_gps_position_0.vel_d_m_s'), time_resampled);
+airspeed = resample(sysvector('airspeed_0.true_airspeed_m_s'), time_resampled);
+q_0 = resample(sysvector('vehicle_attitude_0.q_0'), time_resampled);
+q_1 = resample(sysvector('vehicle_attitude_0.q_1'), time_resampled);
+q_2 = resample(sysvector('vehicle_attitude_0.q_2'), time_resampled);
+q_3 = resample(sysvector('vehicle_attitude_0.q_3'), time_resampled);
 
 % make z up
 pos_z.Data = -pos_z.Data;
@@ -78,20 +78,20 @@ fig15 = figure(15);
 fig15.Name = 'Estimated Wind Plot';
 wind(1) = subplot(3,1,1);
 hold on;
-plot(sysvector('wind_estimate.east').Time, sysvector('wind_estimate.east').Data)
-plot(sysvector('wind_estimate.north').Time, sysvector('wind_estimate.north').Data)
+plot(sysvector('wind_estimate_0.windspeed_east').Time, sysvector('wind_estimate_0.windspeed_east').Data)
+plot(sysvector('wind_estimate_0.windspeed_north').Time, sysvector('wind_estimate_0.windspeed_north').Data)
 legend('wind east', 'wind north')
 title('Wind Estimate [m/s]')
 hold off;
 
 wind(2) = subplot(3,1,2);
-plot(sysvector('wind_estimate.east').Time, ...
-    sqrt(sysvector('wind_estimate.east').Data.^2+sysvector('wind_estimate.north').Data.^2))
+plot(sysvector('wind_estimate_0.windspeed_east').Time, ...
+    sqrt(sysvector('wind_estimate_0.windspeed_east').Data.^2+sysvector('wind_estimate_0.windspeed_north').Data.^2))
 title('Wind Estimate Magnitude [m/s]')
 
 wind(3) = subplot(3,1,3);
-plot(sysvector('wind_estimate.east').Time, ...
-    90.0 - atan2d(sysvector('wind_estimate.north').Data, sysvector('wind_estimate.east').Data))
+plot(sysvector('wind_estimate_0.windspeed_east').Time, ...
+    90.0 - atan2d(sysvector('wind_estimate_0.windspeed_north').Data, sysvector('wind_estimate_0.windspeed_east').Data))
 title('Wind Estimate Heading [deg]')
 
 linkaxes(wind(:),'x');
