@@ -223,7 +223,7 @@ k.clear;
 if topics.vehicle_gps_position.logged && plotvector.plotGPSReference
     k.useDegrees;
     k.plot3(double(gps_lon.Data), double(gps_lat.Data), double(gps_alt.Data),...
-        'altitudeMode','absolute','lineWidth',5,'lineColor','FFFFFFFF',...
+        'altitudeMode','absolute','lineWidth',5,'lineColor','FFFF0000',...
         'name','Position Referance');
     hold on;
 end
@@ -243,7 +243,7 @@ if topics.vehicle_global_position.logged
             end
         otherwise
             k.plot3(double(pos_lon.Data), double(pos_lat.Data), double(pos_alt.Data),...
-                'altitudeMode','absolute','lineWidth',5,'lineColor','FF1400FF',...
+                'altitudeMode','absolute','lineWidth',5,'lineColor','FF00FF00',...
                 'name','Position Estimation');
     end
     hold on;
@@ -255,7 +255,7 @@ if (plotvector.plotPathShadow)
         k.useDegrees;
         k.plot3(double(gps_lon.Data), double(gps_lat.Data), double(gps_alt.Data),...
             'altitudeMode','clampToGround','lineWidth',5,'lineColor',...
-            '5FFFFFFF', 'name','Position Referance (ground)');
+            '5FFF0000', 'name','Position Referance (ground)');
     end
     hold on;
 
@@ -275,7 +275,7 @@ if (plotvector.plotPathShadow)
             otherwise
                 k.plot3(double(pos_lon.Data), double(pos_lat.Data), double(pos_alt.Data),...
                     'altitudeMode','clampToGround','lineWidth',5,'lineColor',...
-                    '5F1400FF', 'name','Position Estimation (ground)');
+                    '5F00FF00', 'name','Position Estimation (ground)');
         end
         hold on;
     end
