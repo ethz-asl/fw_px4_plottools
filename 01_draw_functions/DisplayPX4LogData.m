@@ -28,7 +28,7 @@ plotvector.missionResultPlots = true;
 plotvector.vehicleStatusFlags = true;
 plotvector.magVsThrustPlots = true;
 plotvector.powerPlots = true;
-
+plotvector.BatMonPlots = true;
 
 % *********************
 % Link the Figure Axis Settings
@@ -40,7 +40,7 @@ plotvector.linkAxes = true;
 % number
 plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ...
     15, 16, 17, 18 ,19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,...
-    32, 33, 34];
+    32, 33, 34, 35, 36];
 
 
 % *********************
@@ -201,6 +201,11 @@ end
 % power plots
 if (topics.battery_status.logged && plotvector.powerPlots)
     PowerPlots(sysvector);
+end
+
+% Batttery monitoring plots
+if (topics.bat_mon.logged && plotvector.BatMonPlots)
+    BatMonPlots(sysvector, topics);
 end
 
 % link the axes of the different figures
