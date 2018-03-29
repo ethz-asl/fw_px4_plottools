@@ -204,7 +204,7 @@ if (topics.battery_status.logged && plotvector.powerPlots)
 end
 
 % Batttery monitoring plots
-if (topics.battery_status.logged && plotvector.BatMonPlots)
+if (topics.bat_mon.logged && plotvector.BatMonPlots)
     BatMonPlots(sysvector, topics);
 end
 
