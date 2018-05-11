@@ -2,8 +2,8 @@ function TelemRSSIPlots(sysvector, topics)
 % Display telemetry and rc input connection data
 % TODO: - Add the 3D rc loss position plot
 
-fig18 = figure(18);
-fig18.Name = 'Telemetry and RC Connection Data';
+fig1 = figure();
+fig1.Name = 'Telemetry and RC Connection Data';
 
 % compute general data
 theta = timeseries(atan2d(sysvector('vehicle_local_position_0.y').Data, sysvector('vehicle_local_position_0.x').Data), ...

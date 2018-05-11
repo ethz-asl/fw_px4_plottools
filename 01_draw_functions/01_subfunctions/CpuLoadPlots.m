@@ -1,8 +1,8 @@
 function CpuLoadPlots(sysvector)
 % Display the cpu load data
 
-fig27 = figure(27);
-fig27.Name = 'CPU Load';
+fig1 = figure();
+fig1.Name = 'CPU Load';
 
 hold on;
 plot(sysvector('cpuload_0.load')); 
@@ -11,5 +11,7 @@ xlabel('time [s]')
 hold off;
 ylim([0, 1]);
 legend('CPU Load', 'RAM');
+
+set(gca, 'XGrid','on','YGrid','on','ZGrid','on');
 end
 

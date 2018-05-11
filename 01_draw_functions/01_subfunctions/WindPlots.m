@@ -1,8 +1,8 @@
 function WindPlots(sysvector, plotvector)
 % Display the wind data.
 
-fig14 = figure(14);
-fig14.Name = 'Estimated Wind 3D';
+fig1 = figure();
+fig1.Name = 'Estimated Wind 3D';
 % synchronise the data
 dt = plotvector.dtWindPlot;
 min_time = max([sysvector('wind_estimate_0.windspeed_east').Time(1),...
@@ -37,7 +37,6 @@ vel_d.Data = -vel_d.Data;
 
 plot3(pos_x.Data,pos_y.Data,pos_z.Data,'k.');
 axis equal
-view(2);
 hold all
 text(pos_x.Data(1),pos_y.Data(1),pos_z.Data(1),'t_{min}');
 text(pos_x.Data(end),pos_y.Data(end),pos_z.Data(end),'t_{max}');
@@ -74,8 +73,8 @@ ylabel('delta-Latitude [m]');
 zlabel('Altitude above MSL [m]');
 grid on
 
-fig15 = figure(15);
-fig15.Name = 'Estimated Wind Plot';
+fig2 = figure();
+fig2.Name = 'Estimated Wind Plot';
 wind(1) = subplot(3,1,1);
 hold on;
 plot(sysvector('wind_estimate_0.windspeed_east').Time, sysvector('wind_estimate_0.windspeed_east').Data)

@@ -22,8 +22,8 @@ yawRef = getsampleusingtime(sysvector('vehicle_attitude_setpoint_0.yaw_body'),..
     sysvector('vehicle_attitude_0.yawspeed').Time(1), sysvector('vehicle_attitude_0.yawspeed').Time(end));
 yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
-fig16 = figure(16);
-fig16.Name = 'Attitude+Airspd+Alt Control';
+fig1 = figure();
+fig1.Name = 'Attitude+Airspd+Alt Control';
 nrSubplotSections = 10;
 plotmargins.horiz = 0.05;
 plotmargins.vert = 0.016;
