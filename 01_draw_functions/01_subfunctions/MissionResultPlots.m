@@ -1,8 +1,8 @@
 function MissionResultPlots(sysvector)
 % Display the mission result
 
-fig29 = figure(29);
-fig29.Name = 'Mission Result';
+fig1 = figure();
+fig1.Name = 'Mission Result';
 
 mission_results(1) = subplot(3,1,1);
 hold on;

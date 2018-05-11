@@ -1,8 +1,8 @@
 function BatMonPlots(sysvector, topics)
 % DisplayS Battery Monitoring plots
 
-fig35 = figure(35);
-fig35.Name = 'Battery Monitoring Statistics';
+fig1 = figure();
+fig1.Name = 'Battery Monitoring Statistics';
 
 raw(1)=subplot(5,1,1);
     if topics.bat_mon.logged
@@ -54,8 +54,8 @@ legend('battery status','operation status','safety status');
 linkaxes([raw(1) raw(2) raw(3) raw(4) raw(5)],'x');
 set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');   
 
-fig36 = figure(36);
-fig36.Name = 'Battery Monitoring balancing';
+fig2 = figure();
+fig2.Name = 'Battery Monitoring balancing';
     if topics.bat_mon.logged
         hold on;
         plot(sysvector('bat_mon_0.cellvoltage1').Time, sysvector('bat_mon_0.cellvoltage1').Data/ 1000.0,'LineWidth',2);

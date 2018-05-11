@@ -11,8 +11,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
         airspeed_true_unfiltered] = AirspeedTubeCorrection(sysvector,...
         plotvector.pressureCorrectionD, plotvector.pressureCorrectionL,...
         plotvector.pressureCorrectionDPSensor, plotvector.pressureCorrectionMassflow);
-    fig5 = figure(5);
-    fig5.Name = 'Pressure Tube Correction';
+    fig1 = figure();
+    fig1.Name = 'Pressure Tube Correction';
     hold on;
     plot(airspeed_indicated.Time, airspeed_indicated.Data);
     plot(airspeed_true.Time, airspeed_true.Data);
@@ -24,8 +24,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     hold off;
 
 
-    fig6 = figure(6);
-    fig6.Name = 'Pressure Tube Correction Difference';
+    fig2 = figure();
+    fig2.Name = 'Pressure Tube Correction Difference';
     diff_true_airspeed = TimeseriesSubtraction(airspeed_true, sysvector('airspeed_0.true_airspeed_m_s'), 0.05);
     diff_indicated_airspeed = TimeseriesSubtraction(airspeed_indicated, sysvector('airspeed_0.indicated_airspeed_m_s'), 0.05);
     hold on;
@@ -35,8 +35,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     title('Difference between corrected and uncorrected airspeed [m/s]');
     hold off;
 
-    fig7 = figure(7);
-    fig7.Name = 'Pressure Tube Correction Raw Data';
+    fig3 = figure();
+    fig3.Name = 'Pressure Tube Correction Raw Data';
     raw_corr(1) = subplot(3,1,1);
     plot(sysvector('sensor_baro_0.pressure').Time, sysvector('sensor_baro_0.pressure').Data);
     title('Raw ambient pressure [mbar]');
@@ -64,8 +64,8 @@ if plotvector.doPressureCorrection && (~topics.sensor_baro.logged)
    disp('Could not execute the pressure correction as no baro data was logged');
 end
 
-fig8 = figure(8);
-fig8.Name = 'Differential Pressure Data';
+fig4 = figure();
+fig4.Name = 'Differential Pressure Data';
 raw_baro(1) = subplot(4,1,1);
 hold on;
 plot(dp_raw.Time, dp_raw.Data);

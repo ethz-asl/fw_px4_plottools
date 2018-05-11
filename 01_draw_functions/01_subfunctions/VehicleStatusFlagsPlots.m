@@ -1,70 +1,60 @@
 function VehicleStatusFlagsPlots(sysvector)
 % Display the cpu load data
 
-fig30 = figure(30);
-fig30.Name = 'Condition Vehicle Status Flags';
+fig1 = figure();
+fig1.Name = 'Condition Vehicle Status Flags';
 
-condition_flags(1) = subplot(7,2,1);
+condition_flags(1) = subplot(6,2,1);
 plot(sysvector('vehicle_status_flags_0.condition_calibration_enabled'));
 ylabel(' ')
 title('Calibration Enabled')
 
-condition_flags(2) = subplot(7,2,2);
+condition_flags(2) = subplot(6,2,2);
 plot(sysvector('vehicle_status_flags_0.condition_system_sensors_initialized'));
 ylabel(' ')
 title('System Sensor Initialzed')
 
-condition_flags(3) = subplot(7,2,3);
-plot(sysvector('vehicle_status_flags_0.condition_system_prearm_error_reported'));
-ylabel(' ')
-title('Prearm Error Reported')
-
-condition_flags(4) = subplot(7,2,4);
+condition_flags(3) = subplot(6,2,3);
 plot(sysvector('vehicle_status_flags_0.condition_system_hotplug_timeout'));
 ylabel(' ')
 title('Hotplug Timeout')
 
-condition_flags(5) = subplot(7,2,5);
+condition_flags(4) = subplot(6,2,4);
 plot(sysvector('vehicle_status_flags_0.condition_system_returned_to_home'));
 ylabel(' ')
 title('Return to Home')
 
-condition_flags(6) = subplot(7,2,6);
+condition_flags(5) = subplot(6,2,5);
 plot(sysvector('vehicle_status_flags_0.condition_auto_mission_available'));
 ylabel(' ')
 title('Auto Mission Available')
 
-condition_flags(7) = subplot(7,2,7);
+condition_flags(6) = subplot(6,2,6);
 plot(sysvector('vehicle_status_flags_0.condition_global_position_valid'));
 ylabel(' ')
 title('Global Position Valid')
 
-condition_flags(8) = subplot(7,2,8);
-plot(sysvector('vehicle_status_flags_0.condition_global_velocity_valid'));
-ylabel(' ')
-title('Global Velocity Valid')
-
-condition_flags(9) = subplot(7,2,9);
+condition_flags(7) = subplot(6,2,7);
 plot(sysvector('vehicle_status_flags_0.condition_home_position_valid'));
 ylabel(' ')
 title('Home Position Valid')
 
-condition_flags(10) = subplot(7,2,10);
+condition_flags(8) = subplot(6,2,8);
 plot(sysvector('vehicle_status_flags_0.condition_local_position_valid'));
 ylabel(' ')
 title('Local Position Valid')
 
-condition_flags(11) = subplot(7,2,11);
+condition_flags(9) = subplot(6,2,9);
 plot(sysvector('vehicle_status_flags_0.condition_local_velocity_valid'));
 ylabel(' ')
 title('Local Velicity Valid')
 
-condition_flags(12) = subplot(7,2,12);
+condition_flags(10) = subplot(6,2,10);
 plot(sysvector('vehicle_status_flags_0.condition_local_altitude_valid'));
 ylabel(' ')
 title('Local Altitude Valid')
 
-condition_flags(12) = subplot(7,2,12);
+condition_flags(11) = subplot(6,2,11);
 plot(sysvector('vehicle_status_flags_0.condition_power_input_valid'));
 ylabel(' ')
 title('Power Input Valid')
@@ -72,8 +62,8 @@ title('Power Input Valid')
 linkaxes(condition_flags(:),'x');
 set(condition_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
     
-fig31 = figure(31);
-fig31.Name = 'Circuit Breaker Vehicle Status Flags';
+fig2 = figure();
+fig2.Name = 'Circuit Breaker Vehicle Status Flags';
 
 cbk_flags(1) = subplot(4,2,1);
 plot(sysvector('vehicle_status_flags_0.circuit_breaker_engaged_power_check'));
@@ -113,8 +103,8 @@ title('Position Failure Check')
 linkaxes(cbk_flags(:),'x');
 set(cbk_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
 
-fig32 = figure(32);
-fig32.Name = 'Other Vehicle Status Flags';
+fig3 = figure();
+fig3.Name = 'Other Vehicle Status Flags';
 
 other_flags(1) = subplot(4,2,1);
 plot(sysvector('vehicle_status_flags_0.offboard_control_signal_found_once'));

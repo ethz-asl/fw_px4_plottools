@@ -105,8 +105,8 @@ end
 
 % 3D plot of the global position estimate
 if topics.vehicle_global_position.logged
-    fig13 = figure(13);
-    fig13.Name = 'Estimated Position 3D Plot';
+    fig1 = figure();
+    fig1.Name = 'Estimated Position 3D Plot';
     switch(plotvector.colorModeGlobalPosition)
         case 0
             % plot global position estimate
@@ -295,8 +295,8 @@ end
 
 
 if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
-    fig20 = figure(20);
-    fig20.Name = 'Estimated Position 2D Plot';
+    fig2 = figure();
+    fig2.Name = 'Estimated Position 2D Plot';
     pos(1) = subplot(3,1,1);
     hold on;
     plot(pos_lat.Time,pos_lat.Data);

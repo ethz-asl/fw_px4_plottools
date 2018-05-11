@@ -37,13 +37,6 @@ plotvector.iridiumsbdStatusPlots = true;
 % Link the axes of different figure
 plotvector.linkAxes = true;
 
-% The figures for which the axes should be linked specified by the figure
-% number
-plotvector.figures_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ...
-    15, 16, 18 ,19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,...
-    32, 33, 34, 35, 36, 37];
-
-
 % *********************
 % GPS Plot Settings
 % *********************
@@ -121,7 +114,7 @@ if topics.vehicle_gps_position.logged && plotvector.gpsPlots
 end
 
 % display sensor data if it was logged
-if topics.sensor_combined.logged && plotvector.sensorPlots
+if plotvector.sensorPlots
     SensorPlots(sysvector, topics, fconv_gpsalt);
 end
 
@@ -216,5 +209,5 @@ end
 
 % link the axes of the different figures
 if plotvector.linkAxes
-   LinkFigureAxes(plotvector);
+   LinkFigureAxes();
 end

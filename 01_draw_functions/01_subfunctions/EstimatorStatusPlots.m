@@ -8,8 +8,8 @@ function EstimatorStatusPlots(sysvector, topics)
 if topics.estimator_status.logged
     % innovation checkbit
     inno_check_bits = de2bi(sysvector('estimator_status_0.innovation_check_flags').Data,12);
-    fig21 = figure(21);
-    fig21.Name = 'Innovation Check Flags';
+    fig1 = figure();
+    fig1.Name = 'Innovation Check Flags';
 
     titles = [string('Reject VEL NED'), string('Reject POS NE'), string('Reject POS D'),...
         string('Reject Mag X'), string('Reject Mag Y'), string('Reject Mag Z'),...
@@ -27,8 +27,8 @@ if topics.estimator_status.logged
     
     % gps_check_fail_flags
     gps_check_bits = de2bi(sysvector('estimator_status_0.gps_check_fail_flags').Data,10);
-    fig22 = figure(22);
-    fig22.Name = 'GPS Check Fail Flags';
+    fig2 = figure();
+    fig2.Name = 'GPS Check Fail Flags';
     
     titles = [string('Fix Type Insufficient'), string('Number of Satellites Insufficient'), ...
         string('GDOP Insufficient'), string('Horizontal Accuracy Insufficient'),...
@@ -49,8 +49,8 @@ if topics.estimator_status.logged
     
     % control_mode_flags
     control_mode_bits = de2bi(sysvector('estimator_status_0.control_mode_flags').Data,20);
-    fig23 = figure(23);
-    fig23.Name = 'Control Mode Flags';
+    fig3 = figure();
+    fig3.Name = 'Control Mode Flags';
     
     titles = [string('Tilt Alignment Complete'), string('Yaw Alignment Complete'), ...
         string('GPS Fused'), string('Optical Flow Fused'), string('Mag Yaw Fused'),...
@@ -73,8 +73,8 @@ if topics.estimator_status.logged
         
     % filter_fault_flags
     filter_fault_flags = de2bi(sysvector('estimator_status_0.filter_fault_flags').Data,16);
-    fig24 = figure(24);
-    fig24.Name = 'Filter Fault Flags';
+    fig4 = figure();
+    fig4.Name = 'Filter Fault Flags';
     
     titles = [string('Mag X Num Error'), string('Mag y Num Error'), ...
         string('Mag Z Num Error'), string('Mag Heading Num Error'), string('Mag Decl Num Error'),...
@@ -95,8 +95,8 @@ if topics.estimator_status.logged
     
     % solution_status_flags
     solution_status_flags = de2bi(sysvector('estimator_status_0.solution_status_flags').Data,12);
-    fig25 = figure(25);
-    fig25.Name = 'Solution Status Flags';
+    fig5 = figure();
+    fig5.Name = 'Solution Status Flags';
     
     titles = [string('Good Attitude'), string('Good Horizontal Velocity'), ...
         string('Good Vertical Velocity'), string('Good Horizontal Position (Relative)'),...
@@ -118,8 +118,8 @@ if topics.estimator_status.logged
     set(filter_fault(:), 'XGrid','on','YGrid','on','ZGrid','on');
     
     % test ratios
-    fig26 = figure(26);
-    fig26.Name = 'Estimator Test Ratios';
+    fig6 = figure();
+    fig6.Name = 'Estimator Test Ratios';
     
     test_ratios(1) = subplot(3,2,1);
     plot(sysvector('estimator_status_0.mag_test_ratio').Time,sysvector('estimator_status_0.mag_test_ratio').Data);

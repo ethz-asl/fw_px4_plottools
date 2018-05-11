@@ -1,8 +1,8 @@
 function DistanceSensorPlots(sysvector)
 % Display the distance sensor data
 
-fig28 = figure(28);
-fig28.Name = 'Distance Sensor';
+fig1 = figure();
+fig1.Name = 'Distance Sensor';
 
 hold on;
 plot(sysvector('distance_sensor_0.min_distance')); 
@@ -13,5 +13,7 @@ hold off;
 xlabel('time [s]');
 ylabel('distance [m]');
 legend('Min Dist [m]', 'Max Dist [m]', 'Current Dist [m]', 'Covariance [m]');
+
+set(gca, 'XGrid','on','YGrid','on','ZGrid','on');
 end
 
