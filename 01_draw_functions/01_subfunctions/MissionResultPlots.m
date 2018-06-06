@@ -27,7 +27,7 @@ plot(sysvector('mission_result_0.stay_in_failsafe'));
 plot(sysvector('mission_result_0.flight_termination'));
 plot(sysvector('mission_result_0.item_do_jump_changed'));
 hold off;
-legend('valid', 'warning', 'finished', 'failure', 'stay_in_failsafe', 'flight_termination', 'item_do_jump_changed');
+legend('valid', 'warning', 'finished', 'failure', 'stay\_in\_failsafe', 'flight\_termination', 'item\_do\_jump\_changed');
 title('Flags')
 ylim([-0.1, 1.1])
 

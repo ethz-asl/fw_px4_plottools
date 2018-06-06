@@ -59,6 +59,13 @@ plot(sysvector('vehicle_status_flags_0.condition_power_input_valid'));
 ylabel(' ')
 title('Power Input Valid')
 
+if (isKey(sysvector,'vehicle_land_detected_0.landed'))
+    condition_flags(12) = subplot(6,2,12);
+    plot(sysvector('vehicle_land_detected_0.landed'),'LineWidth',2);
+    ylabel(' ')
+    title('Vehicle landed state')
+end
+
 linkaxes(condition_flags(:),'x');
 set(condition_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
     

@@ -24,7 +24,7 @@ yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
 fig1 = figure();
 fig1.Name = 'Attitude+Airspd+Alt Control';
-nrSubplotSections = 10;
+nrSubplotSections = 11;
 plotmargins.horiz = 0.05;
 plotmargins.vert = 0.016;
 plotmargins.vert_last = 0.055;
@@ -47,7 +47,6 @@ plot(yaw.Time, rad2deg(yaw.Data));
 plot(yawRef.Time, rad2deg(yawRef.Data));
 hold off;
 legend('Yaw Angle', 'Yaw Angle Ref')
-%ylabel('Attitude [deg]')
 
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[3 4],[plotmargins.vert plotmargins.horiz]);
 hold on;
@@ -72,8 +71,8 @@ hold off;
 legend('p','pRef','q','qRef','r','rRef');
 ylabel('Rates [deg/s]')
 
+% actuator output plots
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[7 8],[plotmargins.vert plotmargins.horiz]);
-% airspeed plots
 hold on;
 plot(sysvector('actuator_controls_0.control_0').Time, sysvector('actuator_controls_0.control_0').Data);
 plot(sysvector('actuator_controls_0.control_1').Time, sysvector('actuator_controls_0.control_1').Data);
@@ -83,8 +82,8 @@ plot(sysvector('actuator_controls_0.control_4').Time, sysvector('actuator_contro
 legend('u_{ail}','u_{elev}', 'u_{red}', 'u_{throt}', 'u_{flaps}');
 ylabel('Act. outputs []')
 
-axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[9],[plotmargins.vert plotmargins.horiz]);
 % airspeed plots
+axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[9],[plotmargins.vert plotmargins.horiz]);
 hold on;
 plot(sysvector('airspeed_0.true_airspeed_m_s').Time, sysvector('airspeed_0.true_airspeed_m_s').Data);
 plot(sysvector('airspeed_0.indicated_airspeed_m_s').Time, sysvector('airspeed_0.indicated_airspeed_m_s').Data);
@@ -93,13 +92,14 @@ plot(sysvector('tecs_status_0.airspeedSp').Time, sysvector('tecs_status_0.airspe
 legend('v_{TAS} [m/s]','v_{IAS} [m/s]', 'v_{IAS} ref[m/s]');
 ylabel('Airsp. [m/s]')
 
-% altitude plot
-axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[10],[plotmargins.vert_last plotmargins.horiz]);
+% altitude plots
+axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[10],[plotmargins.vert plotmargins.horiz]);
 plot(sysvector('vehicle_global_position_0.alt').Time, sysvector('vehicle_global_position_0.alt').Data);
+hold on;
 plot(sysvector('tecs_status_0.altitudeSp').Time, sysvector('tecs_status_0.altitudeSp').Data);
+plot(sysvector('position_setpoint_triplet_0.current0x2Ealt').Time, sysvector('position_setpoint_triplet_0.current0x2Ealt').Data);
 plot(sysvector('vehicle_gps_position_0.alt').Time, sysvector('vehicle_gps_position_0.alt').Data*fconv_gpsalt);
-% TODO add here alt min/max and altitude ramp (if that exists)
-legend('Altitude estimate [m]', 'Altitude ref[m]', 'GPS Alt [m]');
+legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','GPS Alt [m]');
 xlabel('Time [s]')
 ylabel('Alt. [m]')
 
