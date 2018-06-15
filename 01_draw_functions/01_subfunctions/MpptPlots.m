@@ -28,7 +28,6 @@ raw(2)=subplot(4,1,2);
 title('Voltage [V]');
 ylabel('voltage [V]')
 legend('MPPT1','MPPT2','MPPT3');
-grid on;
 
 raw(3)=subplot(4,1,3);
 if topics.sensor_mppt.logged
@@ -41,7 +40,6 @@ if topics.sensor_mppt.logged
 title('PWM');
 ylabel('pwm')
 legend('MPPT1','MPPT2','MPPT3');
-grid on;
 
 raw(4)=subplot(4,1,4);
 if topics.sensor_mppt.logged
@@ -54,6 +52,8 @@ if topics.sensor_mppt.logged
 title('Status');
 ylabel('status')
 legend('MPPT1','MPPT2','MPPT3');
-grid on;
+
+linkaxes([raw(1) raw(2) raw(3) raw(4)],'x');
+set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');
 
 end
