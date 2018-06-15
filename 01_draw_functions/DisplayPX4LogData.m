@@ -30,6 +30,7 @@ plotvector.magVsThrustPlots = true;
 plotvector.powerPlots = true;
 plotvector.BatMonPlots = true;
 plotvector.iridiumsbdStatusPlots = true;
+plotvector.mpptPlots = true;
 
 % *********************
 % Link the Figure Axis Settings
@@ -205,6 +206,11 @@ end
 % satcom plots
 if (topics.iridiumsbd_status.logged && plotvector.iridiumsbdStatusPlots)
     IridiumSBDStatusPlots(sysvector);
+end
+
+% mppt plots
+if (topics.sensor_mppt.logged && plotvector.mpptPlots)
+    MpptPlots(sysvector, topics);
 end
 
 % link the axes of the different figures
