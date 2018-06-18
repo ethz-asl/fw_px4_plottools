@@ -74,6 +74,9 @@ diff_plot = max(max_lat-min_lat, max_lon-min_lon);
 axis([min_lat+0.5*(max_lat-min_lat-diff_plot) min_lat+0.5*(max_lat-min_lat+diff_plot)...
     min_lon+0.5*(max_lon-min_lon-diff_plot) min_lon+0.5*(max_lon-min_lon+diff_plot) -inf inf])
 
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
+
 % GPS velocity plot
 fig2 = figure();
 fig2.Name = 'GPS Velocity';
@@ -85,6 +88,8 @@ hold off;
 title('GPS Velocity (NED frame) [m/sec]');
 legend('V_N','V_E','V_D');
 grid on;
+dcm_obj = datacursormode(fig2);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
 fig3 = figure();
 fig3.Name = 'GPS Accuracy/DOP';
@@ -129,5 +134,7 @@ plot(sysvector('vehicle_gps_position_0.jamming_indicator').Time,sysvector('vehic
 title('GPS Jamming Indicator');
 
 linkaxes(raw(:),'x');
-set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');   
+set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig3);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end

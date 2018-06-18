@@ -33,5 +33,7 @@ ylim([-0.1, 1.1])
 
 linkaxes(mission_results(:),'x');
 set(mission_results(:), 'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 

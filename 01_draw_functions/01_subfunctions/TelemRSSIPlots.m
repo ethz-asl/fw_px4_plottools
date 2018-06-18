@@ -83,5 +83,7 @@ grid on;
 
 linkaxes(rssi_handle(:),'x');
 set(rssi_handle(:),'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 

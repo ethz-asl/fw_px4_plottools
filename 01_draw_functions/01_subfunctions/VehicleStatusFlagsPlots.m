@@ -155,6 +155,8 @@ title('USB Connected')
 
 linkaxes(other_flags(:),'x');
 set(other_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
 end
 

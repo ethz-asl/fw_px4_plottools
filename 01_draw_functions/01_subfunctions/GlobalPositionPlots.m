@@ -297,30 +297,38 @@ end
 if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
     fig2 = figure();
     fig2.Name = 'Estimated Position 2D Plot';
-    pos(1) = subplot(3,1,1);
+    pos(1) = subplot(4,1,1);
     hold on;
     plot(pos_lat.Time,pos_lat.Data);
     plot(gps_lat.Time,gps_lat.Data);
     hold off;
     legend('Estimated','GPS');
     title('Pos lat [deg]');
-    pos(2) = subplot(3,1,2);
+    pos(2) = subplot(4,1,2);
     hold on;
     plot(pos_lon.Time,pos_lon.Data);
     plot(gps_lon.Time,gps_lon.Data);
     hold off;
     legend('Estimated','GPS');
     title('Pos lon [deg]');
-    pos(3) = subplot(3,1,3);
+    pos(3) = subplot(4,1,3);
     hold on;
     plot(pos_alt.Time,pos_alt.Data);
     plot(gps_alt.Time,gps_alt.Data);
+    plot(sysvector('vehicle_air_data_0.baro_alt_meter').Time,sysvector('vehicle_air_data_0.baro_alt_meter').Data);
     hold off;
-    legend('Estimated','GPS');
+    legend('Estimated','GPS','Baro');
     title('Pos alt [m]');
+    pos(4) = subplot(4,1,4);
+    hold on;
+    plot(sysvector('vehicle_global_position_0.vel_d').Time,sysvector('vehicle_global_position_0.vel_d').Data);
+    legend('Downwards velocity v_d');
+    title('Downwards velocity v_d[m/s]');
 
     linkaxes(pos(:),'x');
     set(pos(:),'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig2);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
 end
 

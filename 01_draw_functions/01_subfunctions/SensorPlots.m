@@ -55,5 +55,7 @@ function SensorPlots(sysvector, topics, fconv_gpsalt)
     title('Altitude above MSL [m]');
 
     linkaxes([raw(1) raw(2) raw(3) raw(4)],'x');
-    set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');   
+    set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig1);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end

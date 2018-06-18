@@ -15,5 +15,7 @@ hold off;
 
 legend('Magnetic Norm', 'Thrust');
 set(gca, 'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 

@@ -22,6 +22,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
         'Indicated Airspeed (IAS) uncorrected','True Airspeed (TAS) uncorrected');
     title('Airspeed (Tube Correction) [m/s]');
     hold off;
+    dcm_obj = datacursormode(fig1);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
 
     fig2 = figure();
@@ -34,6 +36,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     legend('Difference for True Airspeed (TAS)','Difference for Indicated Airspeed (IAS)');
     title('Difference between corrected and uncorrected airspeed [m/s]');
     hold off;
+    dcm_obj = datacursormode(fig2);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
     fig3 = figure();
     fig3.Name = 'Pressure Tube Correction Raw Data';
@@ -52,6 +56,8 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged
     title('Raw ambient temperature [C]');
     linkaxes([raw_corr(1) raw_corr(2) raw_corr(3)],'x');
     set(raw_corr(:),'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig3);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 else
     dp_raw = sysvector('differential_pressure_0.differential_pressure_raw_pa');
     dp_filtered = sysvector('differential_pressure_0.differential_pressure_filtered_pa');
@@ -109,5 +115,7 @@ legend('Indicated Airspeed (IAS)','True Airspeed (TAS)');
 title('Airspeed [m/s]');
 
 linkaxes([raw_baro(1) raw_baro(2) raw_baro(3) raw_baro(4)],'x');
-set(raw_baro(:),'XGrid','on','YGrid','on','ZGrid','on');   
+set(raw_baro(:),'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig4);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end

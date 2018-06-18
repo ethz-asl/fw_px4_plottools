@@ -24,6 +24,8 @@ if topics.estimator_status.logged
 
     linkaxes(inno_check(:),'x');
     set(inno_check(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig1);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % gps_check_fail_flags
     gps_check_bits = de2bi(sysvector('estimator_status_0.gps_check_fail_flags').Data,10);
@@ -46,6 +48,8 @@ if topics.estimator_status.logged
 
     linkaxes(gps_check(:),'x');
     set(gps_check(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig2);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % control_mode_flags
     control_mode_bits = de2bi(sysvector('estimator_status_0.control_mode_flags').Data,20);
@@ -70,6 +74,8 @@ if topics.estimator_status.logged
     
     linkaxes(control_modes(:),'x');
     set(control_modes(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig3);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
         
     % filter_fault_flags
     filter_fault_flags = de2bi(sysvector('estimator_status_0.filter_fault_flags').Data,16);
@@ -92,6 +98,8 @@ if topics.estimator_status.logged
     
     linkaxes(filter_fault(:),'x');
     set(filter_fault(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig4);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % solution_status_flags
     solution_status_flags = de2bi(sysvector('estimator_status_0.solution_status_flags').Data,12);
@@ -116,6 +124,8 @@ if topics.estimator_status.logged
     
     linkaxes(filter_fault(:),'x');
     set(filter_fault(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig5);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % test ratios
     fig6 = figure();
@@ -147,6 +157,8 @@ if topics.estimator_status.logged
 
     linkaxes(test_ratios(:),'x');
     set(test_ratios(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig6);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 else
     disp('EstimatorStatusBitsPlots: The estimator status was not logged so no plots are displayed.');
 end

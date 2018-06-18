@@ -16,5 +16,8 @@ legend('Raw Voltage [V]', 'Filtered Voltage [V]', 'Raw Current [A]', 'Filtered C
     'Discharged [mAh/100]', 'Remaining [0 = Empty, 10 = Full]');
 
 set(gca,'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
+
 end
 

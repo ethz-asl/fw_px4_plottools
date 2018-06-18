@@ -24,7 +24,7 @@ yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
 fig1 = figure();
 fig1.Name = 'Attitude+Airspd+Alt Control';
-nrSubplotSections = 11;
+nrSubplotSections = 12;
 plotmargins.horiz = 0.05;
 plotmargins.vert = 0.016;
 plotmargins.vert_last = 0.055;
@@ -93,19 +93,25 @@ legend('v_{TAS} [m/s]','v_{IAS} [m/s]', 'v_{IAS} ref[m/s]');
 ylabel('Airsp. [m/s]')
 
 % altitude plots
-axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[10],[plotmargins.vert plotmargins.horiz]);
+axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[10 11],[plotmargins.vert plotmargins.horiz]);
 plot(sysvector('vehicle_global_position_0.alt').Time, sysvector('vehicle_global_position_0.alt').Data);
 hold on;
 plot(sysvector('tecs_status_0.altitudeSp').Time, sysvector('tecs_status_0.altitudeSp').Data);
 plot(sysvector('position_setpoint_triplet_0.current0x2Ealt').Time, sysvector('position_setpoint_triplet_0.current0x2Ealt').Data);
 plot(sysvector('vehicle_gps_position_0.alt').Time, sysvector('vehicle_gps_position_0.alt').Data*fconv_gpsalt);
-legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','GPS Alt [m]');
+terrain_alt = sysvector('vehicle_global_position_0.terrain_alt').Data;
+terrain_alt(sysvector('vehicle_global_position_0.terrain_alt_valid').Data == 0) = NaN;
+plot(sysvector('vehicle_global_position_0.terrain_alt').Time, terrain_alt);
+legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','GPS Alt [m]','Terrain Altitude [m]');
 xlabel('Time [s]')
 ylabel('Alt. [m]')
 
+% Plot configuration
 for i=1:length(axeshandle)-1; set(axeshandle(end-i),'XTickLabel',''); end;
 linkaxes(axeshandle(:),'x');
 set(axeshandle(:),'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
 end
 

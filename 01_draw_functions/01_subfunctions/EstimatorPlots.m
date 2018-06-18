@@ -21,6 +21,8 @@ if topics.vehicle_attitude.logged
     title('Estimated attitude [deg]');
     legend('roll','pitch','yaw');
     grid on;
+    dcm_obj = datacursormode(fig1);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 
 if topics.estimator_status.logged
@@ -86,6 +88,8 @@ if topics.estimator_status.logged
 
     linkaxes([state(1) state(2) state(3) state(4) state(5) state(6) state(7) state(8)],'x');
     set(state(:),'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig2);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 
     % Covariances
     fig3 = figure();
@@ -149,6 +153,8 @@ if topics.estimator_status.logged
 
     linkaxes([state(1) state(2) state(3) state(4) state(5) state(6) state(7) state(8)],'x');
     set(state(:),'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig3);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 
 % plot the relative timestamps
@@ -188,4 +194,6 @@ if topics.ekf2_timestamps.logged
     linkaxes([timestamp_rel(1) timestamp_rel(2) timestamp_rel(3) ...
         timestamp_rel(4) timestamp_rel(5) timestamp_rel(6)],'x');
     set(timestamp_rel(:), 'XGrid','on','YGrid','on','ZGrid','on');
+    dcm_obj = datacursormode(fig4);
+    set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end

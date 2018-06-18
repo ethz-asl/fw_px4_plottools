@@ -15,5 +15,7 @@ ylabel('distance [m]');
 legend('Min Dist [m]', 'Max Dist [m]', 'Current Dist [m]', 'Covariance [m]');
 
 set(gca, 'XGrid','on','YGrid','on','ZGrid','on');
+dcm_obj = datacursormode(fig1);
+set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 
