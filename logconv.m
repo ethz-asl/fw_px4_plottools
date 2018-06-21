@@ -165,7 +165,9 @@ function ImportPX4LogData()
     if numel(topic_fields) == 0
         error('No topics specified in the setupTopics() function.') 
     end
-    
+
+    %TODO: parallelize the first loop with parfor if we can see another
+    %speed issue
     for idx_topics = 1:numel(topic_fields)
         for idx_instance = 0:5
             csv_file = ...
@@ -173,15 +175,16 @@ function ImportPX4LogData()
                 '_' char(num2str(idx_instance)) '.csv'];
             if exist(csv_file, 'file') == 2
                 try
-                    csv_data = tdfread(csv_file, ',');
-                    csv_fields = fieldnames(csv_data);
+                    csv_data = readtable(csv_file,'ReadVariableNames',true,'Delimiter',',');
+                    csv_fields = csv_data.Properties.VariableNames;
 
                     for idx = 2:numel(csv_fields)
                         field_name = strrep(csv_fields(idx), '0x5B', '_');
                         field_name = strrep(field_name, '0x5D', '');
+                        field_name = strip(field_name, '_');
 
-                        ts = timeseries(csv_data.(csv_fields{idx}), ...
-                            csv_data.timestamp*fconv_timestamp, ...
+                        ts = timeseries(table2array(csv_data(:, idx)), ...
+                            table2array(csv_data(:, 1))*fconv_timestamp, ...
                             'Name', [topic_fields{idx_topics} '.' char(field_name)]);
                         ts.DataInfo.Interpolation = tsdata.interpolation('zoh');
                         sysvector([topic_fields{idx_topics} '_' char(num2str(idx_instance)) '.' char(field_name)]) = ts;
