@@ -17,7 +17,7 @@ ylabel('current [A]')
 legend('MPPT1','MPPT2','MPPT3');
 grid on;
 
-raw(2)=subplot(4,1,2);
+raw(end+1)=subplot(4,1,2);
     if topics.sensor_mppt.logged
         hold on;
         plot(sysvector('sensor_mppt_0.mppt_volt_0').Time, sysvector('sensor_mppt_0.mppt_volt_0').Data,'LineWidth',2);
@@ -29,7 +29,7 @@ title('Voltage [V]');
 ylabel('voltage [V]')
 legend('MPPT1','MPPT2','MPPT3');
 
-raw(3)=subplot(4,1,3);
+raw(end+1)=subplot(4,1,3);
 if topics.sensor_mppt.logged
         hold on;
         plot(sysvector('sensor_mppt_0.mppt_pwm_0').Time, sysvector('sensor_mppt_0.mppt_pwm_0').Data,'LineWidth',2);
@@ -41,7 +41,7 @@ title('PWM');
 ylabel('pwm')
 legend('MPPT1','MPPT2','MPPT3');
 
-raw(4)=subplot(4,1,4);
+raw(end+1)=subplot(4,1,4);
 if topics.sensor_mppt.logged
         hold on;
         plot(sysvector('sensor_mppt_0.mppt_status_0').Time, sysvector('sensor_mppt_0.mppt_status_0').Data,'LineWidth',2);
@@ -53,7 +53,7 @@ title('Status');
 ylabel('status')
 legend('MPPT1','MPPT2','MPPT3');
 
-linkaxes([raw(1) raw(2) raw(3) raw(4)],'x');
+linkaxes([raw(:)],'x');
 set(raw(:),'XGrid','on','YGrid','on','ZGrid','on');
 
 end
