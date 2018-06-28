@@ -62,11 +62,11 @@ ylabel('Attitude [deg]')
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[5 6],[plotmargins.vert plotmargins.horiz]);
 hold on;
 plot(sysvector('vehicle_attitude_0.rollspeed').Time, rad2deg(sysvector('vehicle_attitude_0.rollspeed').Data));
-plot(pRef.Time, pRef.Data);
+plot(pRef.Time, rad2deg(pRef.Data));
 plot(sysvector('vehicle_attitude_0.pitchspeed').Time, rad2deg(sysvector('vehicle_attitude_0.pitchspeed').Data));
-plot(qRef.Time, qRef.Data);
+plot(qRef.Time, rad2deg(qRef.Data));
 plot(sysvector('vehicle_attitude_0.yawspeed').Time, rad2deg(sysvector('vehicle_attitude_0.yawspeed').Data));
-plot(rRef.Time, rRef.Data);
+plot(rRef.Time, rad2deg(rRef.Data));
 hold off;
 legend('p','pRef','q','qRef','r','rRef');
 ylabel('Rates [deg/s]')
@@ -79,7 +79,7 @@ plot(sysvector('actuator_controls_0.control_1').Time, sysvector('actuator_contro
 plot(sysvector('actuator_controls_0.control_2').Time, sysvector('actuator_controls_0.control_2').Data);
 plot(sysvector('actuator_controls_0.control_3').Time, sysvector('actuator_controls_0.control_3').Data);
 plot(sysvector('actuator_controls_0.control_4').Time, sysvector('actuator_controls_0.control_4').Data);
-legend('u_{ail}','u_{elev}', 'u_{red}', 'u_{throt}', 'u_{flaps}');
+legend('u_{ail}','u_{elev}', 'u_{rud}', 'u_{throt}', 'u_{flaps}');
 ylabel('Act. outputs []')
 
 % airspeed plots
@@ -89,7 +89,7 @@ plot(sysvector('airspeed_0.true_airspeed_m_s').Time, sysvector('airspeed_0.true_
 plot(sysvector('airspeed_0.indicated_airspeed_m_s').Time, sysvector('airspeed_0.indicated_airspeed_m_s').Data);
 plot(sysvector('tecs_status_0.airspeedSp').Time, sysvector('tecs_status_0.airspeedSp').Data);
 % TODO add here v ref nom, v ref min, v ref max
-legend('v_{TAS} [m/s]','v_{IAS} [m/s]', 'v_{IAS} ref[m/s]');
+legend('v_{TAS} [m/s]','v_{IAS} [m/s]', 'v_{TAS} ref[m/s]');
 ylabel('Airsp. [m/s]')
 
 % altitude plots

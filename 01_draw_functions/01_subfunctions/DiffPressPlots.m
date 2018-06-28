@@ -92,8 +92,8 @@ if topics.vehicle_gps_position.logged
     plot(v_gps.Time,v_gps.Data);
 end
 hold off;
-title('differential barometer and GPS velocity [m/s]');    
-legend('dbaro raw', 'dbaro filtered','GPS');
+title('True Airspeed (from dBaro) and GPS velocity [m/s]');    
+legend('TAS raw', 'TAS filtered+corrected','GPS');
 
 raw_baro(3) = subplot(4,1,3);
 if topics.vehicle_gps_position.logged
