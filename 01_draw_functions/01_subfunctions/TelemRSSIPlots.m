@@ -31,7 +31,6 @@ else
     legend('TEL0 RSSI','TEL0 Remote RSSI', 'TEL0 Noise', 'TEL0 Remote Noise');
 end
 hold off;
-xlabel('Time [s]');
 
 % rc data
 rssi_handle(2) = subplot(5,1,2);
@@ -55,7 +54,6 @@ plot(sysvector('telemetry_status_0.fixed').Time, sysvector('telemetry_status_0.f
 plot(sysvector('telemetry_status_0.rxerrors').Time, sysvector('telemetry_status_0.rxerrors').Data);
 hold off;
 legend('TEL0 Fixed RX packets','TEL0 Lost RX packets');
-xlabel('Time [s]');
 
 % attitude
 rssi_handle(4) = subplot(5,1,4);
@@ -80,6 +78,7 @@ plot(sysvector('vehicle_local_position_0.z').Time, -sysvector('vehicle_local_pos
 hold off;
 legend('dist home hor [m]','dist home tot [m]','rel alt [m]');
 grid on;
+xlabel('Time [s]');
 
 linkaxes(rssi_handle(:),'x');
 set(rssi_handle(:),'XGrid','on','YGrid','on','ZGrid','on');

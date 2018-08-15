@@ -52,7 +52,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % control_mode_flags
-    control_mode_bits = de2bi(sysvector('estimator_status_0.control_mode_flags').Data,20);
+    control_mode_bits = de2bi(sysvector('estimator_status_0.control_mode_flags').Data,22);
     fig3 = figure();
     fig3.Name = 'Control Mode Flags';
     

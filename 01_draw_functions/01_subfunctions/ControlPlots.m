@@ -105,9 +105,6 @@ plot(sysvector('vehicle_gps_position_0.alt').Time, sysvector('vehicle_gps_positi
 terrain_alt = sysvector('vehicle_global_position_0.terrain_alt').Data;
 terrain_alt(sysvector('vehicle_global_position_0.terrain_alt_valid').Data == 0) = NaN;
 plot(sysvector('vehicle_global_position_0.terrain_alt').Time, terrain_alt);
-% terrain_alt = sysvector('vehicle_local_position_0.dist_bottom').Data;
-% terrain_alt(sysvector('vehicle_local_position_0.dist_bottom_valid').Data == 0) = NaN;
-% plot(sysvector('vehicle_local_position_0.dist_bottom').Time, sysvector('vehicle_local_position_0.dist_bottom_valid').Data .* 100);
 legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','GPS Alt [m]','Terrain Altitude [m]');
 xlabel('Time [s]')
 ylabel('Alt. [m]')
@@ -132,6 +129,7 @@ plotmargins.vert = 0.014;
 plotmargins.vert_last = 0.055;
 
 % Mode and state plot
+axeshandle = zeros(0,0);
 axeshandle(1) = subplot_tight(nrSubplotSections,1,1,[plotmargins.vert plotmargins.horiz]);
 hold on;
 stairs(sysvector('commander_state_0.main_state').Time, sysvector('commander_state_0.main_state').Data);
@@ -195,11 +193,10 @@ plot(sysvector('vehicle_global_position_0.alt').Time, sysvector('vehicle_global_
 hold on;
 plot(sysvector('tecs_status_0.altitudeSp').Time, sysvector('tecs_status_0.altitudeSp').Data);
 plot(sysvector('position_setpoint_triplet_0.current_alt').Time, sysvector('position_setpoint_triplet_0.current_alt').Data);
-plot(sysvector('vehicle_gps_position_0.alt').Time, sysvector('vehicle_gps_position_0.alt').Data*fconv_gpsalt);
 terrain_alt = sysvector('vehicle_global_position_0.terrain_alt').Data;
 terrain_alt(sysvector('vehicle_global_position_0.terrain_alt_valid').Data == 0) = NaN;
 plot(sysvector('vehicle_global_position_0.terrain_alt').Time, terrain_alt);
-legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','GPS Alt [m]','Terrain Altitude [m]');
+legend('Altitude estimate [m]', 'Alt. ref (smoothed)[m]', 'Alt. ref [m]','Terrain Altitude [m]');
 xlabel('Time [s]')
 ylabel('Alt. [m]')
 

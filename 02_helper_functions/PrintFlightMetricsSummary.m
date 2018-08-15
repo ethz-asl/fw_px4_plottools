@@ -19,8 +19,8 @@ else
     vGndMean = mean(vGnd(iLaunchGnd:iLandGnd));
     FlightDistanceAir = vAirMean * FlightTime;
     FlightDistanceGnd = vGndMean * FlightTime;
-    str = sprintf('tLaunch: %.2fs tLand:%.2fs tFlight: %.2fs (%s dd:hh:mm:ss) dist_air: %.2fkm dist_gnd: %.2fkm\n', tLaunch, tLand, FlightTime, datestr(FlightTime/86400.0, 'DD:HH:MM:SS'),FlightDistanceAir/1000.0,FlightDistanceGnd/1000.0);
-    display(str);
+    str = sprintf('***********************\n*** Flight Summary: ***\n***********************\ntLaunch: %.2fs tLand:%.2fs tFlight: %.2fs (%s dd:hh:mm:ss) dist_air: %.2fkm dist_gnd: %.2fkm\n', tLaunch, tLand, FlightTime, datestr(FlightTime/86400.0, 'DD:HH:MM:SS'),FlightDistanceAir/1000.0,FlightDistanceGnd/1000.0);
+    disp(str);
 end
 
 end

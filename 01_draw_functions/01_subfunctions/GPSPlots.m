@@ -71,8 +71,10 @@ min_lon = min(sysvector('vehicle_gps_position_0.lon').Data)*fconv_gpslatlong;
 max_lat = max(sysvector('vehicle_gps_position_0.lat').Data)*fconv_gpslatlong;
 max_lon = max(sysvector('vehicle_gps_position_0.lon').Data)*fconv_gpslatlong;
 diff_plot = max(max_lat-min_lat, max_lon-min_lon);
-axis([min_lat+0.5*(max_lat-min_lat-diff_plot) min_lat+0.5*(max_lat-min_lat+diff_plot)...
+if(min_lat~=max_lat && min_lon~=max_lon) 
+    axis([min_lat+0.5*(max_lat-min_lat-diff_plot) min_lat+0.5*(max_lat-min_lat+diff_plot)...
     min_lon+0.5*(max_lon-min_lon-diff_plot) min_lon+0.5*(max_lon-min_lon+diff_plot) -inf inf])
+end
 
 dcm_obj = datacursormode(fig1);
 set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);

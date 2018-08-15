@@ -9,10 +9,11 @@ plot(sysvector('distance_sensor_0.min_distance'));
 plot(sysvector('distance_sensor_0.max_distance')); 
 plot(sysvector('distance_sensor_0.current_distance')); 
 plot(sysvector('distance_sensor_0.covariance')); 
+plot(sysvector('distance_sensor_0.signal_strength'));
 hold off;
 xlabel('time [s]');
 ylabel('distance [m]');
-legend('Min Dist [m]', 'Max Dist [m]', 'Current Dist [m]', 'Covariance [m]');
+legend('Min Dist [m]', 'Max Dist [m]', 'Current Dist [m]', 'Covariance [m]', 'Signal Strength [%]');
 
 set(gca, 'XGrid','on','YGrid','on','ZGrid','on');
 dcm_obj = datacursormode(fig1);

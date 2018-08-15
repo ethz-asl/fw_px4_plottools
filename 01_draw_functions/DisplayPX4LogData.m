@@ -202,9 +202,9 @@ if (topics.battery_status.logged && plotvector.powerPlots)
 end
 
 % Battery monitoring plots
-% if (topics.sensor_bat_mon.logged && plotvector.BatMonPlots)
-%     BatMonPlots(sysvector, topics);
-% end
+if (topics.sensor_bat_mon.logged && plotvector.BatMonPlots)
+     BatMonPlots(sysvector, topics);
+end
 
 % satcom plots
 if (topics.iridiumsbd_status.logged && plotvector.iridiumsbdStatusPlots)
