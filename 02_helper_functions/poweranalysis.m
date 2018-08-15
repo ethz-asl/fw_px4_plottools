@@ -24,41 +24,59 @@ t2=[3585 3951 4246 4559 4893 5388 5795];
 %SS2A TF20180626 F1 13x11 prop
 t1=[1640 2306 2596 2848 3182 3601 3984];
 t2=[2271 2557 2822 3142 3550 3957 4375];
+%SS2A TF20180627 attempted 6h flight with lots of turbulence
+t1=[1608];
+t2=[3932];
+%SS2A TF20180701 actually achieved 5:30 hour flight with many downdrafts
+t1=[856];
+t2=[20434];
 %cal1=922.0;
 %cal2=2306.0;
 
 h1 = t1;
 
-newPWRboard = false;
-if(newPWRboard==true)
+PWRboard = true;
+if(PWRboard==true)
     %Precalcs
-    sysvector.POWB_SERVO1_CUR(sysvector.POWB_SERVO1_CUR>1.0) = 0.0; %Correct for bug in power board
-    sysvector.POWB_SERVO1_CUR(sysvector.POWB_SERVO1_CUR<-0.4) = 0.0; %Correct for bug in power board
-    sysvector.p_servos = sysvector.POWB_SERVO_volt / 1000.0 .* (sysvector.POWB_SERVO1_CUR+sysvector.POWB_SERVO2_CUR+sysvector.POWB_SERVO3_CUR+sysvector.POWB_SERVO4_CUR);
-    sysvector.p_aux = sysvector.POWB_SERVO_volt / 1000.0 .* sysvector.POWB_AUX_CUR;
-    sysvector.p_motor = sysvector.POWB_SYS_volt / 1000.0 .* (sysvector.POWB_MOTL_CUR + sysvector.POWB_MOTR_CUR);
-    %sysvector.p_pixhawk = 0.0; %TODO: We really need to add this measurement!
-    sysvector.p_system = sysvector.p_motor + sysvector.p_servos + sysvector.p_aux;
-    P_batteries = (sysvector.BAT0_I_bat.* sysvector.BAT0_V_bat +sysvector.BAT1_I_bat.* sysvector.BAT1_V_bat +sysvector.BAT2_I_bat.* sysvector.BAT2_V_bat)/1.0E6;
+    m_SystemPower = sysvector('sensor_pwr_brd_0.pwr_brd_mot_l_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Data + ...
+            sysvector('sensor_pwr_brd_0.pwr_brd_analog_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_servo_volt').Data + ...
+            sysvector('sensor_pwr_brd_0.pwr_brd_digital_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_digital_volt').Data + ...
+            sysvector('sensor_pwr_brd_0.pwr_brd_ext_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Data + ...
+            sysvector('sensor_pwr_brd_0.pwr_brd_aux_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_digital_volt').Data;
+    
+    
+    
+    %mot_l_amp *system_volt + analog_amp * servo_volt + digital_amp * digital_volt + ext_amp * system_volt + aux_amp * digital_volt;
+    
+%     sysvector.POWB_SERVO1_CUR(sysvector.POWB_SERVO1_CUR>1.0) = 0.0; %Correct for bug in power board
+%     sysvector.POWB_SERVO1_CUR(sysvector.POWB_SERVO1_CUR<-0.4) = 0.0; %Correct for bug in power board
+%     sysvector.p_servos = sysvector.POWB_SERVO_volt / 1000.0 .* (sysvector.POWB_SERVO1_CUR+sysvector.POWB_SERVO2_CUR+sysvector.POWB_SERVO3_CUR+sysvector.POWB_SERVO4_CUR);
+%     sysvector.p_aux = sysvector.POWB_SERVO_volt / 1000.0 .* sysvector.POWB_AUX_CUR;
+%     sysvector.p_motor = sysvector.POWB_SYS_volt / 1000.0 .* (sysvector.POWB_MOTL_CUR + sysvector.POWB_MOTR_CUR);
+%     %sysvector.p_pixhawk = 0.0; %TODO: We really need to add this measurement!
+%     sysvector.p_system = sysvector.p_motor + sysvector.p_servos + sysvector.p_aux;
+%     P_batteries = (sysvector.BAT0_I_bat.* sysvector.BAT0_V_bat +sysvector.BAT1_I_bat.* sysvector.BAT1_V_bat +sysvector.BAT2_I_bat.* sysvector.BAT2_V_bat)/1.0E6;
     
     %"Calibrate" our measurements
-    i1=find(time>cal1,1,'first');
-    i2=find(time>cal2,1,'first');
-    P_System_AtRest_mean = mean(sysvector.p_system(i1:i2));
-    P_Batmon_AtRest_mean = mean(P_batteries(i1:i2));
-    P_Bias = -P_Batmon_AtRest_mean - P_System_AtRest_mean;
+%     i1=find(time>cal1,1,'first');
+%     i2=find(time>cal2,1,'first');
+%     P_System_AtRest_mean = mean(sysvector.p_system(i1:i2));
+%     P_Batmon_AtRest_mean = mean(P_batteries(i1:i2));
+%     P_Bias = -P_Batmon_AtRest_mean - P_System_AtRest_mean;
 end
 
 str='';
 for i=1:numel(t1)
-    idx1bat = find(sysvector('bat_mon_0.voltage').Time > t1(i),1,'first');
-    idx2bat = find(sysvector('bat_mon_0.voltage').Time > t2(i),1,'first');
+    idx1bat = find(sysvector('sensor_bat_mon_0.voltage').Time > t1(i),1,'first');
+    idx2bat = find(sysvector('sensor_bat_mon_0.voltage').Time > t2(i),1,'first');
+    idx1pwr = find(sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Time > t1(i),1,'first');
+    idx2pwr = find(sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Time > t2(i),1,'first');
     idx1tecs = find(sysvector('tecs_status_0.airspeedSp').Time > t1(i),1,'first');
     idx2tecs = find(sysvector('tecs_status_0.airspeedSp').Time > t2(i),1,'first');
     idx1aspd = find(sysvector('airspeed_0.true_airspeed_m_s').Time > t1(i),1,'first');
     idx2aspd = find(sysvector('airspeed_0.true_airspeed_m_s').Time > t2(i),1,'first');
         
-    dt(i) = sysvector('bat_mon_0.voltage').Time(idx2bat)-sysvector('bat_mon_0.voltage').Time(idx1bat);
+    dt(i) = sysvector('sensor_bat_mon_0.voltage').Time(idx2bat)-sysvector('sensor_bat_mon_0.voltage').Time(idx1bat);
 
     %mean airspeed, power, etc
     airspeed_ref(i) = mean(sysvector('tecs_status_0.airspeedSp').Data(idx1tecs:idx2tecs));
@@ -77,7 +95,8 @@ for i=1:numel(t1)
 %         I_mean(i) = 0.0;
 %         P_mean(i) = mean(sysvector.p_system(idx1:idx2))+P_Bias;
 %     end
-    P_mean_batmon(i) = mean(sysvector('bat_mon_0.voltage').Data(idx1bat:idx2bat).*sysvector('bat_mon_0.current').Data(idx1bat:idx2bat)) /1.0E6;
+    P_mean_batmon(i) = mean(sysvector('sensor_bat_mon_0.voltage').Data(idx1bat:idx2bat).*sysvector('sensor_bat_mon_0.current').Data(idx1bat:idx2bat)) /1.0E6;
+    P_mean_pwrbrd(i) = mean(m_SystemPower(idx1pwr:idx2pwr));
 %     uThrot_mean(i) = mean(sysvector.ASLD_uT(idx1:idx2));
 %     pitch_mean(i) = mean(sysvector.ASLD_P(idx1:idx2))*180.0/pi();
 %     %v_gps_mean(i)=mean(sysvector.v_gps(idx1:idx2))
@@ -95,8 +114,8 @@ for i=1:numel(t1)
     %str = [str sprintf('#%u vRef=%.2f: h1/t1/t2/dt=%.2f/%.2f/%.2f/%.2f v/U/I/P/Pcorr=%.2f/%.2f/%.2f/%.2f/%.2f uT/uTSR/duT=%.2f/%.2f/%.2f Rref/R/P/hdot/dh/dh_gps/dh_baro=%.2f/%.2f/%.2f/%.2f/%.2f/%.2f/%.2f\n',...
     %    i,airspeed_ref(i),h1(i),t1(i),t2(i),dt(i),v_mean(i),U_mean(i),I_mean(i),P_mean(i),P_corr(i),uThrot_mean(i),uThrotSlewrate(i),duT_mean(i),rollref_mean(i),roll_mean(i),pitch_mean(i),dh_dot(i),dh(i),dh_gps(i),dh_baro(i))];    
     
-    str = [str sprintf('#%u vIASRef/vTASRef=%.2f/%.2f: t1/t2/dt=%.2f/%.2f/%.2f vTAS/vIAS/P=%.2f/%.2f/%.2f\n',...
-        i,airspeed_ref(i)*v_mean_ias(i)/v_mean_tas(i),airspeed_ref(i),t1(i),t2(i),dt(i),v_mean_tas(i),v_mean_ias(i),P_mean_batmon(i))];    
+    str = [str sprintf('#%u vIASRef/vTASRef=%.2f/%.2f: t1/t2/dt=%.2f/%.2f/%.2f vTAS/vIAS/P_bat/P_brd/P_mppt=%.2f/%.2f/%.2f/%.2f/%.2f\n',...
+        i,airspeed_ref(i)*v_mean_ias(i)/v_mean_tas(i),airspeed_ref(i),t1(i),t2(i),dt(i),v_mean_tas(i),v_mean_ias(i),P_mean_batmon(i),P_mean_pwrbrd(i),P_mean_pwrbrd(i)-(-P_mean_batmon(i)))];    
  end
 
 display(str);
