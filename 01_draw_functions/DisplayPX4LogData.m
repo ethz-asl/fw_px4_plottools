@@ -109,6 +109,9 @@ plotvector.plotAirSpeedVector = false;
 % Settings end
 % ************************************************************
 
+% Output flight summary
+PrintFlightMetricsSummary(sysvector);
+
 % display GPS data if it was logged
 if topics.vehicle_gps_position.logged && plotvector.gpsPlots
     GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector);
