@@ -58,12 +58,12 @@ fig2 = figure();
 fig2.Name = 'Battery Monitoring balancing';
     if topics.sensor_bat_mon.logged
         hold on;
+        plot(sysvector('sensor_bat_mon_0.cellvoltage_0').Time, sysvector('sensor_bat_mon_0.cellvoltage_0').Data/ 1000.0,'LineWidth',2);
         plot(sysvector('sensor_bat_mon_0.cellvoltage_1').Time, sysvector('sensor_bat_mon_0.cellvoltage_1').Data/ 1000.0,'LineWidth',2);
         plot(sysvector('sensor_bat_mon_0.cellvoltage_2').Time, sysvector('sensor_bat_mon_0.cellvoltage_2').Data/ 1000.0,'LineWidth',2);
         plot(sysvector('sensor_bat_mon_0.cellvoltage_3').Time, sysvector('sensor_bat_mon_0.cellvoltage_3').Data/ 1000.0,'LineWidth',2);
         plot(sysvector('sensor_bat_mon_0.cellvoltage_4').Time, sysvector('sensor_bat_mon_0.cellvoltage_4').Data/ 1000.0,'LineWidth',2);
         plot(sysvector('sensor_bat_mon_0.cellvoltage_5').Time, sysvector('sensor_bat_mon_0.cellvoltage_5').Data/ 1000.0,'LineWidth',2);
-        plot(sysvector('sensor_bat_mon_0.cellvoltage_6').Time, sysvector('sensor_bat_mon_0.cellvoltage_6').Data/ 1000.0,'LineWidth',2);
         hold off;
     end
 title('Battery cells voltage');
