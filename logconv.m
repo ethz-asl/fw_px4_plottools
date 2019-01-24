@@ -14,7 +14,7 @@
 function logconv()
 % Clear everything
 clc;
-clear all;
+clear;
 close all;
 
 addpath(genpath('01_draw_functions'));
@@ -174,6 +174,10 @@ function ImportPX4LogData()
                 [plainFileName '_' topics.(topic_fields{idx_topics}).topic_name...
                 '_' char(num2str(idx_instance)) '.csv'];
             if exist(csv_file, 'file') == 2
+                if loadingVerbose
+                    str = sprintf('%s\n', string(topics.(topic_fields{idx_topics}).topic_name));
+                    fprintf(str)
+                end
                 try
                     csv_data = readtable(csv_file,'ReadVariableNames',true,'Delimiter',',');
                     csv_fields = csv_data.Properties.VariableNames;
@@ -190,7 +194,7 @@ function ImportPX4LogData()
                         sysvector([topic_fields{idx_topics} '_' char(num2str(idx_instance)) '.' char(field_name)]) = ts;
 
                         if loadingVerbose
-                            str = sprintf('%s', string(field_name));
+                            str = sprintf('\t%s\n', string(field_name));
                             fprintf(str)
                         end
                     end
