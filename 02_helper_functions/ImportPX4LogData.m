@@ -1,4 +1,4 @@
-function [sysvector, topics] = ImportPX4LogData(fileName, loadingMode, ...
+function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, loadingMode, ...
                                                 pathDelimiter, fconv_timestamp, ...
                                                 loadingVerbose, saveMatlabData, ...
                                                 deleteCSVFiles)
@@ -6,16 +6,23 @@ function [sysvector, topics] = ImportPX4LogData(fileName, loadingMode, ...
 %   Detailed explanation goes here
     disp('INFO: Start importing the log data.')
     
-    if exist(fileName, 'file') ~= 2
-        error('Log file does not exist: %s', fileName)
-    end
+    % setup the topics struct
+    topics = setupTopics();
+
+    % initialize the sysvector
+    sysvector = containers.Map();
 
     % *********************************
     % convert the log file to csv files
     % *********************************
     if (loadingMode~=1) && (loadingMode~=2)
+        fullFileName = [fileLocation pathDelimiter fileName '.ulg'];
+        if exist(fullFileName, 'file') ~= 2
+            error('Log file does not exist: %s', fullFileName)
+        end
+
         tic;
-        system(sprintf('ulog2csv 04_log_files%s%s -o 05_csv_files', pathDelimiter, fileName));
+        system(sprintf('ulog2csv %s -o 05_csv_files', fullFileName));
         time_csv_conversion = toc;
         disp(['INFO: Converting the ulog file to csv took ' char(num2str(time_csv_conversion)) ' s.'])
     end
@@ -36,7 +43,7 @@ function [sysvector, topics] = ImportPX4LogData(fileName, loadingMode, ...
     for idx_topics = 1:numel(topic_fields)
         for idx_instance = 0:5
             csv_file = ...
-                [plainFileName '_' topics.(topic_fields{idx_topics}).topic_name...
+                [fileName '_' topics.(topic_fields{idx_topics}).topic_name...
                 '_' char(num2str(idx_instance)) '.csv'];
             if exist(csv_file, 'file') == 2
                 try
@@ -122,14 +129,14 @@ function [sysvector, topics] = ImportPX4LogData(fileName, loadingMode, ...
     % save the sysvector and topics struct if requested
     % *********************************
     if saveMatlabData
-        save(['06_mat_files' pathDelimiter plainFileName '.mat'], 'sysvector', 'topics');
+        save(['06_mat_files' pathDelimiter fileName '.mat'], 'sysvector', 'topics');
     end
     
     % *********************************
     % delete the csv files if requested
     % *********************************
     if deleteCSVFiles
-        system(sprintf('rm 05_csv_files%s%s_*', pathDelimiter, plainFileName));
+        system(sprintf('rm 05_csv_files%s%s_*', pathDelimiter, fileName));
     end
     
     disp('INFO: Finished importing the log data.')
