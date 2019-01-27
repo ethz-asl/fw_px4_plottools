@@ -70,6 +70,106 @@ t_end = NaN;
 
 % change topic names or add new topics in the setupTopics function.
 
+% ************************************************************
+% Plotting settings
+% ************************************************************
+
+% *********************
+% Enable/Disable Plots
+% *********************
+plotvector.gpsPlots = true;
+plotvector.sensorPlots = true;
+plotvector.differentialPressurePlots = true;
+plotvector.estimatorPlots = true;
+plotvector.estimatorStatusPlots = true;
+plotvector.globalPositionPlots = true;
+plotvector.windPlots = true;
+plotvector.controlPlots = true;
+plotvector.telemRSSIPlots = true;
+plotvector.rawSensorPlots = true;
+plotvector.cpuLoadPlots = true;
+plotvector.distanceSensorPlots = true;
+plotvector.missionResultPlots = true;
+plotvector.vehicleStatusFlags = true;
+plotvector.magVsThrustPlots = true;
+plotvector.powerPlots = true;
+plotvector.BatMonPlots = true;
+plotvector.iridiumsbdStatusPlots = true;
+plotvector.mpptPlots = true;
+
+% *********************
+% Link the Figure Axis Settings
+% *********************
+% Link the axes of different figure
+plotvector.linkAxes = false;
+
+% *********************
+% GPS Plot Settings
+% *********************
+% Color mode for the 3D gps plot
+% 0: Colored by altitude
+% 1: Colored by GPS horizontal velocity
+% 2: Red
+% 3: Colored by the GPS velocity
+% 4: Colored by the filtered airspeed
+% Default: Colored by altitude
+plotvector.colorModeGPS = 0;
+
+
+% *********************
+% Global Position Estimate Plot Settings
+% *********************
+% Color mode for the 3D estimated global position plot
+% 0: Colored by the control mode
+% 1: Red
+% 2: Colored by altitude, not in Google Earth
+% 3: Colored by the estimated ground velocity, not in Google Earth
+% 4: Colored by the filtered airspeed, not in Google Earth
+plotvector.colorModeGlobalPosition = 0;
+
+% Indicates if the GPS position should be plot as a reference
+plotvector.plotGPSReference = true;
+
+% Indicates if in Google Earth a projection of the path to the ground
+% should be displayed.
+plotvector.plotPathShadow = true;
+
+% Indicates if GoogleEarth should be autostarted.
+plotvector.autostartGoogleEarth = false;
+
+% *********************
+% Differential Pressure Plot Settings
+% *********************
+% Indicates if the differential pressure and airspeed measurements should
+% be corrected by the tube pressure loss according to: https://goo.gl/2d3WGc
+plotvector.doPressureCorrection = false;
+
+% Diameter of the pitot tube
+plotvector.pressureCorrectionD = 0.003; % [m]
+
+% Length of the pitot tube
+plotvector.pressureCorrectionL = 0.65; % [m]
+
+% DP reading of the sensor (101 for SDP3X, 62 for SDP600)
+plotvector.pressureCorrectionDPSensor = 59.3314; % [Pa]
+
+% Massflow (4.79e-7 for SDP3X, 6.17e-7 for SDP600)
+plotvector.pressureCorrectionMassflow = 4.79e-7; % [kg/s]
+
+% *********************
+% Wind Plot Settings
+% *********************
+% Resampling time interval for displaying the wind vector.
+plotvector.dtWindPlot = 0.5;
+
+% Indicates if the ground speed vector should be added to the wind vectors
+% plot.
+plotvector.plotGroundSpeedVector = false;
+
+% Indicates if the air speed vector should be added to the wind vectors
+% plot.
+plotvector.plotAirSpeedVector = false;
+
 % ************************************************************************
 % SETTINGS end
 % ************************************************************************
@@ -110,5 +210,5 @@ CropPX4LogData(sysvector, t_start, t_end);
 % ******************
 
 if generatePlots
-    DisplayPX4LogData(sysvector, topics, fileName, fconv_gpsalt, fconv_gpslatlong)
+    DisplayPX4LogData(sysvector, topics, fileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
 end
