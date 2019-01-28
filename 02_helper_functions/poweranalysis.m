@@ -38,11 +38,11 @@ h1 = t1;
 PWRboard = true;
 if(PWRboard==true)
     %Precalcs
-    m_SystemPower = sysvector('sensor_pwr_brd_0.pwr_brd_mot_l_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Data + ...
-            sysvector('sensor_pwr_brd_0.pwr_brd_analog_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_servo_volt').Data + ...
-            sysvector('sensor_pwr_brd_0.pwr_brd_digital_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_digital_volt').Data + ...
-            sysvector('sensor_pwr_brd_0.pwr_brd_ext_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Data + ...
-            sysvector('sensor_pwr_brd_0.pwr_brd_aux_amp').Data .* sysvector('sensor_pwr_brd_0.pwr_brd_digital_volt').Data;
+    m_SystemPower = sysvector.sensor_pwr_brd_0.pwr_brd_mot_l_amp.Data .* sysvector.sensor_pwr_brd_0.pwr_brd_system_volt.Data + ...
+            sysvector.sensor_pwr_brd_0.pwr_brd_analog_amp.Data .* sysvector.sensor_pwr_brd_0.pwr_brd_servo_volt.Data + ...
+            sysvector.sensor_pwr_brd_0.pwr_brd_digital_amp.Data .* sysvector.sensor_pwr_brd_0.pwr_brd_digital_volt.Data + ...
+            sysvector.sensor_pwr_brd_0.pwr_brd_ext_amp.Data .* sysvector.sensor_pwr_brd_0.pwr_brd_system_volt.Data + ...
+            sysvector.sensor_pwr_brd_0.pwr_brd_aux_amp.Data .* sysvector.sensor_pwr_brd_0.pwr_brd_digital_volt.Data;
     
     
     
@@ -67,21 +67,21 @@ end
 
 str='';
 for i=1:numel(t1)
-    idx1bat = find(sysvector('sensor_bat_mon_0.voltage').Time > t1(i),1,'first');
-    idx2bat = find(sysvector('sensor_bat_mon_0.voltage').Time > t2(i),1,'first');
-    idx1pwr = find(sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Time > t1(i),1,'first');
-    idx2pwr = find(sysvector('sensor_pwr_brd_0.pwr_brd_system_volt').Time > t2(i),1,'first');
-    idx1tecs = find(sysvector('tecs_status_0.airspeedSp').Time > t1(i),1,'first');
-    idx2tecs = find(sysvector('tecs_status_0.airspeedSp').Time > t2(i),1,'first');
-    idx1aspd = find(sysvector('airspeed_0.true_airspeed_m_s').Time > t1(i),1,'first');
-    idx2aspd = find(sysvector('airspeed_0.true_airspeed_m_s').Time > t2(i),1,'first');
+    idx1bat = find(sysvector.sensor_bat_mon_0.voltage.Time > t1(i),1,'first');
+    idx2bat = find(sysvector.sensor_bat_mon_0.voltage.Time > t2(i),1,'first');
+    idx1pwr = find(sysvector.sensor_pwr_brd_0.pwr_brd_system_volt.Time > t1(i),1,'first');
+    idx2pwr = find(sysvector.sensor_pwr_brd_0.pwr_brd_system_volt.Time > t2(i),1,'first');
+    idx1tecs = find(sysvector.tecs_status_0.airspeedSp.Time > t1(i),1,'first');
+    idx2tecs = find(sysvector.tecs_status_0.airspeedSp.Time > t2(i),1,'first');
+    idx1aspd = find(sysvector.airspeed_0.true_airspeed_m_s.Time > t1(i),1,'first');
+    idx2aspd = find(sysvector.airspeed_0.true_airspeed_m_s.Time > t2(i),1,'first');
         
-    dt(i) = sysvector('sensor_bat_mon_0.voltage').Time(idx2bat)-sysvector('sensor_bat_mon_0.voltage').Time(idx1bat);
+    dt(i) = sysvector.sensor_bat_mon_0.voltage.Time(idx2bat)-sysvector.sensor_bat_mon_0.voltage.Time(idx1bat);
 
     %mean airspeed, power, etc
-    airspeed_ref(i) = mean(sysvector('tecs_status_0.airspeedSp').Data(idx1tecs:idx2tecs));
-    v_mean_tas(i) = mean( sysvector('airspeed_0.true_airspeed_m_s').Data(idx1aspd:idx2aspd));
-    v_mean_ias(i) = mean( sysvector('airspeed_0.indicated_airspeed_m_s').Data(idx1aspd:idx2aspd));
+    airspeed_ref(i) = mean(sysvector.tecs_status_0.airspeedSp.Data(idx1tecs:idx2tecs));
+    v_mean_tas(i) = mean( sysvector.airspeed_0.true_airspeed_m_s.Data(idx1aspd:idx2aspd));
+    v_mean_ias(i) = mean( sysvector.airspeed_0.indicated_airspeed_m_s.Data(idx1aspd:idx2aspd));
 %     if(newPWRboard == false)
 %         U_mean(i) = mean(sysvector.POWS_Main_Volt(idx1:idx2));
 %         I_mean(i) = mean(sysvector.POWS_Main_Cur(idx1:idx2));
@@ -95,7 +95,7 @@ for i=1:numel(t1)
 %         I_mean(i) = 0.0;
 %         P_mean(i) = mean(sysvector.p_system(idx1:idx2))+P_Bias;
 %     end
-    P_mean_batmon(i) = mean(sysvector('sensor_bat_mon_0.voltage').Data(idx1bat:idx2bat).*sysvector('sensor_bat_mon_0.current').Data(idx1bat:idx2bat)) /1.0E6;
+    P_mean_batmon(i) = mean(sysvector.sensor_bat_mon_0.voltage.Data(idx1bat:idx2bat).*sysvector.sensor_bat_mon_0.current.Data(idx1bat:idx2bat)) /1.0E6;
     P_mean_pwrbrd(i) = mean(m_SystemPower(idx1pwr:idx2pwr));
 %     uThrot_mean(i) = mean(sysvector.ASLD_uT(idx1:idx2));
 %     pitch_mean(i) = mean(sysvector.ASLD_P(idx1:idx2))*180.0/pi();

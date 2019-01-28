@@ -5,8 +5,8 @@ fig1 = figure();
 fig1.Name = 'CPU Load';
 
 hold on;
-plot(sysvector('cpuload_0.load')); 
-plot(sysvector('cpuload_0.ram_usage'));
+plot(sysvector.cpuload_0.load); 
+plot(sysvector.cpuload_0.ram_usage);
 xlabel('time [s]')
 hold off;
 ylim([0, 1]);

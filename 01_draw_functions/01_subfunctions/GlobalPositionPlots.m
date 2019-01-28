@@ -14,33 +14,38 @@
 function GlobalPositionPlots(sysvector, topics, plainFileName, ...
     fconv_gpsalt, fconv_gpslatlong, plotvector)
 
+% check if the commander_state is non-empty
+if topics.commander_state.logged && (plotvector.colorModeGlobalPosition == 0) && (numel(sysvector.commander_state_0.main_state.Time) == 0)
+    error('DisplayGlobalPositionLogData: No commander_state message in the requested time period')
+end
+
 % resample the position, commander state and gps to 10 Hz
 min_time = realmin;
 max_time = realmax;
 if topics.vehicle_global_position.logged
-    min_time = max(min_time, sysvector('vehicle_global_position_0.lat').Time(1));
-    max_time = min(max_time, sysvector('vehicle_global_position_0.lat').Time(end));
+    min_time = max(min_time, sysvector.vehicle_global_position_0.lat.Time(1));
+    max_time = min(max_time, sysvector.vehicle_global_position_0.lat.Time(end));
 end
 if topics.vehicle_gps_position.logged && plotvector.plotGPSReference
-    min_time = max(min_time, sysvector('vehicle_gps_position_0.lat').Time(1));
-    max_time = min(max_time, sysvector('vehicle_gps_position_0.lat').Time(end));
+    min_time = max(min_time, sysvector.vehicle_gps_position_0.lat.Time(1));
+    max_time = min(max_time, sysvector.vehicle_gps_position_0.lat.Time(end));
 end
 if topics.commander_state.logged && (plotvector.colorModeGlobalPosition == 0)
-    min_time = max(min_time, sysvector('commander_state_0.main_state').Time(1));
-    max_time = min(max_time, sysvector('commander_state_0.main_state').Time(end));
+    min_time = max(min_time, sysvector.commander_state_0.main_state.Time(1));
+    max_time = min(max_time, sysvector.commander_state_0.main_state.Time(end));
 end
 time_resampled = min_time:0.1:max_time;
 
 if topics.vehicle_gps_position.logged
-    gps_lat = resample(sysvector('vehicle_gps_position_0.lat')*fconv_gpslatlong, time_resampled);
-    gps_lon = resample(sysvector('vehicle_gps_position_0.lon')*fconv_gpslatlong, time_resampled);
-    gps_alt = resample(sysvector('vehicle_gps_position_0.alt')*fconv_gpsalt, time_resampled);
+    gps_lat = resample(sysvector.vehicle_gps_position_0.lat*fconv_gpslatlong, time_resampled);
+    gps_lon = resample(sysvector.vehicle_gps_position_0.lon*fconv_gpslatlong, time_resampled);
+    gps_alt = resample(sysvector.vehicle_gps_position_0.alt*fconv_gpsalt, time_resampled);
 end
 
 if topics.vehicle_global_position.logged
-    pos_lat = resample(sysvector('vehicle_global_position_0.lat'), time_resampled);
-    pos_lon = resample(sysvector('vehicle_global_position_0.lon'), time_resampled);
-    pos_alt = resample(sysvector('vehicle_global_position_0.alt'), time_resampled);
+    pos_lat = resample(sysvector.vehicle_global_position_0.lat, time_resampled);
+    pos_lon = resample(sysvector.vehicle_global_position_0.lon, time_resampled);
+    pos_alt = resample(sysvector.vehicle_global_position_0.alt, time_resampled);
 end
 
 switch(plotvector.colorModeGlobalPosition)
@@ -58,7 +63,7 @@ switch(plotvector.colorModeGlobalPosition)
         end
 
         % detect mode changes
-        commander_state = resample(sysvector('commander_state_0.main_state'), time_resampled);
+        commander_state = resample(sysvector.commander_state_0.main_state, time_resampled);
 
         commander_state_change = find(logical(diff(commander_state.Data)))+1;
         if isempty(commander_state_change)
@@ -78,9 +83,9 @@ switch(plotvector.colorModeGlobalPosition)
         color = pos_alt.Data;
     case 3
         % color changes by velocity
-        vel_n = resample(sysvector('vehicle_global_position_0.vel_n'), time_resampled);
-        vel_e = resample(sysvector('vehicle_global_position_0.vel_e'), time_resampled);
-        vel_d = resample(sysvector('vehicle_global_position_0.vel_d'), time_resampled);
+        vel_n = resample(sysvector.vehicle_global_position_0.vel_n, time_resampled);
+        vel_e = resample(sysvector.vehicle_global_position_0.vel_e, time_resampled);
+        vel_d = resample(sysvector.vehicle_global_position_0.vel_d, time_resampled);
         color = sqrt(vel_n.Data.^2+vel_e.Data.^2+vel_d.Data.^2);
     case 4
         if (~topics.airspeed.logged) || (~topics.vehicle_global_position.logged)
@@ -88,7 +93,7 @@ switch(plotvector.colorModeGlobalPosition)
         end
         
         % interpolate airspeed
-        airspeed = sysvector('airspeed_0.true_airspeed_m_s');
+        airspeed = sysvector.airspeed_0.true_airspeed_m_s;
         if (airspeed.Time(1) > pos_lat.Time(1))
             airspeed = addsample(airspeed, 'Data', airspeed.Data(1), 'Time', ...
                 pos_lat.Time(1));
@@ -315,13 +320,13 @@ if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
     hold on;
     plot(pos_alt.Time,pos_alt.Data);
     plot(gps_alt.Time,gps_alt.Data);
-    plot(sysvector('vehicle_air_data_0.baro_alt_meter').Time,sysvector('vehicle_air_data_0.baro_alt_meter').Data);
+    plot(sysvector.vehicle_air_data_0.baro_alt_meter.Time,sysvector.vehicle_air_data_0.baro_alt_meter.Data);
     hold off;
     legend('Estimated','GPS','Baro');
     title('Pos alt [m]');
     pos(4) = subplot(4,1,4);
     hold on;
-    plot(sysvector('vehicle_global_position_0.vel_d').Time,sysvector('vehicle_global_position_0.vel_d').Data);
+    plot(sysvector.vehicle_global_position_0.vel_d.Time,sysvector.vehicle_global_position_0.vel_d.Data);
     legend('Downwards velocity v_d');
     title('Downwards velocity v_d[m/s]');
 

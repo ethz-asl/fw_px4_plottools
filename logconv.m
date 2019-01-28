@@ -52,7 +52,7 @@ loadingVerbose = false;
 saveMatlabData = true;
 
 % delete the csv file after a run of the script
-deleteCSVFiles = false;
+deleteCSVFiles = true;
 
 % delimiter for the path
 %   '/' for ubuntu
@@ -125,7 +125,7 @@ plotvector.colorModeGPS = 0;
 % 2: Colored by altitude, not in Google Earth
 % 3: Colored by the estimated ground velocity, not in Google Earth
 % 4: Colored by the filtered airspeed, not in Google Earth
-plotvector.colorModeGlobalPosition = 0;
+plotvector.colorModeGlobalPosition = 4;
 
 % Indicates if the GPS position should be plot as a reference
 plotvector.plotGPSReference = true;
@@ -186,7 +186,7 @@ fconv_gpslatlong=1E-7;   % [gps_raw_position_unit] to [deg]
 if loadingMode==2
     if exist([fileName '.mat'], 'file') == 2
         load([fileName '.mat']);
-        if (numel(fieldnames(topics)) == 0) || (sysvector.Count == 0)
+        if (numel(fieldnames(topics)) == 0) || (numel(fieldnames(sysvector)) == 0)
             error(['Sysvector and/or topics loaded from the .mat file are empty.' newline ...
                 'Run script first with loadingMode=0 and saveMatlabData=true'])
         end
@@ -203,7 +203,7 @@ end
 % Crop the data
 % ******************
 
-CropPX4LogData(sysvector, t_start, t_end);
+sysvector = CropPX4LogData(sysvector, t_start, t_end);
 
 % ******************
 % Print the data

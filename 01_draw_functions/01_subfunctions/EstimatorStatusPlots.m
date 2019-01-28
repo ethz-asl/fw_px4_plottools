@@ -7,7 +7,7 @@
 function EstimatorStatusPlots(sysvector, topics)
 if topics.estimator_status.logged
     % innovation checkbit
-    inno_check_bits = de2bi(sysvector('estimator_status_0.innovation_check_flags').Data,12);
+    inno_check_bits = de2bi(sysvector.estimator_status_0.innovation_check_flags.Data,12);
     fig1 = figure();
     fig1.Name = 'Innovation Check Flags';
 
@@ -18,7 +18,7 @@ if topics.estimator_status.logged
     
     for i = 1:12
         inno_check(i) = subplot(3,4,i);
-        plot(sysvector('estimator_status_0.innovation_check_flags').Time,inno_check_bits(:,i));
+        plot(sysvector.estimator_status_0.innovation_check_flags.Time,inno_check_bits(:,i));
         title(titles(i))
     end
 
@@ -28,7 +28,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % gps_check_fail_flags
-    gps_check_bits = de2bi(sysvector('estimator_status_0.gps_check_fail_flags').Data,10);
+    gps_check_bits = de2bi(sysvector.estimator_status_0.gps_check_fail_flags.Data,10);
     fig2 = figure();
     fig2.Name = 'GPS Check Fail Flags';
     
@@ -42,7 +42,7 @@ if topics.estimator_status.logged
     
     for i = 1:10
         gps_check(i) = subplot(5,2,i);
-        plot(sysvector('estimator_status_0.gps_check_fail_flags').Time,gps_check_bits(:,i));
+        plot(sysvector.estimator_status_0.gps_check_fail_flags.Time,gps_check_bits(:,i));
         title(titles(i))
     end
 
@@ -52,7 +52,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % control_mode_flags
-    control_mode_bits = de2bi(sysvector('estimator_status_0.control_mode_flags').Data,22);
+    control_mode_bits = de2bi(sysvector.estimator_status_0.control_mode_flags.Data,22);
     fig3 = figure();
     fig3.Name = 'Control Mode Flags';
     
@@ -68,7 +68,7 @@ if topics.estimator_status.logged
     
     for i = 1:20
         control_modes(i) = subplot(5,4,i);
-        plot(sysvector('estimator_status_0.control_mode_flags').Time,control_mode_bits(:,i));
+        plot(sysvector.estimator_status_0.control_mode_flags.Time,control_mode_bits(:,i));
         title(titles(i))
     end
     
@@ -78,7 +78,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
         
     % filter_fault_flags
-    filter_fault_flags = de2bi(sysvector('estimator_status_0.filter_fault_flags').Data,16);
+    filter_fault_flags = de2bi(sysvector.estimator_status_0.filter_fault_flags.Data,16);
     fig4 = figure();
     fig4.Name = 'Filter Fault Flags';
     
@@ -92,7 +92,7 @@ if topics.estimator_status.logged
     
     for i = 1:16
         filter_fault(i) = subplot(4,4,i);
-        plot(sysvector('estimator_status_0.filter_fault_flags').Time,filter_fault_flags(:,i));
+        plot(sysvector.estimator_status_0.filter_fault_flags.Time,filter_fault_flags(:,i));
         title(titles(i))
     end
     
@@ -102,7 +102,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % solution_status_flags
-    solution_status_flags = de2bi(sysvector('estimator_status_0.solution_status_flags').Data,12);
+    solution_status_flags = de2bi(sysvector.estimator_status_0.solution_status_flags.Data,12);
     fig5 = figure();
     fig5.Name = 'Solution Status Flags';
     
@@ -118,7 +118,7 @@ if topics.estimator_status.logged
     
     for i = 1:12
         filter_fault(i) = subplot(4,3,i);
-        plot(sysvector('estimator_status_0.solution_status_flags').Time,solution_status_flags(:,i));
+        plot(sysvector.estimator_status_0.solution_status_flags.Time,solution_status_flags(:,i));
         title(titles(i))
     end
     
@@ -132,27 +132,27 @@ if topics.estimator_status.logged
     fig6.Name = 'Estimator Test Ratios';
     
     test_ratios(1) = subplot(3,2,1);
-    plot(sysvector('estimator_status_0.mag_test_ratio').Time,sysvector('estimator_status_0.mag_test_ratio').Data);
+    plot(sysvector.estimator_status_0.mag_test_ratio.Time,sysvector.estimator_status_0.mag_test_ratio.Data);
     title('Mag Test Ratio')
     
     test_ratios(2) = subplot(3,2,2);
-    plot(sysvector('estimator_status_0.vel_test_ratio').Time,sysvector('estimator_status_0.vel_test_ratio').Data);
+    plot(sysvector.estimator_status_0.vel_test_ratio.Time,sysvector.estimator_status_0.vel_test_ratio.Data);
     title('Vel Test Ratio')
     
     test_ratios(3) = subplot(3,2,3);
-    plot(sysvector('estimator_status_0.pos_test_ratio').Time,sysvector('estimator_status_0.pos_test_ratio').Data);
+    plot(sysvector.estimator_status_0.pos_test_ratio.Time,sysvector.estimator_status_0.pos_test_ratio.Data);
     title('Pos Test Ratio')
     
     test_ratios(4) = subplot(3,2,4);
-    plot(sysvector('estimator_status_0.hgt_test_ratio').Time,sysvector('estimator_status_0.hgt_test_ratio').Data);
+    plot(sysvector.estimator_status_0.hgt_test_ratio.Time,sysvector.estimator_status_0.hgt_test_ratio.Data);
     title('Hgt Test Ratio')
     
     test_ratios(5) = subplot(3,2,5);
-    plot(sysvector('estimator_status_0.tas_test_ratio').Time,sysvector('estimator_status_0.tas_test_ratio').Data);
+    plot(sysvector.estimator_status_0.tas_test_ratio.Time,sysvector.estimator_status_0.tas_test_ratio.Data);
     title('Tas Test Ratio')
     
     test_ratios(6) = subplot(3,2,6);
-    plot(sysvector('estimator_status_0.hagl_test_ratio').Time,sysvector('estimator_status_0.hagl_test_ratio').Data);
+    plot(sysvector.estimator_status_0.hagl_test_ratio.Time,sysvector.estimator_status_0.hagl_test_ratio.Data);
     title('Hagl Test Ratio')
 
     linkaxes(test_ratios(:),'x');
