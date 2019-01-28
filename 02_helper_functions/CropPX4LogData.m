@@ -13,15 +13,20 @@ function [ sysvector ] = CropPX4LogData(sysvector, t_start, t_end)
 
     disp('INFO: Start cropping the log data.')
 
-    sysvector_keys = sysvector.keys();
-    for idx_key = 1:numel(sysvector_keys)
-        % copy data info
-        data_info = sysvector(sysvector_keys{idx_key}).DataInfo;
+    
+    fieldnames_topics = fieldnames(sysvector);
+    for idx_tpc = 1:numel(fieldnames_topics)
+        fieldnames_message = fieldnames(sysvector.(fieldnames_topics{idx_tpc}));
+        
+        for idx_msg = 1:numel(fieldnames_message)
+            % copy data info
+            data_info = sysvector.(fieldnames_topics{idx_tpc}).(fieldnames_message{idx_msg}).DataInfo;
 
-        % crop time series
-        ts_temp = getsampleusingtime(sysvector(sysvector_keys{idx_key}), t_start, t_end);
-        ts_temp.DataInfo = data_info;
-        sysvector(sysvector_keys{idx_key}) = ts_temp;
+            % crop time series
+            ts_temp = getsampleusingtime(sysvector.(fieldnames_topics{idx_tpc}).(fieldnames_message{idx_msg}), t_start, t_end);
+            ts_temp.DataInfo = data_info;
+            sysvector.(fieldnames_topics{idx_tpc}).(fieldnames_message{idx_msg}) = ts_temp;
+        end
     end
 
     disp('INFO: Finshed cropping the log data.')

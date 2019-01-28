@@ -2,20 +2,20 @@ function PrintFlightMetricsSummary(sysvector)
 %PRINTFLIGHTMETRICSSUMMARY Summary of this function goes here
 %   Detailed explanation goes here
 
-iLaunchAir=find(sysvector('airspeed_0.true_airspeed_m_s').Data > 8.0,1,'first');
-iLandAir=find(sysvector('airspeed_0.true_airspeed_m_s').Data > 8.0,1,'last');
+iLaunchAir=find(sysvector.airspeed_0.true_airspeed_m_s.Data > 8.0,1,'first');
+iLandAir=find(sysvector.airspeed_0.true_airspeed_m_s.Data > 8.0,1,'last');
 
 if(isempty(iLaunchAir) || isempty(iLandAir))
-    display('WARNING: No launch- or land-time found.');
+    disp('WARNING: No launch- or land-time found.');
 else
-    tLaunch = sysvector('airspeed_0.true_airspeed_m_s').Time(iLaunchAir);
-    tLand = sysvector('airspeed_0.true_airspeed_m_s').Time(iLandAir);
-    iLaunchGnd = find(sysvector('vehicle_global_position_0.vel_n').Time > tLaunch,1,'first');
-    iLandGnd = find(sysvector('vehicle_global_position_0.vel_n').Time > tLand,1,'first');
+    tLaunch = sysvector.airspeed_0.true_airspeed_m_s.Time(iLaunchAir);
+    tLand = sysvector.airspeed_0.true_airspeed_m_s.Time(iLandAir);
+    iLaunchGnd = find(sysvector.vehicle_global_position_0.vel_n.Time > tLaunch,1,'first');
+    iLandGnd = find(sysvector.vehicle_global_position_0.vel_n.Time > tLand,1,'first');
 
     FlightTime = tLand-tLaunch;
-    vAirMean = mean(sysvector('airspeed_0.true_airspeed_m_s').Data(iLaunchAir:iLandAir));
-    vGnd = sqrt(sysvector('vehicle_global_position_0.vel_n').Data.^2+sysvector('vehicle_global_position_0.vel_e').Data.^2);
+    vAirMean = mean(sysvector.airspeed_0.true_airspeed_m_s.Data(iLaunchAir:iLandAir));
+    vGnd = sqrt(sysvector.vehicle_global_position_0.vel_n.Data.^2+sysvector.vehicle_global_position_0.vel_e.Data.^2);
     vGndMean = mean(vGnd(iLaunchGnd:iLandGnd));
     FlightDistanceAir = vAirMean * FlightTime;
     FlightDistanceGnd = vGndMean * FlightTime;
