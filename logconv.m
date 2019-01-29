@@ -195,8 +195,9 @@ if loadingMode==2
             'Run script first with loadingMode=0 and saveMatlabData=true'])
     end
 else
-    [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, loadingMode, pathDelimiter,...
-        fconv_timestamp, loadingVerbose, saveMatlabData, deleteCSVFiles);
+    [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, '05_csv_files', '06_mat_files',...
+            loadingMode, pathDelimiter, fconv_timestamp, loadingVerbose,...
+            saveMatlabData, deleteCSVFiles);
 end
 
 % ******************
