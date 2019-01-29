@@ -1,4 +1,5 @@
-function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, loadingMode, ...
+function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, csvLocation,...
+                                                matLocation, loadingMode, ...
                                                 pathDelimiter, fconv_timestamp, ...
                                                 loadingVerbose, saveMatlabData, ...
                                                 deleteCSVFiles)
@@ -19,7 +20,7 @@ function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, loadingM
         end
 
         tic;
-        system(sprintf('ulog2csv %s -o 05_csv_files', fullFileName));
+        system(sprintf('ulog2csv %s -o %s', fullFileName, csvLocation));
         time_csv_conversion = toc;
         disp(['INFO: Converting the ulog file to csv took ' char(num2str(time_csv_conversion)) ' s.'])
     end
@@ -129,14 +130,14 @@ function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, loadingM
     % save the sysvector and topics struct if requested
     % *********************************
     if saveMatlabData
-        save(['06_mat_files' pathDelimiter fileName '.mat'], 'sysvector', 'topics');
+        save([matLocation pathDelimiter fileName '.mat'], 'sysvector', 'topics');
     end
     
     % *********************************
     % delete the csv files if requested
     % *********************************
     if deleteCSVFiles
-        system(sprintf('rm 05_csv_files%s%s_*', pathDelimiter, fileName));
+        system(sprintf('rm %s%s%s_*', csvLocation, pathDelimiter, fileName));
     end
     
     disp('INFO: Finished importing the log data.')
