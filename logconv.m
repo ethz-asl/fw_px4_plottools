@@ -20,6 +20,7 @@ addpath(genpath('04_log_files'));
 addpath(genpath('05_csv_files'));
 addpath(genpath('06_mat_files'));
 addpath(genpath('07_kmz_files'));
+addpath(genpath('08_analysis_tools'));
 
 % ************************************************************************
 % SETTINGS (modify necessary parameter)
