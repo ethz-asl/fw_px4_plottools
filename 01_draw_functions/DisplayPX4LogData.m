@@ -6,7 +6,7 @@
 
 function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
     % Output flight summary
-    PrintFlightMetricsSummary(sysvector);
+    PrintFlightMetricsSummary(sysvector, topics);
 
     % display GPS data if it was logged
     if topics.vehicle_gps_position.logged && plotvector.gpsPlots
