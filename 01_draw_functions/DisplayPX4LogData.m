@@ -112,6 +112,13 @@ function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv
         MpptPlots(sysvector, topics);
     end
 
+    % airflow angle plots
+    if ((topics.airflow_aoa.logged || topics.airflow_aos.logged || ...
+        topics.sensor_hall.logged || topics.sensor_hall_01.logged) && ...
+        plotvector.airflowAnglePlots)
+        AirflowAnglePlots(sysvector, topics);
+    end
+
     % link the axes of the different figures
     if plotvector.linkAxes
        LinkFigureAxes();
