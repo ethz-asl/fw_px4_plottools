@@ -97,6 +97,7 @@ plotvector.powerPlots = true;
 plotvector.BatMonPlots = true;
 plotvector.iridiumsbdStatusPlots = true;
 plotvector.mpptPlots = true;
+plotvector.airflowAnglePlots = true;
 
 % *********************
 % Link the Figure Axis Settings
