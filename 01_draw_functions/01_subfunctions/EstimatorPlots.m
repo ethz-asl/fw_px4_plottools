@@ -76,6 +76,9 @@ if topics.estimator_status.logged
     hold on;
     plot(sysvector.estimator_status_0.states_22.Time,sysvector.estimator_status_0.states_22.Data);
     plot(sysvector.estimator_status_0.states_23.Time,sysvector.estimator_status_0.states_23.Data);
+    if (isfield(sysvector.estimator_status_0, 'states_24'))
+        plot(sysvector.estimator_status_0.states_24.Time,sysvector.estimator_status_0.states_24.Data);
+    end
     hold off;
     title('Wind states (NED frame) [m/s]');
     state(8) = subplot(3,3,9);
@@ -141,6 +144,9 @@ if topics.estimator_status.logged
     hold on;
     plot(sysvector.estimator_status_0.covariances_22.Time,sysvector.estimator_status_0.covariances_22.Data);
     plot(sysvector.estimator_status_0.covariances_23.Time,sysvector.estimator_status_0.covariances_23.Data);
+    if (isfield(sysvector.estimator_status_0, 'covariances_24'))
+        plot(sysvector.estimator_status_0.covariances_24.Time,sysvector.estimator_status_0.covariances_24.Data);
+    end
     hold off;
     title('Wind covariances');
     state(8) = subplot(3,3,9);
