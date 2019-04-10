@@ -25,6 +25,6 @@ if (topics.airspeed.logged)
     end
 
 else
-    disp('INFO: No flight detected.');
+    disp('INFO: Airspeed topic not logged.');
 end
 
