@@ -6,7 +6,13 @@ elseif (strcmp(sensor_sel, 'BETA') && topics.sensor_hall_01.logged)
     sensor_hall_mag_T = sysvector.sensor_hall_01_0.mag_T;
 else
     clc;
-    disp('HALL SENS CAL: Logged topics are not sufficient for airspeed calibration.');
+    if (strcmp(sensor_sel, 'ALPHA'))
+        disp('ERROR: calibration of ALPHA sensor requires that sensor_hall topic is logged.');
+    elseif (strcmp(sensor_sel, 'BETA'))
+        disp('ERROR: calibration of BETA sensor requires that sensor_hall_01 topic is logged.');
+    else
+        disp(['ERROR: ', sensor_sel, ' is not a valid sensor identifier -- see instructions in 08_analysis_tools/CalibrateHallSensor.m']);
+    end
     return;
 end
 

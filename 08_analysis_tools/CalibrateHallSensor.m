@@ -23,7 +23,8 @@
 % NOTE: it is advised to take steps of 5 degrees at larger angles, until
 % reaching e.g. +/- 5-10 degrees, where the step size shold be reduced
 % (e.g. 1 or 2 degrees) in an attempt to give a higher accuracy fit at the
-% more common values the vane will take while in flight.
+% more common values the vane will take while in flight (see calibration 
+% option "cal_opt.small_step_range" in the following steps).
 % 6) shut down pixhawk, conver the log file, and work with this script.
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
