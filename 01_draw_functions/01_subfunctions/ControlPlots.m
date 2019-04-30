@@ -1,5 +1,7 @@
-function ControlPlots(sysvector, fconv_gpsalt)
+function ControlPlots(sysvector, paramvector, params, fconv_gpsalt)
 % Display the low level controller data.
+
+lines_ = lines(7);
 
 % cut rate and attitude setpoints
 pRef = getsampleusingtime(sysvector.vehicle_rates_setpoint_0.roll,...
@@ -21,6 +23,11 @@ pitchRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 yawRef = getsampleusingtime(sysvector.vehicle_attitude_setpoint_0.yaw_body,...
     sysvector.vehicle_attitude_0.yawspeed.Time(1), sysvector.vehicle_attitude_0.yawspeed.Time(end));
 yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
+
+% resample trim params
+trim_roll_resampled = TimeseriesExtrapolation(paramvector.trim_roll, sysvector.actuator_controls_0.control_0);
+trim_pitch_resampled = TimeseriesExtrapolation(paramvector.trim_pitch, sysvector.actuator_controls_0.control_0);
+trim_yaw_resampled = TimeseriesExtrapolation(paramvector.trim_yaw, sysvector.actuator_controls_0.control_0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % First Figure: Overall Control
@@ -74,16 +81,23 @@ hold off;
 legend('p','pRef','q','qRef','r','rRef');
 ylabel('Rates [deg/s]')
 
-% actuator output plots
+% actuator controls plots
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[7 8],[plotmargins.vert plotmargins.horiz]);
 hold on;
-plot(sysvector.actuator_controls_0.control_0.Time, sysvector.actuator_controls_0.control_0.Data);
-plot(sysvector.actuator_controls_0.control_1.Time, sysvector.actuator_controls_0.control_1.Data);
-plot(sysvector.actuator_controls_0.control_2.Time, sysvector.actuator_controls_0.control_2.Data);
-plot(sysvector.actuator_controls_0.control_3.Time, sysvector.actuator_controls_0.control_3.Data);
-plot(sysvector.actuator_controls_0.control_4.Time, sysvector.actuator_controls_0.control_4.Data);
-legend('u_{ail}','u_{elev}', 'u_{rud}', 'u_{throt}', 'u_{flaps}');
-ylabel('Act. outputs []')
+ref_opacity = 0.5;
+plot(trim_roll_resampled.Time, trim_roll_resampled.Data, '-.', 'color', ...
+    lines_(1,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
+plot(sysvector.actuator_controls_0.control_0.Time, sysvector.actuator_controls_0.control_0.Data, 'color', lines_(1,:));
+plot(trim_pitch_resampled.Time, trim_pitch_resampled.Data, '-.', 'color', ...
+    lines_(2,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
+plot(sysvector.actuator_controls_0.control_1.Time, sysvector.actuator_controls_0.control_1.Data, 'color', lines_(2,:));
+plot(trim_yaw_resampled.Time, trim_yaw_resampled.Data, '-.', 'color', ...
+    lines_(3,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
+plot(sysvector.actuator_controls_0.control_2.Time, sysvector.actuator_controls_0.control_2.Data, 'color', lines_(3,:));
+plot(sysvector.actuator_controls_0.control_3.Time, sysvector.actuator_controls_0.control_3.Data, 'color', lines_(4,:));
+plot(sysvector.actuator_controls_0.control_4.Time, sysvector.actuator_controls_0.control_4.Data, 'color', lines_(5,:));
+legend('u_{ail}^{trim}', 'u_{ail}', 'u_{elev}^{trim}', 'u_{elev}', 'u_{rud}^{trim}', 'u_{rud}', 'u_{throt}', 'u_{flaps}');
+ylabel('Act. controls []')
 
 % airspeed plots
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[9],[plotmargins.vert plotmargins.horiz]);
