@@ -130,22 +130,6 @@ function [sysvector, topics, paramvector, params] = ...
         end
     end
    
-    % *********************************
-    % save the sysvector and topics struct if requested
-    % *********************************
-    if saveMatlabData
-        save([matLocation pathDelimiter fileName '.mat'], 'sysvector', 'topics');
-    end
-    
-    % *********************************
-    % delete the csv files if requested
-    % *********************************
-    if deleteCSVFiles
-        system(sprintf('rm %s%s%s_*', csvLocation, pathDelimiter, fileName));
-    end
-    
-    disp('INFO: Finished importing the log data.')
-    
     % *********************************************************************
     % IMPORT PARAMETERS ***************************************************
     % *********************************************************************
@@ -245,7 +229,7 @@ function [sysvector, topics, paramvector, params] = ...
     % save the paramvector and params struct if requested
     % *********************************
     if saveMatlabData
-        save([matLocation pathDelimiter fileName '.mat'], 'paramvector', 'params', '-append');
+        save([matLocation pathDelimiter fileName '.mat'], 'sysvector', 'topics', 'paramvector', 'params');
     end
 
     % *********************************
@@ -255,5 +239,5 @@ function [sysvector, topics, paramvector, params] = ...
         system(sprintf('rm %s%s%s_*', csvLocation, pathDelimiter, fileName));
     end
 
-    disp('INFO: Finished importing the logged parameter data.');
+    disp('INFO: Finished importing the log data.')
 end
