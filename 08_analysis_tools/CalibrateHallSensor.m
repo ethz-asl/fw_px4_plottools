@@ -96,10 +96,9 @@ cal_data = AutomatedHallCalibration(sysvector, topics, sensor_sel, cal_opt);
 
 % TODO: just using mean measurements for now.. could do weighted later from
 % standard deviations
-[p,S,mu] = polyfit(cal_data(:,2)', cal_data(:,1)', 3);
+p= polyfit(cal_data(:,2)', cal_data(:,1)', 3);
 poly_fit.p = p;
-poly_fit.S = S;
-poly_fit.mu = mu;
+
 
 % parameters (converted to int) for PX4
 disp(['CAL_HALL_P0 = ',int2str(int32(p(4)*1e7))]);
