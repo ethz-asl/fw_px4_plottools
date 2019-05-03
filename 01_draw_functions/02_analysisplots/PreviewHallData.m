@@ -30,7 +30,7 @@ if (plot_ploy_fit && ~isempty(cal_data) && ~isempty(poly_fit))
     xx = linspace(sensor_hall_mag_T.Data(cal_data(1,4)), ...
         sensor_hall_mag_T.Data(cal_data(last_populated_idx,5)), ...
         501);
-    yy = polyval(poly_fit.p, xx, poly_fit.S, poly_fit.mu);
+    yy = polyval(poly_fit.p, xx);
     ax_(3) = plot(xx, yy, 'linewidth', 2, 'color', 'r');
     
     legend(ax_, {'measurements', 'means', 'poly fit'});
