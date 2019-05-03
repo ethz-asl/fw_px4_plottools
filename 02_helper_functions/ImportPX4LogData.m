@@ -1,10 +1,14 @@
-function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, csvLocation,...
-                                                matLocation, loadingMode, ...
-                                                pathDelimiter, fconv_timestamp, ...
-                                                loadingVerbose, saveMatlabData, ...
-                                                deleteCSVFiles)
+function [sysvector, topics, paramvector, params] = ...
+    ImportPX4LogData(fileName, fileLocation, csvLocation, matLocation, ...
+                     loadingMode, pathDelimiter, fconv_timestamp, ...
+                     loadingVerbose, saveMatlabData, deleteCSVFiles)
 %IMPORTPX4LOGDATA Summary of this function goes here
 %   Detailed explanation goes here
+
+    % *********************************************************************
+    % IMPORT TOPICS *******************************************************
+    % *********************************************************************
+
     disp('INFO: Start importing the log data.')
     
     % setup the topics struct
@@ -126,19 +130,114 @@ function [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, csvLocat
         end
     end
    
+    % *********************************************************************
+    % IMPORT PARAMETERS ***************************************************
+    % *********************************************************************
+    
+    disp('INFO: Start importing the log param data.')
+    
+    % setup the params struct
+    params = setupParams();
+
     % *********************************
-    % save the sysvector and topics struct if requested
+    % convert the log file to csv files
     % *********************************
-    if saveMatlabData
-        save([matLocation pathDelimiter fileName '.mat'], 'sysvector', 'topics');
+    if (loadingMode~=1) && (loadingMode~=2)
+        fullFileName = [fileLocation pathDelimiter fileName '.ulg'];
+        if exist(fullFileName, 'file') ~= 2
+            error('Log file does not exist: %s', fullFileName)
+        end
+        fullCSVName = [csvLocation pathDelimiter fileName '_params.csv'];
+
+        tic;
+        system(sprintf('ulog_params -t %s %s', fullFileName, fullCSVName));
+        time_csv_conversion = toc;
+        disp(['INFO: Converting the ulog params to csv took ' char(num2str(time_csv_conversion)) ' s.'])
     end
     
+    % *********************************
+    % unpack the csv files
+    % *********************************
+    disp('INFO: Starting to import the csv data into matlab.')
+    tic;
+    param_fields = fieldnames(params);
+    
+    if numel(param_fields) == 0
+        error('No params specified in the setupParams() function.') 
+    end
+    
+    if exist(fullCSVName, 'file') == 2 % make sure file was created
+        try
+            % read in the data
+            opts = detectImportOptions(fullCSVName);
+            opts.EmptyLineRule = 'read';
+            csv_data = readtable(fullCSVName, opts,'ReadRowNames',true);
+            size_csv_data = size(csv_data);
+
+            % convert extra column strings to doubles and group numeric param
+            % properties
+            if size_csv_data(2) > 2
+                extra_cols = str2double(csv_data{:,3:size_csv_data(2)});
+            else
+                extra_cols = [];
+            end
+            csv_numeric_data = [csv_data{:,2}, extra_cols]; 
+
+            for idx_data = 1:2:size_csv_data(1) % skip timestamp rows
+
+                for idx_params = 1:numel(param_fields)
+
+                    % check if logged field is in defined param list
+                    if strcmpi(string(csv_data{idx_data, 1}), string(param_fields{idx_params}))
+
+                        % set field in parameter struct
+                        temp_params = csv_numeric_data(idx_data:idx_data+1,:);
+                        temp_params = temp_params(~isnan(temp_params));
+                        paramvector.(param_fields{idx_params}) = ...
+                            timeseries(temp_params(1,:), temp_params(2,:));
+
+                        % set logged
+                        params.(param_fields{idx_params}).logged = true;
+
+                    end
+                end
+            end
+        catch
+            disp(['Could not process the param: ' char(param_fields{idx_params})]);
+        end
+    else
+        error('Parameter CSV file does not exist: %s', fullCSVName);
+    end
+
+    time_csv_import = toc;
+    disp(['INFO: Importing the csv data to matlab took ' char(num2str(time_csv_import)) ' s.']);
+
+    % check that we have a nonempy paramvector
+    if (loadingMode~=1) && (loadingMode~=2)
+        if numel(fieldnames(paramvector)) == 0
+            error(['Empty paramvector: Converted the ulog file to csv and parsed it.' newline ...
+                'Does the logfile contain any parameters specified in the setupParams() function?'])
+        end
+    else
+        if numel(fieldnames(paramvector)) == 0
+            error(['Empty paramvector: Tried to read directly from the csv files.' newline ...
+                'Does a csv file containing parameters specified in the setupParams() function exist?'])
+        end
+    end
+
+    % *********************************
+    % save the paramvector and params struct if requested
+    % *********************************
+    if saveMatlabData
+        save([matLocation pathDelimiter fileName '.mat'], 'sysvector', 'topics', 'paramvector', 'params');
+    end
+
     % *********************************
     % delete the csv files if requested
     % *********************************
     if deleteCSVFiles
         system(sprintf('rm %s%s%s_*', csvLocation, pathDelimiter, fileName));
     end
-    
+
     disp('INFO: Finished importing the log data.')
 end

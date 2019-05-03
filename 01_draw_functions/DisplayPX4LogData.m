@@ -4,7 +4,7 @@
 %  Display the data from the log file.
 %  TODO: Display the waypoints
 
-function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
+function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
     % Output flight summary
     PrintFlightMetricsSummary(sysvector, topics);
 
@@ -52,7 +52,7 @@ function DisplayPX4LogData(sysvector, topics, plainFileName, fconv_gpsalt, fconv
             topics.vehicle_rates_setpoint.logged && topics.airspeed.logged &&...
             topics.tecs_status.logged && topics.vehicle_gps_position.logged &&...
             plotvector.controlPlots)
-        ControlPlots(sysvector, fconv_gpsalt);
+        ControlPlots(sysvector, paramvector, params, fconv_gpsalt);
     end
 
     % display the telemetry data

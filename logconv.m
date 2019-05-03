@@ -4,6 +4,11 @@
 % plotting most plots only display the first instance.
 % The script assumes that the topics instances exist in increasing order
 % starting from 0.
+% NOTE:
+% - parameter importing uses modified python scripts **post- pyulog release
+%   v0.6.0 -- until the next release, source compliation from the commit 
+%   commit 3bc4f93 on https://github.com/PX4/pyulog/ master branch must be
+%   done (once) before this script will execute properly 
 % TODO:
 % - properly catch all cases of a missing topic
 % - properly support multi instance topics
@@ -197,21 +202,23 @@ if loadingMode==2
             'Run script first with loadingMode=0 and saveMatlabData=true'])
     end
 else
-    [sysvector, topics] = ImportPX4LogData(fileName, fileLocation, '05_csv_files', '06_mat_files',...
-            loadingMode, pathDelimiter, fconv_timestamp, loadingVerbose,...
-            saveMatlabData, deleteCSVFiles);
+    [sysvector, topics, paramvector, params] = ...
+        ImportPX4LogData(fileName, fileLocation, '05_csv_files', ...
+                         '06_mat_files', loadingMode, pathDelimiter, ...
+                         fconv_timestamp, loadingVerbose, saveMatlabData, ...
+                         deleteCSVFiles);
 end
 
 % ******************
 % Crop the data
 % ******************
 
-sysvector = CropPX4LogData(sysvector, t_start, t_end);
+[sysvector, paramvector] = CropPX4LogData(sysvector, paramvector, t_start, t_end);
 
 % ******************
 % Print the data
 % ******************
 
 if generatePlots
-    DisplayPX4LogData(sysvector, topics, fileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
+    DisplayPX4LogData(sysvector, topics, paramvector, params, fileName, fconv_gpsalt, fconv_gpslatlong, plotvector)
 end
