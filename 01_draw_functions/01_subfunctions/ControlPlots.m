@@ -25,9 +25,9 @@ yawRef = getsampleusingtime(sysvector.vehicle_attitude_setpoint_0.yaw_body,...
 yawRef.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
 % resample trim params
-trim_roll_resampled = TimeseriesExtrapolation(paramvector.trim_roll, sysvector.actuator_controls_0.control_0);
-trim_pitch_resampled = TimeseriesExtrapolation(paramvector.trim_pitch, sysvector.actuator_controls_0.control_0);
-trim_yaw_resampled = TimeseriesExtrapolation(paramvector.trim_yaw, sysvector.actuator_controls_0.control_0);
+trim_roll_resampled = TimeseriesExtrapolation(paramvector.trim_roll, sysvector.actuator_controls_0_0.control_0);
+trim_pitch_resampled = TimeseriesExtrapolation(paramvector.trim_pitch, sysvector.actuator_controls_0_0.control_0);
+trim_yaw_resampled = TimeseriesExtrapolation(paramvector.trim_yaw, sysvector.actuator_controls_0_0.control_0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % First Figure: Overall Control
@@ -87,15 +87,15 @@ hold on;
 ref_opacity = 0.5;
 plot(trim_roll_resampled.Time, trim_roll_resampled.Data, '-.', 'color', ...
     lines_(1,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
-plot(sysvector.actuator_controls_0.control_0.Time, sysvector.actuator_controls_0.control_0.Data, 'color', lines_(1,:));
+plot(sysvector.actuator_controls_0_0.control_0.Time, sysvector.actuator_controls_0_0.control_0.Data, 'color', lines_(1,:));
 plot(trim_pitch_resampled.Time, trim_pitch_resampled.Data, '-.', 'color', ...
     lines_(2,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
-plot(sysvector.actuator_controls_0.control_1.Time, sysvector.actuator_controls_0.control_1.Data, 'color', lines_(2,:));
+plot(sysvector.actuator_controls_0_0.control_1.Time, sysvector.actuator_controls_0_0.control_1.Data, 'color', lines_(2,:));
 plot(trim_yaw_resampled.Time, trim_yaw_resampled.Data, '-.', 'color', ...
     lines_(3,:) * ref_opacity + ones(1,3) * (1 - ref_opacity));
-plot(sysvector.actuator_controls_0.control_2.Time, sysvector.actuator_controls_0.control_2.Data, 'color', lines_(3,:));
-plot(sysvector.actuator_controls_0.control_3.Time, sysvector.actuator_controls_0.control_3.Data, 'color', lines_(4,:));
-plot(sysvector.actuator_controls_0.control_4.Time, sysvector.actuator_controls_0.control_4.Data, 'color', lines_(5,:));
+plot(sysvector.actuator_controls_0_0.control_2.Time, sysvector.actuator_controls_0_0.control_2.Data, 'color', lines_(3,:));
+plot(sysvector.actuator_controls_0_0.control_3.Time, sysvector.actuator_controls_0_0.control_3.Data, 'color', lines_(4,:));
+plot(sysvector.actuator_controls_0_0.control_4.Time, sysvector.actuator_controls_0_0.control_4.Data, 'color', lines_(5,:));
 legend('u_{ail}^{trim}', 'u_{ail}', 'u_{elev}^{trim}', 'u_{elev}', 'u_{rud}^{trim}', 'u_{rud}', 'u_{throt}', 'u_{flaps}');
 ylabel('Act. controls []')
 
@@ -166,9 +166,9 @@ ylabel('Attitude [deg]')
 % throttle output
 axeshandle(end+1) = subplot_tight(nrSubplotSections,1,[4 5],[plotmargins.vert plotmargins.horiz]);
 hold on;
-plot(sysvector.actuator_controls_0.control_3.Time, sysvector.actuator_controls_0.control_3.Data);
+plot(sysvector.actuator_controls_0_0.control_3.Time, sysvector.actuator_controls_0_0.control_3.Data);
 plot(sysvector.tecs_status_0.throttle_integ.Time, sysvector.tecs_status_0.throttle_integ.Data);
-plot(sysvector.actuator_controls_0.control_4.Time, sysvector.actuator_controls_0.control_4.Data);
+plot(sysvector.actuator_controls_0_0.control_4.Time, sysvector.actuator_controls_0_0.control_4.Data);
 legend('u_{throt}', 'u_{throt,I}','u_{flaps}');
 ylabel('Act. outputs []')
 
