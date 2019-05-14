@@ -85,11 +85,11 @@ legend('wind east', 'wind north', 'wind east mean', 'wind north mean');
 ylabel('Wind Components [m/s]');
 
 wind(2) = subplot(3,1,2); hold on; grid on; box on;
-wind_mag = sqrt(wind_e.^2 + wind_n.^2);
-plot(time_resampled, wind_mag);
-plot(time_resampled([1 end]), mean(wind_mag) * ones(1,2), 'linewidth', 2);
-ylabel('Wind Magnitude [m/s]');
-legend('raw', 'mean');
+plot(time_resampled, sqrt(vel_n.Data.^2 + vel_e.Data.^2));
+plot(time_resampled, airspeed.Data);
+plot(time_resampled, sqrt(wind_n.^2 + wind_e.^2));
+ylabel('Speeds [m/s]');
+legend('ground sp.', 'airspeed', 'wind sp.');
 
 wind(3) = subplot(3,1,3); hold on; grid on; box on;
 if (topics.vehicle_local_position.logged)
