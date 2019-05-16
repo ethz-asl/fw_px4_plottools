@@ -7,6 +7,9 @@
 % A nonlinear least squares regression is solved for constant wind vector
 % and airspeed scale factor by minimizing ground speed output errors.
 
+% NOTE: this script is segmented into cells which should be run
+%       sequentially after modifying settings at the top of each section
+
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % Plot wind reconstructions from (uncalibrated) true airspeed and ground
 % speed measurements to approximate initial guess of NE wind components and
@@ -22,6 +25,7 @@
 t_st_cal = -1;
 t_ed_cal = 10000;
 
+% ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
 if (topics.airspeed.logged && topics.vehicle_gps_position.logged && topics.vehicle_attitude.logged)
     [mean_raw_wind, tspan] = WindPlotsRaw(sysvector, topics, [t_st_cal, t_ed_cal]);
@@ -30,9 +34,10 @@ if (topics.airspeed.logged && topics.vehicle_gps_position.logged && topics.vehic
 else
     disp('ERROR: logged topics are not sufficient for airspeed calibration.');
 end
+% ! END do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-% Setup optimization
+% Setup optimization (modify these settings for the optimiziation)
 
 % load tube diameter and length from logs (implies these parameters have
 % been previously measured and set to the airframe for the given flight)
@@ -44,21 +49,23 @@ tube_params_from_logs = false;
 % - 'ezg3_drotek'
 % - 'techpod-agrofly_drotek'
 airframe_pitot_config = 'manual-input';
- 
+% NOTE: this config does not affect the resulting calibration - only
+%       compares with potential flow theory as a "sanity check"
 if strcmp(airframe_pitot_config, 'manual-input')
     % enter config manually
-    radius_profile_cm = 1;
-    r_probe_tip_cm = 100;
-    theta_probe_tip_deg = 0;
-    tube_dia = 1.5/1000;     	% tube diameter [m]
-    tube_len = 0.5;           	% tube length [m]
-    pitot_type = 1;         	% pitot type (drotek pitot = 0; custom pitot = 1)
+    radius_profile_cm = 1;      % radius of profile on which the probe is mounted (sphere or cylinder) [cm]
+    r_probe_tip_cm = 100;       % length of radial vector from center of profile to probe tip [cm]
+    theta_probe_tip_deg = 0;    % angle between horizon and radial vector [deg]
+    tube_dia = 1.5/1000;        % tube diameter [m] !!-this param is overwritten if loading tube params from logs
+    tube_len = 0.5;             % tube length [m]   !!-this param is overwritten if loading tube params from logs
+    pitot_type = 1;             % pitot type (drotek pitot = 0; custom pitot = 1)
     mount_location = 1;         % 0 = wing (2D cylinder assumption), 1 = nose (3D sphere assumption)
 else
     % load airframe / pitot config from file
     AirframePitotConfig;
 end
 
+% ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 % load tube len/dia from params
 if (tube_params_from_logs)
     if (params.cal_air_cmodel.logged && params.cal_air_tubelen.logged && params.cal_air_tubed_mm.logged)
@@ -88,9 +95,11 @@ elseif (mount_location == 1)
 else
     disp('ERROR: not a valid mounting location');
 end
+% ! END do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % Solve nonlinear least squares regression for sensor calibration
+% (these settings may be adjusted, but typically do not need to be)
 
 % initial guesses
 sf0 = 1;                    % scale factor
@@ -102,6 +111,7 @@ x0 = [wn0; we0; sf0];
 lb = [-20; -20; 0.1];
 ub = [20; 20; 2];
 
+% ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
 if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         topics.vehicle_attitude.logged && topics.vehicle_gps_position.logged && ...
@@ -125,3 +135,4 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
 else
     disp('ERROR: logged topics are not sufficient for airspeed calibration.');
 end
+% ! END do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
