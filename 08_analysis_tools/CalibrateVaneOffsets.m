@@ -32,8 +32,8 @@
 % otherwise unobservable.
 
 % start and end times (modify these)
-t_st_cal = 2115;
-t_ed_cal = 2160;
+t_st_cal = -1;
+t_ed_cal = 10000;
 
 clc;
 if (topics.airspeed.logged && ...
@@ -53,6 +53,10 @@ if (topics.airspeed.logged && ...
             params.cal_hall_01_p3.logged)
         % if hall calibration params were not present in the logs, they
         % must be defined here to execute the mounting offset calibration.
+        
+        % !! default values given here are for two ASL vanes, shown as
+        %    example for typical calibration values - these will not be
+        %    valid for any different vane !!
         
         % aoa
         paramvector.cal_hall_rev = timeseries(-1, 0);
