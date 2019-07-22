@@ -1,19 +1,16 @@
-function cal_data = AutomatedHallCalibration(sysvector, topics, sensor_sel, cal_opt)
+function cal_data = AutomatedHallCalibration(sysvector, topics, sensor_index, cal_opt)
 
-if (strcmp(sensor_sel, 'ALPHA') && topics.sensor_hall.logged)
-    sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
-elseif (strcmp(sensor_sel, 'BETA') && topics.sensor_hall_01.logged)   
-    sensor_hall_mag_T = sysvector.sensor_hall_01_0.mag_T;
-else
-    clc;
-    if (strcmp(sensor_sel, 'ALPHA'))
-        disp('ERROR: calibration of ALPHA sensor requires that sensor_hall topic is logged.');
-    elseif (strcmp(sensor_sel, 'BETA'))
-        disp('ERROR: calibration of BETA sensor requires that sensor_hall_01 topic is logged.');
-    else
-        disp(['ERROR: ', sensor_sel, ' is not a valid sensor identifier -- see instructions in 08_analysis_tools/CalibrateHallSensor.m']);
-    end
-    return;
+switch sensor_index
+   case 0
+      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
+   case 1
+      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_T;
+   case 2
+      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_T;
+   case 3
+      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_T;
+   otherwise
+      disp('HALL SENS PREV: Invalid sensor_index')
 end
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /

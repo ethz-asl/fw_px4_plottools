@@ -1,13 +1,16 @@
-function [tspan1] = PreviewHallData(sysvector, topics, sensor_sel, tspan, plot_ploy_fit, poly_fit, cal_data)
+function [tspan1] = PreviewHallData(sysvector, topics, sensor_index, tspan, plot_ploy_fit, poly_fit, cal_data)
 
-if (strcmp(sensor_sel, 'ALPHA') && topics.sensor_hall.logged)
-    sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
-elseif (strcmp(sensor_sel, 'BETA') && topics.sensor_hall_01.logged)   
-    sensor_hall_mag_T = sysvector.sensor_hall_01_0.mag_T;
-else
-    clc;
-    disp('HALL SENS PREV: Logged topics are not sufficient for airspeed calibration.');
-    return;
+switch sensor_index
+   case 0
+      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
+   case 1
+      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_T;
+   case 2
+      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_T;
+   case 3
+      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_T;
+   otherwise
+      disp('HALL SENS PREV: Invalid sensor_index')
 end
 
 if (plot_ploy_fit && ~isempty(cal_data) && ~isempty(poly_fit))
