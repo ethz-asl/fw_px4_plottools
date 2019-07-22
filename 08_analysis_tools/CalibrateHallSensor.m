@@ -30,19 +30,15 @@
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % / Preview hall data / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-% Choose sensor (ALPHA / BETA, corresponding to sensor_hall /
-% sensor_hall_01 topics, respectively). ASL FW-team airflow vane
-% convention assumes:
-% - ALPHA (angle of attack) on *left wing using topic sensor_hall
-% - BETA (sideslip) on *right wing, using topic sensor_hall_01
-sensor_sel = 'BETA';
+% Choose sensor instance
+sensor_instance = 0;
 
 % start and end times (modify these if necessary)
 t_st_preview = -1;
 t_ed_preview = 10000;
 
 % preview the hall data
-PreviewHallData(sysvector, topics, sensor_sel, [t_st_preview, t_ed_preview], false, [], []);
+PreviewHallData(sysvector, topics, sensor_instance, [t_st_preview, t_ed_preview], false, [], []);
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % / Populate calibration array / / / / / / / / / / / / / / / / / / / / / /
@@ -51,16 +47,16 @@ PreviewHallData(sysvector, topics, sensor_sel, [t_st_preview, t_ed_preview], fal
 
 % input the calibration start time (corresponding to angle_st); obtain from
 % the previewed plot.
-cal_opt.t_st_cal = 56.02;       % s
+cal_opt.t_st_cal = 0;       % s
 
 % input start and end angles for the calibration
-cal_opt.angle_st = -55;         % deg
-cal_opt.angle_ed = 60;          % deg
+cal_opt.angle_st = -40;         % deg
+cal_opt.angle_ed = 40;          % deg
 
 % discretization
 cal_opt.large_step_size = 5;    % deg
-cal_opt.small_step_size = 1;    % deg
-cal_opt.small_step_range = 5;   % deg (this is the +/- range containing the small steps)
+cal_opt.small_step_size = 3;    % deg
+cal_opt.small_step_range = 15;   % deg (this is the +/- range containing the small steps)
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % stuff to play with to make the automated data processing choose the
@@ -89,7 +85,7 @@ cal_opt.idx_ed_crop = 3;
 % populate the calibration array -- CHECK this plot output to make sure the
 % results are what you expect.. otherwise tune the above parameters until
 % you get what you want.
-cal_data = AutomatedHallCalibration(sysvector, topics, sensor_sel, cal_opt);
+cal_data = AutomatedHallCalibration(sysvector, topics, sensor_instance, cal_opt);
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % / Fit 3rd order polynomial / / / / / / / / / / / / / / / / / / / / / / /
@@ -108,4 +104,4 @@ disp(['CAL_HALL_P3 = ',int2str(int32(p(1)*1e7))]);
 
 %% / plot poly fit / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-PreviewHallData(sysvector, topics, sensor_sel, [], true, poly_fit, cal_data);
+PreviewHallData(sysvector, topics, sensor_instance, [], true, poly_fit, cal_data);
