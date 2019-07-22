@@ -24,15 +24,25 @@ if (cal_opt.angle_st > cal_opt.angle_ed)
     cal_data = [(cal_opt.angle_st:-cal_opt.large_step_size:cal_opt.small_step_range)'; ...
         (cal_opt.small_step_range-cal_opt.small_step_size:-cal_opt.small_step_size:-cal_opt.small_step_range)'; ...
         (-cal_opt.small_step_range-cal_opt.large_step_size:-cal_opt.large_step_size:cal_opt.angle_ed)'];
+    size_1 = size((cal_opt.angle_st:-cal_opt.large_step_size:cal_opt.small_step_range)');
+    size_2 = size((cal_opt.small_step_range-cal_opt.small_step_size:-cal_opt.small_step_size:-cal_opt.small_step_range)');
+    size_3 = size((-cal_opt.small_step_range-cal_opt.large_step_size:-cal_opt.large_step_size:cal_opt.angle_ed)');
 else
     cal_data = [(cal_opt.angle_st:cal_opt.large_step_size:-cal_opt.small_step_range)'; ...
         (-cal_opt.small_step_range+cal_opt.small_step_size:cal_opt.small_step_size:cal_opt.small_step_range)'; ...
         (cal_opt.small_step_range+cal_opt.large_step_size:cal_opt.large_step_size:cal_opt.angle_ed)'];
+    size_1 = size((cal_opt.angle_st:cal_opt.large_step_size:-cal_opt.small_step_range)');
+    size_2 = size((-cal_opt.small_step_range+cal_opt.small_step_size:cal_opt.small_step_size:cal_opt.small_step_range)');
+    size_3 = size((cal_opt.small_step_range+cal_opt.large_step_size:cal_opt.large_step_size:cal_opt.angle_ed)');
 end
 len_cal_data = length(cal_data);
 
-% calibration data matrix [deg, mean mT, st dev mT, idx_st, idx_ed]
-cal_data = [cal_data, zeros(len_cal_data, 4)]; 
+% set the weights
+weights = [ones(size_1); cal_opt.weight_increase * ones(size_2); ones(size_3)];
+weights(size_1(1)) = cal_opt.weight_increase;
+
+% calibration data matrix [deg, mean mT, st dev mT, idx_st, idx_ed, weights]
+cal_data = [cal_data, zeros(len_cal_data, 4), weights];
 
 len_t = length(sensor_hall_mag_T.Time(idx_st:end));
 dmT_filt = 0;
