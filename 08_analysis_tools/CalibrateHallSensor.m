@@ -58,6 +58,10 @@ cal_opt.large_step_size = 5;    % deg
 cal_opt.small_step_size = 3;    % deg
 cal_opt.small_step_range = 15;   % deg (this is the +/- range containing the small steps)
 
+% sample weights
+cal_opt.use_weighting = true;   % flag to enable the different weighting of the samples
+cal_opt.weight_increase = 4.0;  % increased weight for the samples in the small step size range
+
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % stuff to play with to make the automated data processing choose the
 % segments you want ... 
@@ -92,9 +96,13 @@ cal_data = AutomatedHallCalibration(sysvector, topics, sensor_instance, cal_opt)
 
 % TODO: just using mean measurements for now.. could do weighted later from
 % standard deviations
-p= polyfit(cal_data(:,2)', cal_data(:,1)', 3);
-poly_fit.p = p;
+if cal_opt.use_weighting
+    p= polyfitweighted(cal_data(:,2)', cal_data(:,1)', 3, cal_data(:,6)');
+else
+    p= polyfit(cal_data(:,2)', cal_data(:,1)', 3);
+end
 
+poly_fit.p = p;
 
 % parameters (converted to int) for PX4
 disp(['CAL_HALL_P0 = ',int2str(int32(p(4)*1e7))]);
