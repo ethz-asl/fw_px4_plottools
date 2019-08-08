@@ -57,7 +57,7 @@ if new_params
        slip_p1 = paramvector.cal_av_slip_p1.Data(1);
        slip_p2 = paramvector.cal_av_slip_p2.Data(1);
        slip_p3 = paramvector.cal_av_slip_p3.Data(1);
-       slip_id = paramvector.cal_av_aoa_id.Data(1);
+       slip_id = paramvector.cal_av_slip_id.Data(1);
     end
     
     % aoa and slip data
