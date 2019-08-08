@@ -192,10 +192,9 @@ function [sysvector, topics, paramvector, params] = ...
 
                         % set field in parameter struct
                         temp_params = csv_numeric_data(idx_data:idx_data+1,:);
-                        temp_params = temp_params(~isnan(temp_params));
+                        temp_params = temp_params(:,~isnan(temp_params(1,:)));
                         paramvector.(param_fields{idx_params}) = ...
-                            timeseries(temp_params(1,:), temp_params(2,:));
-
+                            timeseries(temp_params(1,:)', temp_params(2,:)'*fconv_timestamp);
                         % set logged
                         params.(param_fields{idx_params}).logged = true;
 
