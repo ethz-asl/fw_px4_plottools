@@ -1,5 +1,6 @@
 function [aoa, slip, aoa_logged, slip_logged] = CalibrateAirflowAngles(sysvector, topics, paramvector, params, config)
-% Calibrates the airflow angles according to the configuration
+% Calibrates the airflow angles according to the configuration, returns the
+% airflow angles with a bias
 
 % XXX: TODO - incorporate temperature calibration
 % mag_temp_comp = sysvector.sensor_hall_0.mag_T.Data + ...
@@ -124,8 +125,9 @@ end
 
 % angle of attack
 if (config.use_airflow_measurement && ...
-        topics.airflow_aoa.logged)
-    aoa = sysvector.airflow_aoa_0.aoa_rad;
+        topics.airflow_aoa.logged && ...
+        params.cal_av_aoa_off.logged)
+    aoa = sysvector.airflow_aoa_0.aoa_rad + paramvector.cal_av_aoa_off.Data;
 else
     % print warnings if requested config cannot be met
     if (config.use_airflow_measurement && ...
@@ -154,8 +156,9 @@ end
 
 % slip
 if (config.use_airflow_measurement && ...
-        topics.airflow_slip.logged)
-    slip = sysvector.airflow_slip_0.slip_rad;
+        topics.airflow_slip.logged && ...
+        params.cal_av_slip_off.logged)
+    slip = sysvector.airflow_slip_0.slip_rad + deg2rad(paramvector.cal_av_slip_off.Data);
 else
     % print warnings if requested config cannot be met
     if (config.use_airflow_measurement && ...
