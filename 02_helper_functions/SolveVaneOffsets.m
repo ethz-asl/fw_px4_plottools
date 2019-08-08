@@ -92,17 +92,6 @@ linkaxes(result_plots(:),'x');
 xlim(result_plots(:), time_resampled([1 end]));
 
 % wind quiver plot
-aoa_calibrated = aoa_meas.Data - deg2rad(xopt(1));
-slip_calibrated = slip_meas.Data - deg2rad(xopt(2));
-
-vel_airsp = zeros(len_t, 3);
-for i = 1:len_t
-    vel_airsp(i,:) = (Hi2b(:,:,i)' * airspeed.Data(i) * [1; tan(slip_calibrated(i)); tan(aoa_calibrated(i))])';
-end
-
-% reconstruct wind velocity
-vel_wind = [vel_n.Data, vel_e.Data, vel_d.Data] - vel_airsp;
-
 if (topics.vehicle_local_position.logged)
     figure('color','w','name','Position with Wind Vector');
 
@@ -129,6 +118,39 @@ if (topics.vehicle_local_position.logged)
     zlabel('Altitude above MSL [m]');
     grid on
 end
+
+% uncalibrated vs calibrated plot
+vel_airsp = zeros(len_t, 3);
+for i = 1:len_t
+    vel_airsp(i,:) = (Hi2b(:,:,i)' * airspeed.Data(i) * [1; tan(slip_meas.Data(i)); tan(aoa_meas.Data(i))])';
+end
+
+% reconstruct wind velocity
+vel_wind_uncalibrated = [vel_n.Data, vel_e.Data, vel_d.Data] - vel_airsp;
+
+wind_plots(1) = subplot(3,1,1); hold on; grid on; box on;
+plot(time_resampled, vel_wind_uncalibrated(:,1), 'color', lines_(1,:));
+plot(time_resampled, vel_wind(:,1), 'color', lines_(2,:));
+ylabel('Wind x [m/s]');
+legend('Raw Measurements', 'Bias included');
+
+wind_plots(2) = subplot(3,1,2); hold on; grid on; box on;
+plot(time_resampled, vel_wind_uncalibrated(:,2), 'color', lines_(1,:));
+plot(time_resampled, vel_wind(:,2), 'color', lines_(2,:));
+ylabel('Wind y [m/s]');
+legend('Raw Measurements', 'Bias included');
+
+wind_plots(3) = subplot(3,1,3); hold on; grid on; box on;
+plot(time_resampled, vel_wind_uncalibrated(:,3), 'color', lines_(1,:));
+plot(time_resampled, vel_wind(:,3), 'color', lines_(2,:));
+ylabel('Wind z [m/s]');
+legend('Raw Measurements', 'Bias included');
+
+xlabel('Time [s]');
+linkaxes(wind_plots(:),'x');
+xlim(wind_plots(:), time_resampled([1 end]));
+
+
 
 % / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / 
 % Output function / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
