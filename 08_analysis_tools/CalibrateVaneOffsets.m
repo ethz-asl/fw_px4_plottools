@@ -35,47 +35,44 @@
 t_st_cal = -1;
 t_ed_cal = 10000;
 
+% if hall calibration params were not present in the logs, they
+% must be defined here to execute the mounting offset calibration.
+% !! default values given here are for two ASL vanes, shown as
+%    example for typical calibration values - these will not be
+%    valid for any different vane !!
+
+% aoa
+config.cal_hall_aoa_rev = timeseries(-1, 0);
+config.cal_hall_aoa_p0 = timeseries(-14694678, 0);
+config.cal_hall_aoa_p1 = timeseries(-21239312, 0);
+config.cal_hall_aoa_p2 = timeseries(51980, 0);
+config.cal_hall_aoa_p3 = timeseries(-2845, 0);
+config.cal_hall_aoa_id = timeseries(0, 0);
+% slip
+config.cal_hall_slip_rev = timeseries(1, 0);
+config.cal_hall_slip_p0 = timeseries(2696759, 0);
+config.cal_hall_slip_p1 = timeseries(-25891024, 0);
+config.cal_hall_slip_p2 = timeseries(53064, 0);
+config.cal_hall_slip_p3 = timeseries(-7467, 0);
+config.cal_hall_slip_id = timeseries(1, 0);
+% general configs
+config.use_cal_av_params = true;
+config.use_airflow_measurement = true;
+
+% Get the measured airflow angles
+[aoa_meas, slip_meas, aoa_logged, slip_logged] = CalibrateAirflowAngles(sysvector, topics, paramvector, params, config);
+sysvector.aoa_meas = aoa_meas;
+sysvector.slip_meas = slip_meas;
+
 clc;
 if (topics.airspeed.logged && ...
         topics.vehicle_gps_position.logged && ...
         topics.vehicle_attitude.logged && ...
-        topics.sensor_hall.logged || (topics.airflow_aoa.logged && topics.airflow_slip.logged))
-    if ~(params.cal_av_aoa_rev.logged && ...
-            params.cal_av_aoa_p0.logged && ...
-            params.cal_av_aoa_p1.logged && ...
-            params.cal_av_aoa_p2.logged && ...
-            params.cal_av_aoa_p3.logged && ...
-            params.cal_av_aoa_id.logged && ...
-            params.cal_av_slip_id.logged && ...
-            params.cal_av_slip_rev.logged && ...
-            params.cal_av_slip_p0.logged && ...
-            params.cal_av_slip_p1.logged && ...
-            params.cal_av_slip_p2.logged && ...
-            params.cal_av_slip_p3.logged)
-        % if hall calibration params were not present in the logs, they
-        % must be defined here to execute the mounting offset calibration.
-        
-        % !! default values given here are for two ASL vanes, shown as
-        %    example for typical calibration values - these will not be
-        %    valid for any different vane !!
-        
-        % aoa
-        paramvector.cal_av_aoa_rev = timeseries(-1, 0);
-        paramvector.cal_av_aoa_p0 = timeseries(-14694678, 0);
-        paramvector.cal_av_aoa_p1 = timeseries(-21239312, 0);
-        paramvector.cal_av_aoa_p2 = timeseries(51980, 0);
-        paramvector.cal_av_aoa_p3 = timeseries(-2845, 0);
-        paramvector.cal_av_aoa_id = timeseries(0, 0);
-        % slip
-        paramvector.cal_av_slip_rev = timeseries(1, 0);
-        paramvector.cal_av_slip_p0 = timeseries(2696759, 0);
-        paramvector.cal_av_slip_p1 = timeseries(-25891024, 0);
-        paramvector.cal_av_slip_p2 = timeseries(53064, 0);
-        paramvector.cal_av_slip_p3 = timeseries(-7467, 0);
-        paramvector.cal_av_slip_rev = timeseries(1, 0);
-    end
+        aoa_logged && ...
+        slip_logged)
+
     
-    [mean_states, tspan] = VaneMountingCalibrationData(sysvector, topics, paramvector, [t_st_cal, t_ed_cal]);
+    [mean_states, tspan] = VaneMountingCalibrationData(sysvector, topics, [t_st_cal, t_ed_cal]);
     disp(['Mean wind north = ', num2str(mean_states(1)), ' m/s']);
     disp(['Mean wind east = ', num2str(mean_states(2)), ' m/s']);
     disp(['Mean sideslip = ', num2str(mean_states(3)), ' deg']);
@@ -94,19 +91,20 @@ we0 = mean_states(2);       % wind speed east [m/s]
 x0 = [b_aoa0; b_slip0; wn0; we0];
 
 % bounds
-lb = [-10; -10; -20; -20];
-ub = [10; 10; 20; 20];
+lb = [-20; -20; -20; -20];
+ub = [20; 20; 20; 20];
 
 clc;
 if (topics.airspeed.logged && ...
         topics.vehicle_gps_position.logged && ...
         topics.vehicle_attitude.logged && ...
-        topics.sensor_hall.logged || (topics.airflow_aoa.logged && topics.airflow_slip.logged))
-    
+        aoa_logged && ...
+        slip_logged)
+
     % solve
     [xopt, opt_info, mean_gsp_err, std_gsp_err] = ...
-        SolveVaneOffsets(sysvector, topics, paramvector, tspan, x0, lb, ub);
-    
+        SolveVaneOffsets(sysvector, topics, tspan, x0, lb, ub);
+
     disp(['b_aoa = ',num2str(xopt(1)),' deg']);
     disp(['b_slip = ',num2str(xopt(2)),' deg']);
     disp(['wn = ',num2str(xopt(3)),' m/s']);

@@ -1,40 +1,11 @@
 % / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % Airspeed scale solver / / / / / / / / / / / / / / / / / / / / / / / / / /
-function [xopt, opt_info, mean_gsp_err, std_gsp_err] = SolveVaneOffsets(sysvector, topics, paramvector, tspan, x0, lb, ub)
+function [xopt, opt_info, mean_gsp_err, std_gsp_err] = SolveVaneOffsets(sysvector, topics, tspan, x0, lb, ub)
 
 
 % calibrated airflow angle measurements
-if topics.airflow_aoa.logged && topics.airflow_slip.logged
-    aoa_meas = sysvector.airflow_aoa_0.aoa_rad;
-    slip_meas = sysvector.airflow_slip_0.slip_rad;
-
-else
-    % calibrated airflow angle measurements
-    for i = 0:topics.sensor_hall.num_instances - 1
-        hall_name = strcat('sensor_hall_', num2str(i));
-
-        if sysvector.(hall_name).instance.Data(1) == paramvector.cal_av_aoa_id.Data(1)
-            aoa_hall_data = sysvector.(hall_name);
-        end
-
-        if sysvector.(hall_name).instance.Data(1) == paramvector.cal_av_slip_id.Data(1)
-            slip_hall_data = sysvector.(hall_name);
-        end
-    end
-
-    aoa_meas = timeseries(deg2rad(1e-7 * paramvector.cal_av_aoa_rev.Data(1) * ...
-            (paramvector.cal_av_aoa_p0.Data(1) + ...
-            paramvector.cal_av_aoa_p1.Data(1) .* aoa_hall_data.mag_T.Data + ...
-            paramvector.cal_av_aoa_p2.Data(1) .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data + ...
-            paramvector.cal_av_aoa_p3.Data(1) .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data)),...
-            aoa_hall_data.mag_T.Time);
-    slip_meas = timeseries(deg2rad(1e-7 * paramvector.cal_av_slip_rev.Data(1) * ...
-            (paramvector.cal_av_slip_p0.Data(1) + ...
-            paramvector.cal_av_slip_p1.Data(1) .* slip_hall_data.mag_T.Data + ...
-            paramvector.cal_av_slip_p2.Data(1) .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data + ...
-            paramvector.cal_av_slip_p3.Data(1) .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data)),...
-            slip_hall_data.Time);
-end
+aoa_meas = sysvector.aoa_meas;
+slip_meas = sysvector.slip_meas;
 
 % synchronise the data
 dt_rs = 0.05;
@@ -119,6 +90,45 @@ legend('3D gnd. sp.', '2D wind sp.', 'u (x-body) airsp.');
 xlabel('Time [s]');
 linkaxes(result_plots(:),'x');
 xlim(result_plots(:), time_resampled([1 end]));
+
+% wind quiver plot
+aoa_calibrated = aoa_meas.Data - deg2rad(xopt(1));
+slip_calibrated = slip_meas.Data - deg2rad(xopt(2));
+
+vel_airsp = zeros(len_t, 3);
+for i = 1:len_t
+    vel_airsp(i,:) = (Hi2b(:,:,i)' * airspeed.Data(i) * [1; tan(slip_calibrated(i)); tan(aoa_calibrated(i))])';
+end
+
+% reconstruct wind velocity
+vel_wind = [vel_n.Data, vel_e.Data, vel_d.Data] - vel_airsp;
+
+if (topics.vehicle_local_position.logged)
+    figure('color','w','name','Position with Wind Vector');
+
+    pos_x = resample(sysvector.vehicle_local_position_0.x, time_resampled);
+    pos_y = resample(sysvector.vehicle_local_position_0.y, time_resampled);
+    pos_z = resample(sysvector.vehicle_local_position_0.z, time_resampled);
+
+    % make z up
+    pos_z.Data = -pos_z.Data;
+    vel_d.Data = -vel_d.Data;
+
+    plot3(pos_x.Data,pos_y.Data,pos_z.Data,'k.');
+    axis equal
+    hold all
+    text(pos_x.Data(1),pos_y.Data(1),pos_z.Data(1),'t_{min}');
+    text(pos_x.Data(end),pos_y.Data(end),pos_z.Data(end),'t_{max}');
+
+    quiver3(pos_x.Data, pos_y.Data, pos_z.Data,...
+            vel_wind(:,1), vel_wind(:,2), zeros(len_t,1), 0);
+    legend('pos','v_{wind}');
+    title('Wind Data');
+    xlabel('delta-Longitude [m]');
+    ylabel('delta-Latitude [m]');
+    zlabel('Altitude above MSL [m]');
+    grid on
+end
 
 % / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / 
 % Output function / / / / / / / / / / / / / / / / / / / / / / / / / / / / /

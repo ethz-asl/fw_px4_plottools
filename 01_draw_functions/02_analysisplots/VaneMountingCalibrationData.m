@@ -1,36 +1,8 @@
-function [mean_states, tspan1] = VaneMountingCalibrationData(sysvector, topics, paramvector, tspan)
+function [mean_states, tspan1] = VaneMountingCalibrationData(sysvector, topics, tspan)
 
-if topics.airflow_aoa.logged && topics.airflow_slip.logged
-    aoa_meas = sysvector.airflow_aoa_0.aoa_rad;
-    slip_meas = sysvector.airflow_slip_0.slip_rad;
-
-else
-    % calibrated airflow angle measurements
-    for i = 0:topics.sensor_hall.num_instances - 1
-        hall_name = strcat('sensor_hall_', num2str(i));
-
-        if sysvector.(hall_name).instance.Data(1) == paramvector.cal_av_aoa_id.Data(1)
-            aoa_hall_data = sysvector.(hall_name);
-        end
-
-        if sysvector.(hall_name).instance.Data(1) == paramvector.cal_av_slip_id.Data(1)
-            slip_hall_data = sysvector.(hall_name);
-        end
-    end
-
-    aoa_meas = timeseries(deg2rad(1e-7 * paramvector.cal_av_aoa_rev.Data(1) * ...
-            (paramvector.cal_av_aoa_p0.Data(1) + ...
-            paramvector.cal_av_aoa_p1.Data(1) .* aoa_hall_data.mag_T.Data + ...
-            paramvector.cal_av_aoa_p2.Data(1) .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data + ...
-            paramvector.cal_av_aoa_p3.Data(1) .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data .* aoa_hall_data.mag_T.Data)),...
-            aoa_hall_data.mag_T.Time);
-    slip_meas = timeseries(deg2rad(1e-7 * paramvector.cal_av_slip_rev.Data(1) * ...
-            (paramvector.cal_av_slip_p0.Data(1) + ...
-            paramvector.cal_av_slip_p1.Data(1) .* slip_hall_data.mag_T.Data + ...
-            paramvector.cal_av_slip_p2.Data(1) .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data + ...
-            paramvector.cal_av_slip_p3.Data(1) .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data .* slip_hall_data.mag_T.Data)),...
-            slip_hall_data.Time);
-end
+% get the airflow angle measurements
+aoa_meas = sysvector.aoa_meas;
+slip_meas = sysvector.slip_meas;
 
 % synchronise the data
 dt = 0.05;
