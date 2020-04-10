@@ -148,7 +148,7 @@ else
             aoa_p3 .* aoa_hall_data.Data .* aoa_hall_data.Data .* aoa_hall_data.Data)), ...
             aoa_hall_data.Time);
     else
-        aoa = timeseries([0.0, 0.0]', [min_time, max_time]);
+        aoa = timeseries([0.0, 0.0]', [config.st_time, config.end_time]);
         disp('WARNING: aoa hall not logged, setting aoa to 0')
         aoa_logged = false;
     end
@@ -179,7 +179,7 @@ else
             slip_p3 .* slip_hall_data.Data .* slip_hall_data.Data .* slip_hall_data.Data)), ...
             slip_hall_data.Time);
     else
-        slip = timeseries([0.0, 0.0]', [min_time, max_time]);
+        slip = timeseries([0.0, 0.0]', [config.st_time, config.end_time]);
         disp('WARNING: slip hall not logged, setting slip to 0')
         slip_logged = false;
     end
