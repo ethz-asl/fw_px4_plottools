@@ -10,7 +10,7 @@ mag_norm = sqrt(sysvector.sensor_mag_0.x.Data .* sysvector.sensor_mag_0.x.Data +
     
 hold on;
 plot(sysvector.sensor_mag_0.x.Time, mag_norm);
-plot(sysvector.actuator_controls_0.control_3.Time, sysvector.actuator_controls_0.control_3.Data);
+plot(sysvector.actuator_controls_0_0.control_3.Time, sysvector.actuator_controls_0_0.control_3.Data);
 hold off;
 
 legend('Magnetic Norm', 'Thrust');
