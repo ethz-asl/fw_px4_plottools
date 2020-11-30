@@ -44,9 +44,9 @@ ylabel('Angle of attack [deg]');
 legend([ax_meas,ax_est], [str_meas,str_est]);
 
 airflow(2) = subplot(4,1,2); hold on; grid on; box on;
-if (topics.airflow_aos.logged)
-    ax_meas = plot(sysvector.airflow_aos_0.aos_rad.Time, ...
-        rad2deg(sysvector.airflow_aos_0.aos_rad.Data));
+if (topics.airflow_slip.logged)
+    ax_meas = plot(sysvector.airflow_slip_0.slip_rad.Time, ...
+        rad2deg(sysvector.airflow_slip_0.slip_rad.Data));
     str_meas = {'Measurement'};
 else
     ax_meas = [];
@@ -71,8 +71,8 @@ else
     ax_aoa = [];
     str_aoa = {};
 end
-if (topics.airflow_aos.logged)
-    ax_aos = plot(sysvector.airflow_aos_0.valid.Time, sysvector.airflow_aos_0.valid.Data);
+if (topics.airflow_slip.logged)
+    ax_aos = plot(sysvector.airflow_slip_0.valid.Time, sysvector.airflow_slip_0.valid.Data);
     str_aos = {'Slip'};
 else
     ax_aos = [];
