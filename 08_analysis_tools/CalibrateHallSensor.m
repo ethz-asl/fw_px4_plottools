@@ -50,13 +50,13 @@ PreviewHallData(sysvector, topics, sensor_instance, [t_st_preview, t_ed_preview]
 cal_opt.t_st_cal = 0;       % s
 
 % input start and end angles for the calibration
-cal_opt.angle_st = -40;         % deg
-cal_opt.angle_ed = 40;          % deg
+cal_opt.angle_st = -24;         % deg
+cal_opt.angle_ed = 24;          % deg
 
 % discretization
-cal_opt.large_step_size = 5;    % deg
-cal_opt.small_step_size = 3;    % deg
-cal_opt.small_step_range = 15;   % deg (this is the +/- range containing the small steps)
+cal_opt.large_step_size = 4;    % deg
+cal_opt.small_step_size = 2;    % deg
+cal_opt.small_step_range = 12;   % deg (this is the +/- range containing the small steps)
 
 % sample weights
 cal_opt.use_weighting = true;   % flag to enable the different weighting of the samples
@@ -64,14 +64,25 @@ cal_opt.weight_increase = 4.0;  % increased weight for the samples in the small 
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % stuff to play with to make the automated data processing choose the
-% segments you want ... 
+% segments you want ...
+
+% method to determine the steps and which data should be used for the
+% calibration
+cal_opt.step_detection_mode = 1;
+
+
+% ----------------
+% Options for both detection modes
 
 % minimum step time (tune this to make sure all calibration steps are
 % captured, but small perturbations are not)
-cal_opt.t_step_min = 5.5;       % s
+cal_opt.t_step_min = 5;       % s
 
 % step change threshold
-cal_opt.step_thres = 0.25;      % mT
+cal_opt.step_thres = 0.15;      % mT
+
+% ----------------
+% Options for detection mode 0
 
 % magnetic field strength "standard" deviation
 % this is used for checking if we've stepped
@@ -85,6 +96,17 @@ cal_opt.k_filt = 0.9;           % ~
 % mean/st.dev, e.g. to account for filter delay)
 % TODO: this could be calculated from the filter gain itself...
 cal_opt.idx_ed_crop = 3;
+
+% ----------------
+% Options for detection mode 1
+
+% window size for the moving average filter
+cal_opt.window_size = 50;
+
+% standard deviation threshold
+cal_opt.std_dev_threshold = 0.01;      % mT
+
+% ----------------
 
 % populate the calibration array -- CHECK this plot output to make sure the
 % results are what you expect.. otherwise tune the above parameters until
@@ -109,6 +131,10 @@ disp(['CAL_HALL_P0 = ',int2str(int32(p(4)*1e7))]);
 disp(['CAL_HALL_P1 = ',int2str(int32(p(3)*1e7))]);
 disp(['CAL_HALL_P2 = ',int2str(int32(p(2)*1e7))]);
 disp(['CAL_HALL_P3 = ',int2str(int32(p(1)*1e7))]);
+
+% evaluate the error
+pred = polyval(poly_fit.p, cal_data(:,2));
+disp('MSE = ' + string(immse(pred, cal_data(:,1))))
 
 %% / plot poly fit / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
