@@ -44,9 +44,9 @@ ylabel('Angle of attack [deg]');
 legend([ax_meas,ax_est], [str_meas,str_est]);
 
 airflow(2) = subplot(4,1,2); hold on; grid on; box on;
-if (topics.airflow_aos.logged)
-    ax_meas = plot(sysvector.airflow_aos_0.aos_rad.Time, ...
-        rad2deg(sysvector.airflow_aos_0.aos_rad.Data));
+if (topics.airflow_slip.logged)
+    ax_meas = plot(sysvector.airflow_slip_0.slip_rad.Time, ...
+        rad2deg(sysvector.airflow_slip_0.slip_rad.Data));
     str_meas = {'Measurement'};
 else
     ax_meas = [];
@@ -60,7 +60,7 @@ else
     ax_est = [];
     str_est = {};
 end
-ylabel('Sideslip [deg]');
+ylabel('slip [deg]');
 legend([ax_meas,ax_est], [str_meas,str_est]);
 
 airflow(3) = subplot(4,1,3); hold on; grid on; box on;
@@ -71,14 +71,14 @@ else
     ax_aoa = [];
     str_aoa = {};
 end
-if (topics.airflow_aos.logged)
-    ax_aos = plot(sysvector.airflow_aos_0.valid.Time, sysvector.airflow_aos_0.valid.Data);
-    str_aos = {'Slip'};
+if (topics.airflow_slip.logged)
+    ax_slip = plot(sysvector.airflow_slip_0.valid.Time, sysvector.airflow_slip_0.valid.Data);
+    str_slip = {'Slip'};
 else
-    ax_aos = [];
-    str_aos = {};
+    ax_slip = [];
+    str_slip = {};
 end
-legend([ax_aoa,ax_aos],[str_aoa,str_aos]);
+legend([ax_aoa,ax_slip],[str_aoa,str_slip]);
 ylabel('Valid Meas. [~]');
 
 airflow(4) = subplot(4,1,4); hold on; grid on; box on;
@@ -90,13 +90,13 @@ else
     str_aoa = {};
 end
 if (topics.sensor_hall_01.logged)
-    ax_aos = plot(sysvector.sensor_hall_01_0.mag_T.Time, sysvector.sensor_hall_01_0.mag_T.Data);
-    str_aos = {'Slip'};
+    ax_slip = plot(sysvector.sensor_hall_01_0.mag_T.Time, sysvector.sensor_hall_01_0.mag_T.Data);
+    str_slip = {'Slip'};
 else
-    ax_aos = [];
-    str_aos = {};
+    ax_slip = [];
+    str_slip = {};
 end
-legend([ax_aoa,ax_aos],[str_aoa,str_aos]);
+legend([ax_aoa,ax_slip],[str_aoa,str_slip]);
 ylabel('Hall Effect [mT]');
 
 linkaxes(airflow(:),'x');
