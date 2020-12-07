@@ -17,6 +17,32 @@
 % x = [b_aoa, b_slip, w_n, w_e]
 % u = [u, aoa, slip, phi, theta, psi]
 
+%% find vanes offset calibration maneuvers
+
+% check channel 6 (aux2 - remote) for enabled sysid experiments
+% XXX: probably should also check that we are in stablized.. and maybe have
+% a logged state indicating when the sysid is running..
+
+% find sysid mode on + calibration man selected
+
+cal_sel_nr_ = 600;
+
+sysid_switch_ = sysvector.input_rc_0.values_6;
+sid_man_sel_ = resample(paramvector.sid_sel, sysid_switch_.Time, 'zoh');
+
+rising_falling_edges = [0; diff(sysid_switch_.Data > 1600)]; % 1600 is arbitrary threshold
+
+% set starts and ends of experiments via rising and falling edges
+idx_exp_st = find(rising_falling_edges > 0);
+idx_exp_ed = find(rising_falling_edges < 0);
+idx_exp_all = [idx_exp_st(idx_exp_st<idx_exp_ed(end)), ...
+    idx_exp_ed(idx_exp_ed>idx_exp_st(1)) sid_man_sel_.Data(idx_exp_st)];
+
+idx_av_off_cal = idx_exp_all(idx_exp_all(:, end) == cal_sel_nr_, :)
+
+
+bp = 0;
+
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % Calibration data should satisfy the following criteria:
 % - in air at nominal airspeed
