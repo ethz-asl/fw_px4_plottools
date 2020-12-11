@@ -68,6 +68,17 @@ cal_opt.weight_increase = 4.0;  % increased weight for the samples in the small 
 
 % method to determine the steps and which data should be used for the
 % calibration
+% Detection Mode 0:
+%  This method tries to detect steps based on the filtered derivation of
+%  the raw hall sensor measurements. It rejects measurement steps which
+%  are too short.
+% Detection Mode 1:
+%  This method first filters the raw measurements with a moving average
+%  filter. Then the standard deviation on those filtered measurements is
+%  computed. It registers a measurement as a period of time where the
+%  standard deviation is below a certain threshold given that the duration
+%  is above the time threshold.
+
 cal_opt.step_detection_mode = 1;
 
 
