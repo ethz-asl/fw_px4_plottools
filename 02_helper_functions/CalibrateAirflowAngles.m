@@ -127,6 +127,8 @@ end
 if (config.use_airflow_measurement && ...
         topics.airflow_aoa.logged && ...
         params.cal_av_aoa_off.logged)
+    % add the bias here since sysvector.airflow_aoa_0 already has the bias
+    % subtracted and this function returns the angles with a bias
     aoa = sysvector.airflow_aoa_0.aoa_rad + deg2rad(paramvector.cal_av_aoa_off.Data);
 else
     % print warnings if requested config cannot be met
@@ -158,6 +160,8 @@ end
 if (config.use_airflow_measurement && ...
         topics.airflow_slip.logged && ...
         params.cal_av_slip_off.logged)
+    % add the bias here since sysvector.airflow_slip_0 already has the bias
+    % subtracted and this function returns the angles with a bias
     slip = sysvector.airflow_slip_0.slip_rad + deg2rad(paramvector.cal_av_slip_off.Data);
 else
     % print warnings if requested config cannot be met
