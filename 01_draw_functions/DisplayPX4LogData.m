@@ -40,9 +40,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display extended wind estimate
-    if (topics.vehicle_gps_position.logged && topics.vehicle_local_position.logged &&...
-            topics.wind_estimate.logged && plotvector.windPlots)
-        WindPlots(sysvector, plotvector);
+    if plotvector.windPlots
+        WindPlots(sysvector, topics, plotvector);
     end
 
     % display the controller data
