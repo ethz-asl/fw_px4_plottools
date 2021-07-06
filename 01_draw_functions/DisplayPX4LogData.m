@@ -29,7 +29,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display estimator status data if it was logged
-    if (topics.estimator_status.logged) && plotvector.estimatorStatusPlots
+    if plotvector.estimatorStatusPlots
         EstimatorStatusPlots(sysvector, topics);
     end
 

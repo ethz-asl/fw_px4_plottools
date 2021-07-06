@@ -66,7 +66,7 @@ if topics.estimator_status.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
     
     % control_mode_flags
-    control_mode_bits = de2bi(sysvector.estimator_status_0.control_mode_flags.Data,24);
+    control_mode_bits = de2bi(sysvector.estimator_status_0.control_mode_flags.Data,27);
     fig3 = figure();
     fig3.Name = 'Control Mode Flags';
     
@@ -92,11 +92,14 @@ if topics.estimator_status.logged
         string('Airspeed Fused'), ...
         string('Ground Effect Static Pres. Protection Active'), ...
         string('Range Finder is Stuck'), ...
-        string('AoA Fused'), ...
-        string('Wind Z Estimated')];
-    
-    for i = 1:24
-        control_modes(i) = subplot(6,4,i);
+        string('GPS Yaw fusion'), ...
+        string('In flight mag alignment complete'), ...
+        string('External vision velocity fusion'), ...
+        string('Using synthetic z mag component'), ...
+        string('Vehicle at rest')];
+
+    for i = 1:27
+        control_modes(i) = subplot(6,5,i);
         plot(sysvector.estimator_status_0.control_mode_flags.Time,control_mode_bits(:,i));
         title(titles(i))
     end
