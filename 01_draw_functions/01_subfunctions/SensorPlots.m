@@ -15,6 +15,13 @@ function SensorPlots(sysvector, topics, fconv_gpsalt)
         plot(sysvector.vehicle_magnetometer_0.magnetometer_ga_2.Time,sysvector.vehicle_magnetometer_0.magnetometer_ga_2.Data);
         hold off
         legend('x','y','z');
+    elseif (topics.sensor_mag.logged)
+        hold on;
+        plot(sysvector.sensor_mag_0.x.Time,sysvector.sensor_mag_0.x.Data)
+        plot(sysvector.sensor_mag_0.y.Time,sysvector.sensor_mag_0.y.Data)
+        plot(sysvector.sensor_mag_0.z.Time,sysvector.sensor_mag_0.z.Data)
+        hold off
+        legend('x','y','z')
     end
     title('Magnetometers [Gauss]');
 
