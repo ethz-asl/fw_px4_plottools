@@ -1,5 +1,9 @@
-function WindPlots(sysvector, plotvector)
+function WindPlots(sysvector, topics, plotvector)
 % Display the wind data.
+if (~topics.wind_estimate.logged || ~topics.airspeed.logged || ...
+    ~topics.vehicle_attitude.logged || ~topics.vehicle_local_position.logged)
+    return
+end
 
 fig1 = figure();
 fig1.Name = 'Estimated Wind 3D';
@@ -7,12 +11,10 @@ fig1.Name = 'Estimated Wind 3D';
 dt = plotvector.dtWindPlot;
 min_time = max([sysvector.wind_estimate_0.windspeed_east.Time(1),...
     sysvector.vehicle_local_position_0.x.Time(1),...
-    sysvector.vehicle_gps_position_0.vel_n_m_s.Time(1),...
     sysvector.airspeed_0.true_airspeed_m_s.Time(1),...
     sysvector.vehicle_attitude_0.q_0.Time(1)]);
 max_time = min([sysvector.wind_estimate_0.windspeed_east.Time(end),...
     sysvector.vehicle_local_position_0.x.Time(end),...
-    sysvector.vehicle_gps_position_0.vel_n_m_s.Time(end),...
     sysvector.airspeed_0.true_airspeed_m_s.Time(end),...
     sysvector.vehicle_attitude_0.q_0.Time(end)]);
 time_resampled = min_time:dt:max_time;
@@ -22,9 +24,9 @@ pos_y = resample(sysvector.vehicle_local_position_0.y, time_resampled);
 pos_z = resample(sysvector.vehicle_local_position_0.z, time_resampled);
 wind_e = resample(sysvector.wind_estimate_0.windspeed_east, time_resampled);
 wind_n = resample(sysvector.wind_estimate_0.windspeed_north, time_resampled);
-vel_n = resample(sysvector.vehicle_gps_position_0.vel_n_m_s, time_resampled);
-vel_e = resample(sysvector.vehicle_gps_position_0.vel_e_m_s, time_resampled);
-vel_d = resample(sysvector.vehicle_gps_position_0.vel_d_m_s, time_resampled);
+vel_n = resample(sysvector.vehicle_local_position_0.vx, time_resampled);
+vel_e = resample(sysvector.vehicle_local_position_0.vy, time_resampled);
+vel_d = resample(sysvector.vehicle_local_position_0.vz, time_resampled);
 airspeed = resample(sysvector.airspeed_0.true_airspeed_m_s, time_resampled);
 q_0 = resample(sysvector.vehicle_attitude_0.q_0, time_resampled);
 q_1 = resample(sysvector.vehicle_attitude_0.q_1, time_resampled);
