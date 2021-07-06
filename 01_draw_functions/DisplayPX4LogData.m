@@ -19,8 +19,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display differential pressure data if it was logged
-    if topics.differential_pressure.logged && topics.airspeed.logged...
-            && plotvector.differentialPressurePlots
+    if plotvector.differentialPressurePlots
         DiffPressPlots(sysvector, topics, plotvector);
     end
 
