@@ -9,7 +9,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     PrintFlightMetricsSummary(sysvector, topics);
 
     % display GPS data if it was logged
-    if topics.vehicle_gps_position.logged && plotvector.gpsPlots
+    if plotvector.gpsPlots
         GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector);
     end
 
