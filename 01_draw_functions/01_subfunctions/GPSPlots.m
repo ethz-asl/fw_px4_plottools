@@ -36,7 +36,7 @@ else
            error('The airspeed topic is not logged which is required for plotvector.colorModeGPS == 4')
         end
         
-        title('GPS Position Data (Colored by the GPS velocity [m/s])');
+        title('GPS Position Data (Colored by the filtered airspeed [m/s])');
         % interpolate airspeed
         airspeed = sysvector.airspeed_0.true_airspeed_m_s;
         if (airspeed.Time(1) > sysvector.vehicle_gps_position_0.lat.Time(1))
