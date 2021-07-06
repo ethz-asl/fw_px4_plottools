@@ -83,10 +83,14 @@ switch(plotvector.colorModeGlobalPosition)
         color = pos_alt.Data;
     case 3
         % color changes by velocity
-        vel_n = resample(sysvector.vehicle_global_position_0.vel_n, time_resampled);
-        vel_e = resample(sysvector.vehicle_global_position_0.vel_e, time_resampled);
-        vel_d = resample(sysvector.vehicle_global_position_0.vel_d, time_resampled);
-        color = sqrt(vel_n.Data.^2+vel_e.Data.^2+vel_d.Data.^2);
+        if topics.vehicle_local_position.logged
+            vel_n = resample(sysvector.vehicle_local_position_0.vx, time_resampled);
+            vel_e = resample(sysvector.vehicle_local_position_0.vy, time_resampled);
+            vel_d = resample(sysvector.vehicle_local_position_0.vz, time_resampled);
+            color = sqrt(vel_n.Data.^2+vel_e.Data.^2+vel_d.Data.^2);
+        else
+            error('The vehicle_local_position topic needs to be logged to color by groundspeed')
+        end
     case 4
         if (~topics.airspeed.logged) || (~topics.vehicle_global_position.logged)
            error('The airspeed and global position topic are required for plotvector.colorModeGlobalPosition == 4')
@@ -325,10 +329,13 @@ if topics.vehicle_global_position.logged && topics.vehicle_gps_position.logged
     legend('Estimated','GPS','Baro');
     title('Pos alt [m]');
     pos(4) = subplot(4,1,4);
-    hold on;
-    plot(sysvector.vehicle_global_position_0.vel_d.Time,sysvector.vehicle_global_position_0.vel_d.Data);
-    legend('Downwards velocity v_d');
-    title('Downwards velocity v_d[m/s]');
+    if topics.vehicle_local_position.logged
+        hold on;
+        plot(sysvector.vehicle_local_position_0.vz.Time,sysvector.vehicle_local_position_0.vz.Data);
+        legend('Downwards velocity v_d');
+        title('Downwards velocity v_d [m/s]');
+        hold off;
+    end
 
     linkaxes(pos(:),'x');
     set(pos(:),'XGrid','on','YGrid','on','ZGrid','on');

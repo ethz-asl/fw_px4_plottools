@@ -34,7 +34,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display gps and estimate on a map
-    if (topics.vehicle_gps_position.logged || topics.vehicle_global_position.logged) && plotvector.globalPositionPlots
+    if plotvector.globalPositionPlots
         GlobalPositionPlots(sysvector, topics, plainFileName, fconv_gpsalt,...
             fconv_gpslatlong, plotvector);
     end
