@@ -9,6 +9,10 @@
 %          gps velocity from a certain point in the plot.
 
 function GPSPlots(sysvector, topics, fconv_gpsalt, fconv_gpslatlong, plotvector)
+if ~topics.vehicle_gps_position.logged
+    return
+end
+
 % 3D plot of the gps position
 fig1 = figure();
 fig1.Name = 'GPS Position 3D';
