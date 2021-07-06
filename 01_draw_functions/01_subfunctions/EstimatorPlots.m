@@ -25,67 +25,79 @@ if topics.vehicle_attitude.logged
     set(dcm_obj,'UpdateFcn',@HighPrecisionTooltipCallback);
 end
 
-if topics.estimator_status.logged
+ekf2_states_found = false;
+if topics.estimator_states.logged
+    estimator_data = sysvector.estimator_states_0;
+    ekf2_states_found = true;
+
+elseif topics.estimator_status.logged
+    if isfield(sysvector.estimator_status_0, 'states_0')
+        estimator_data = sysvector.estimator_status_0;
+        ekf2_states_found = true;
+    end
+end
+
+if ekf2_states_found
     % States
     fig2 = figure();
     fig2.Name = 'Estimated States';
     state(1) = subplot(3,3,1);
     hold on;
-    plot(sysvector.estimator_status_0.states_7.Time,sysvector.estimator_status_0.states_7.Data);
-    plot(sysvector.estimator_status_0.states_8.Time,sysvector.estimator_status_0.states_8.Data);
-    plot(sysvector.estimator_status_0.states_9.Time,sysvector.estimator_status_0.states_9.Data);
+    plot(estimator_data.states_7.Time,estimator_data.states_7.Data);
+    plot(estimator_data.states_8.Time,estimator_data.states_8.Data);
+    plot(estimator_data.states_9.Time,estimator_data.states_9.Data);
     hold off;
     title('Position state (NED frame) [m]');
     state(2) = subplot(3,3,2);
     hold on;
-    plot(sysvector.estimator_status_0.states_0.Time,sysvector.estimator_status_0.states_0.Data);
-    plot(sysvector.estimator_status_0.states_1.Time,sysvector.estimator_status_0.states_1.Data);
-    plot(sysvector.estimator_status_0.states_2.Time,sysvector.estimator_status_0.states_2.Data);
-    plot(sysvector.estimator_status_0.states_3.Time,sysvector.estimator_status_0.states_3.Data);
+    plot(estimator_data.states_0.Time,estimator_data.states_0.Data);
+    plot(estimator_data.states_1.Time,estimator_data.states_1.Data);
+    plot(estimator_data.states_2.Time,estimator_data.states_2.Data);
+    plot(estimator_data.states_3.Time,estimator_data.states_3.Data);
     hold off;
     title('Angular states');
     state(3) = subplot(3,3,3);
     hold on;
-    plot(sysvector.estimator_status_0.states_4.Time,sysvector.estimator_status_0.states_4.Data);
-    plot(sysvector.estimator_status_0.states_5.Time,sysvector.estimator_status_0.states_5.Data);
-    plot(sysvector.estimator_status_0.states_6.Time,sysvector.estimator_status_0.states_6.Data);
+    plot(estimator_data.states_4.Time,estimator_data.states_4.Data);
+    plot(estimator_data.states_5.Time,estimator_data.states_5.Data);
+    plot(estimator_data.states_6.Time,estimator_data.states_6.Data);
     hold off;
     title('Velocity states (NED frame) [m/s]');
     state(4) = subplot(3,3,4);
     hold on;
-    plot(sysvector.estimator_status_0.states_10.Time,sysvector.estimator_status_0.states_10.Data);
-    plot(sysvector.estimator_status_0.states_11.Time,sysvector.estimator_status_0.states_11.Data);
-    plot(sysvector.estimator_status_0.states_12.Time,sysvector.estimator_status_0.states_12.Data);
+    plot(estimator_data.states_10.Time,estimator_data.states_10.Data);
+    plot(estimator_data.states_11.Time,estimator_data.states_11.Data);
+    plot(estimator_data.states_12.Time,estimator_data.states_12.Data);
     hold off;
     title('Gyroscope bias states (body frame) [rad/s]');
     state(5) = subplot(3,3,5);
     hold on;
-    plot(sysvector.estimator_status_0.states_13.Time,sysvector.estimator_status_0.states_13.Data);
-    plot(sysvector.estimator_status_0.states_14.Time,sysvector.estimator_status_0.states_14.Data);
-    plot(sysvector.estimator_status_0.states_15.Time,sysvector.estimator_status_0.states_15.Data);
+    plot(estimator_data.states_13.Time,estimator_data.states_13.Data);
+    plot(estimator_data.states_14.Time,estimator_data.states_14.Data);
+    plot(estimator_data.states_15.Time,estimator_data.states_15.Data);
     hold off;
     title('Accelerometer bias states (body frame) [m/s^2]');
     state(6) = subplot(3,3,6);
     hold on;
-    plot(sysvector.estimator_status_0.states_16.Time,sysvector.estimator_status_0.states_16.Data);
-    plot(sysvector.estimator_status_0.states_17.Time,sysvector.estimator_status_0.states_17.Data);
-    plot(sysvector.estimator_status_0.states_18.Time,sysvector.estimator_status_0.states_18.Data);
+    plot(estimator_data.states_16.Time,estimator_data.states_16.Data);
+    plot(estimator_data.states_17.Time,estimator_data.states_17.Data);
+    plot(estimator_data.states_18.Time,estimator_data.states_18.Data);
     hold off;
     title('Earth magnetic field states (NED frame) [gauss]');
     state(7) = subplot(3,3,7);
     hold on;
-    plot(sysvector.estimator_status_0.states_22.Time,sysvector.estimator_status_0.states_22.Data);
-    plot(sysvector.estimator_status_0.states_23.Time,sysvector.estimator_status_0.states_23.Data);
-    if (isfield(sysvector.estimator_status_0, 'states_24'))
-        plot(sysvector.estimator_status_0.states_24.Time,sysvector.estimator_status_0.states_24.Data);
+    plot(estimator_data.states_22.Time,estimator_data.states_22.Data);
+    plot(estimator_data.states_23.Time,estimator_data.states_23.Data);
+    if (isfield(estimator_data, 'states_24'))
+        plot(estimator_data.states_24.Time,estimator_data.states_24.Data);
     end
     hold off;
     title('Wind states (NED frame) [m/s]');
     state(8) = subplot(3,3,9);
     hold on;
-    plot(sysvector.estimator_status_0.states_19.Time,sysvector.estimator_status_0.states_19.Data);
-    plot(sysvector.estimator_status_0.states_20.Time,sysvector.estimator_status_0.states_20.Data);
-    plot(sysvector.estimator_status_0.states_21.Time,sysvector.estimator_status_0.states_21.Data);
+    plot(estimator_data.states_19.Time,estimator_data.states_19.Data);
+    plot(estimator_data.states_20.Time,estimator_data.states_20.Data);
+    plot(estimator_data.states_21.Time,estimator_data.states_21.Data);
     hold off;
     title('Magnetometer bias states (body frame) [gauss]');
 
@@ -99,61 +111,61 @@ if topics.estimator_status.logged
     fig3.Name = 'Estimated Covariances';
     state(1) = subplot(3,3,1);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_7.Time,sysvector.estimator_status_0.covariances_7.Data);
-    plot(sysvector.estimator_status_0.covariances_8.Time,sysvector.estimator_status_0.covariances_8.Data);
-    plot(sysvector.estimator_status_0.covariances_9.Time,sysvector.estimator_status_0.covariances_9.Data);
+    plot(estimator_data.covariances_7.Time,estimator_data.covariances_7.Data);
+    plot(estimator_data.covariances_8.Time,estimator_data.covariances_8.Data);
+    plot(estimator_data.covariances_9.Time,estimator_data.covariances_9.Data);
     hold off;
     title('Position covariances');
     state(2) = subplot(3,3,2);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_0.Time,sysvector.estimator_status_0.covariances_0.Data);
-    plot(sysvector.estimator_status_0.covariances_1.Time,sysvector.estimator_status_0.covariances_1.Data);
-    plot(sysvector.estimator_status_0.covariances_2.Time,sysvector.estimator_status_0.covariances_2.Data);
-    plot(sysvector.estimator_status_0.covariances_3.Time,sysvector.estimator_status_0.covariances_3.Data);
+    plot(estimator_data.covariances_0.Time,estimator_data.covariances_0.Data);
+    plot(estimator_data.covariances_1.Time,estimator_data.covariances_1.Data);
+    plot(estimator_data.covariances_2.Time,estimator_data.covariances_2.Data);
+    plot(estimator_data.covariances_3.Time,estimator_data.covariances_3.Data);
     hold off;
     title('Angular covariances');
     state(3) = subplot(3,3,3);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_4.Time,sysvector.estimator_status_0.covariances_4.Data);
-    plot(sysvector.estimator_status_0.covariances_5.Time,sysvector.estimator_status_0.covariances_5.Data);
-    plot(sysvector.estimator_status_0.covariances_6.Time,sysvector.estimator_status_0.covariances_6.Data);
+    plot(estimator_data.covariances_4.Time,estimator_data.covariances_4.Data);
+    plot(estimator_data.covariances_5.Time,estimator_data.covariances_5.Data);
+    plot(estimator_data.covariances_6.Time,estimator_data.covariances_6.Data);
     hold off;
     title('Velocity covariances');
     state(4) = subplot(3,3,4);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_10.Time,sysvector.estimator_status_0.covariances_10.Data);
-    plot(sysvector.estimator_status_0.covariances_11.Time,sysvector.estimator_status_0.covariances_11.Data);
-    plot(sysvector.estimator_status_0.covariances_12.Time,sysvector.estimator_status_0.covariances_12.Data);
+    plot(estimator_data.covariances_10.Time,estimator_data.covariances_10.Data);
+    plot(estimator_data.covariances_11.Time,estimator_data.covariances_11.Data);
+    plot(estimator_data.covariances_12.Time,estimator_data.covariances_12.Data);
     hold off;
     title('Gyroscope bias covariances');
     state(5) = subplot(3,3,5);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_13.Time,sysvector.estimator_status_0.covariances_13.Data);
-    plot(sysvector.estimator_status_0.covariances_14.Time,sysvector.estimator_status_0.covariances_14.Data);
-    plot(sysvector.estimator_status_0.covariances_15.Time,sysvector.estimator_status_0.covariances_15.Data);
+    plot(estimator_data.covariances_13.Time,estimator_data.covariances_13.Data);
+    plot(estimator_data.covariances_14.Time,estimator_data.covariances_14.Data);
+    plot(estimator_data.covariances_15.Time,estimator_data.covariances_15.Data);
     hold off;
     title('Accelerometer bias covariances');
     state(6) = subplot(3,3,6);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_16.Time,sysvector.estimator_status_0.covariances_16.Data);
-    plot(sysvector.estimator_status_0.covariances_17.Time,sysvector.estimator_status_0.covariances_17.Data);
-    plot(sysvector.estimator_status_0.covariances_18.Time,sysvector.estimator_status_0.covariances_18.Data);
+    plot(estimator_data.covariances_16.Time,estimator_data.covariances_16.Data);
+    plot(estimator_data.covariances_17.Time,estimator_data.covariances_17.Data);
+    plot(estimator_data.covariances_18.Time,estimator_data.covariances_18.Data);
     hold off;
     title('Earth magnetic field covariances');
     state(7) = subplot(3,3,7);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_22.Time,sysvector.estimator_status_0.covariances_22.Data);
-    plot(sysvector.estimator_status_0.covariances_23.Time,sysvector.estimator_status_0.covariances_23.Data);
-    if (isfield(sysvector.estimator_status_0, 'covariances_24'))
-        plot(sysvector.estimator_status_0.covariances_24.Time,sysvector.estimator_status_0.covariances_24.Data);
+    plot(estimator_data.covariances_22.Time,estimator_data.covariances_22.Data);
+    plot(estimator_data.covariances_23.Time,estimator_data.covariances_23.Data);
+    if (isfield(estimator_data, 'covariances_24'))
+        plot(estimator_data.covariances_24.Time,estimator_data.covariances_24.Data);
     end
     hold off;
     title('Wind covariances');
     state(8) = subplot(3,3,9);
     hold on;
-    plot(sysvector.estimator_status_0.covariances_19.Time,sysvector.estimator_status_0.covariances_19.Data);
-    plot(sysvector.estimator_status_0.covariances_20.Time,sysvector.estimator_status_0.covariances_20.Data);
-    plot(sysvector.estimator_status_0.covariances_21.Time,sysvector.estimator_status_0.covariances_21.Data);
+    plot(estimator_data.covariances_19.Time,estimator_data.covariances_19.Data);
+    plot(estimator_data.covariances_20.Time,estimator_data.covariances_20.Data);
+    plot(estimator_data.covariances_21.Time,estimator_data.covariances_21.Data);
     hold off;
     title('Magnetometer bias covariances');
 

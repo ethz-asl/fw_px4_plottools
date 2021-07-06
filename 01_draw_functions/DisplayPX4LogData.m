@@ -24,8 +24,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display estimator data if it was logged
-    if (topics.estimator_status.logged || topics.ekf2_timestamps.logged ||...
-            topics.ekf2_innovations.logged || topics.vehicle_attitude.logged) && plotvector.estimatorPlots
+    if plotvector.estimatorPlots
         EstimatorPlots(sysvector, topics);
     end
 
