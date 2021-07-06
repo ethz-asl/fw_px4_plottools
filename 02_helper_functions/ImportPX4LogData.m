@@ -167,26 +167,49 @@ function [sysvector, topics, paramvector, params] = ...
     end
     
     if exist(fullCSVName, 'file') == 2 % make sure file was created
-        try
-            % read in the data
-            opts = detectImportOptions(fullCSVName);
-            opts.EmptyLineRule = 'read';
-            csv_data = readtable(fullCSVName, opts,'ReadRowNames',true);
-            size_csv_data = size(csv_data);
+        % read in the data
+        opts = detectImportOptions(fullCSVName, 'NumHeaderLines', 0);
+        opts.EmptyLineRule = 'read';
+        opts.VariableNamesLine = 0; % Overwrite since older matlab versions sometimes detect the first row as the header
+        opts.DataLines = [1 Inf];
+        csv_data = readtable(fullCSVName, opts);
+        size_csv_data = size(csv_data);
 
-            % convert extra column strings to doubles and group numeric param
-            % properties
-            if size_csv_data(2) > 2
-                extra_cols = str2double(csv_data{:,3:size_csv_data(2)});
+        % convert extra column strings to doubles and group numeric param
+        % properties
+        if size_csv_data(2) > 2
+            if isfloat(csv_data{:,3:size_csv_data(2)})
+                extra_cols = csv_data{:,3:size_csv_data(2)};
+
             else
-                extra_cols = [];
+                try
+                    extra_cols = str2double(csv_data{:,3:size_csv_data(2)});
+                catch
+                    extra_cols = [];
+                    error('Could not convert the extra columns of the parameter file')
+                end
             end
-            csv_numeric_data = [csv_data{:,2}, extra_cols]; 
+        else
+            extra_cols = [];
+        end
 
-            for idx_data = 1:2:size_csv_data(1) % skip timestamp rows
+        if isfloat(csv_data{:,2})
+            first_col = csv_data{:,2};
+        else
+            try
+                first_col = str2double(csv_data{:,2});
+            catch
+                error('Could not convert the parameter values to double')
+            end
+        end
 
-                for idx_params = 1:numel(param_fields)
+        csv_numeric_data = [first_col, extra_cols];
 
+        for idx_data = 1:2:size_csv_data(1) % skip timestamp rows
+
+            for idx_params = 1:numel(param_fields)
+
+                try
                     % check if logged field is in defined param list
                     if strcmpi(string(csv_data{idx_data, 1}), string(param_fields{idx_params}))
 
@@ -199,10 +222,11 @@ function [sysvector, topics, paramvector, params] = ...
                         params.(param_fields{idx_params}).logged = true;
 
                     end
+
+                catch
+                    disp(['Could not process the param: ' char(param_fields{idx_params})]);
                 end
             end
-        catch
-            disp(['Could not process the param: ' char(param_fields{idx_params})]);
         end
     else
         error('Parameter CSV file does not exist: %s', fullCSVName);
