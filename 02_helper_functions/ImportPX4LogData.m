@@ -54,10 +54,19 @@ function [sysvector, topics, paramvector, params] = ...
                     csv_fields = csv_data.Properties.VariableNames;
 
                     message = struct;
+                    if loadingVerbose
+                        str = sprintf('%s: ', string(topics.(topic_fields{idx_topics}).topic_name));
+                        fprintf(str)
+                    end
+
                     for idx = 2:numel(csv_fields)
                         field_name = strrep(csv_fields(idx), '0x5B', '_');
                         field_name = strrep(field_name, '0x5D', '');
-                        field_name = strip(field_name, '_');
+                        field_name = strip(field_name, 'right', '_');
+                        % convert all upper case letters to lower case
+                        % since the new firmware does expect lower case
+                        % field names
+                        field_name = lower(field_name);
 
                         ts = timeseries(table2array(csv_data(:, idx)), ...
                             table2array(csv_data(:, 1))*fconv_timestamp, ...
@@ -67,11 +76,14 @@ function [sysvector, topics, paramvector, params] = ...
                         message.(char(field_name)) = ts;
 
                         if loadingVerbose
-                            str = sprintf('%s', string(field_name));
+                            str = sprintf('%s ', string(field_name));
                             fprintf(str)
                         end
                     end
 
+                    if loadingVerbose
+                        fprintf('\n')
+                    end
                     sysvector.([topic_fields{idx_topics} '_' char(num2str(topics.(topic_fields{idx_topics}).num_instances))]) = message;
 
                     topics.(topic_fields{idx_topics}).num_instances = topics.(topic_fields{idx_topics}).num_instances + 1;
