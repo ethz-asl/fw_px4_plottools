@@ -1,5 +1,9 @@
-function MagVsThrustPlots(sysvector)
+function MagVsThrustPlots(sysvector, topics)
 % Plot the mag norm vs thrust
+
+if ~topics.sensor_mag.logged || ~topics.actuator_controls_0.logged
+    return
+end
 
 fig1 = figure();
 fig1.Name = 'Magnetic Norm vs Thrust';
