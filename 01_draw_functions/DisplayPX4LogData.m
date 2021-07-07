@@ -50,9 +50,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display the telemetry data
-    if (topics.vehicle_local_position.logged && topics.telemetry_status.logged &&...
-            topics.vehicle_attitude.logged && ...
-            plotvector.telemRSSIPlots)
+    if plotvector.telemRSSIPlots
         TelemRSSIPlots(sysvector, topics);
     end
 
