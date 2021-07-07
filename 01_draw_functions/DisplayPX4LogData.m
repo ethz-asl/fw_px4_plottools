@@ -45,11 +45,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % display the controller data
-    if (topics.vehicle_attitude.logged && topics.vehicle_attitude_setpoint.logged &&...
-            topics.vehicle_rates_setpoint.logged && topics.airspeed.logged &&...
-            topics.tecs_status.logged && topics.vehicle_gps_position.logged &&...
-            plotvector.controlPlots)
-        ControlPlots(sysvector, paramvector, params, fconv_gpsalt);
+    if plotvector.controlPlots
+        ControlPlots(sysvector, topics, paramvector, params, fconv_gpsalt);
     end
 
     % display the telemetry data
