@@ -1,5 +1,9 @@
-function MissionResultPlots(sysvector)
+function MissionResultPlots(sysvector, topics)
 % Display the mission result
+
+if ~topics.mission_result.logged
+   return
+end
 
 fig1 = figure();
 fig1.Name = 'Mission Result';
