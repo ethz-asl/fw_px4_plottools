@@ -80,8 +80,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % mag norm versus thrust plot
-    if (topics.actuator_controls_0.logged && topics.sensor_mag.logged && plotvector.magVsThrustPlots)
-        MagVsThrustPlots(sysvector);
+    if plotvector.magVsThrustPlots
+        MagVsThrustPlots(sysvector, topics);
     end
 
     % power plots
