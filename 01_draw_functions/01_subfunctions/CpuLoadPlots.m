@@ -1,5 +1,9 @@
-function CpuLoadPlots(sysvector)
+function CpuLoadPlots(sysvector, topics)
 % Display the cpu load data
+
+if ~topics.cpuload.logged
+   return
+end
 
 fig1 = figure();
 fig1.Name = 'CPU Load';

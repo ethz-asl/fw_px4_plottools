@@ -60,8 +60,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % cpu load plots
-    if (topics.cpuload.logged && plotvector.cpuLoadPlots)
-        CpuLoadPlots(sysvector);
+    if plotvector.cpuLoadPlots
+        CpuLoadPlots(sysvector, topics);
     end
 
     % distance sensor plots
