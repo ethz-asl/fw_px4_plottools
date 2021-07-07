@@ -1,5 +1,9 @@
-function VehicleStatusFlagsPlots(sysvector)
+function VehicleStatusFlagsPlots(sysvector, topics)
 % Display the cpu load data
+
+if ~topics.vehicle_status_flags.logged
+   return 
+end
 
 fig1 = figure();
 fig1.Name = 'Condition Vehicle Status Flags';
@@ -72,37 +76,32 @@ set(condition_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
 fig2 = figure();
 fig2.Name = 'Circuit Breaker Vehicle Status Flags';
 
-cbk_flags(1) = subplot(4,2,1);
+cbk_flags(1) = subplot(3,2,1);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_power_check);
 ylabel(' ')
 title('Power Check')
 
-cbk_flags(2) = subplot(4,2,2);
+cbk_flags(end+1) = subplot(3,2,2);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_airspd_check);
 ylabel(' ')
 title('Airspeed Check')
 
-cbk_flags(3) = subplot(4,2,3);
+cbk_flags(end+1) = subplot(3,2,3);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_enginefailure_check);
 ylabel(' ')
 title('Engine Failure Check')
 
-cbk_flags(4) = subplot(4,2,4);
-plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_gpsfailure_check);
-ylabel(' ')
-title('GPS Failure Check')
-
-cbk_flags(5) = subplot(4,2,5);
+cbk_flags(end+1) = subplot(3,2,4);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_flight_termination_disabled);
 ylabel(' ')
 title('Flight Termination Disabled')
 
-cbk_flags(6) = subplot(4,2,6);
+cbk_flags(end+1) = subplot(3,2,5);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_usb_check);
 ylabel(' ')
 title('USB Check')
 
-cbk_flags(7) = subplot(4,2,7);
+cbk_flags(end+1) = subplot(3,2,6);
 plot(sysvector.vehicle_status_flags_0.circuit_breaker_engaged_posfailure_check);
 ylabel(' ')
 title('Position Failure Check')
@@ -113,42 +112,32 @@ set(cbk_flags(:), 'XGrid','on','YGrid','on','ZGrid','on');
 fig3 = figure();
 fig3.Name = 'Other Vehicle Status Flags';
 
-other_flags(1) = subplot(4,2,1);
+other_flags(1) = subplot(3,2,1);
 plot(sysvector.vehicle_status_flags_0.offboard_control_signal_found_once);
 ylabel(' ')
 title('Offboard Control Signal Found Once')
 
-other_flags(2) = subplot(4,2,2);
+other_flags(end+1) = subplot(3,2,2);
 plot(sysvector.vehicle_status_flags_0.offboard_control_signal_lost);
 ylabel(' ')
 title('Offboard Control Signal Lost')
 
-other_flags(3) = subplot(4,2,3);
-plot(sysvector.vehicle_status_flags_0.offboard_control_set_by_command);
-ylabel(' ')
-title('Offboard Control Set by Command')
-
-other_flags(4) = subplot(4,2,4);
-plot(sysvector.vehicle_status_flags_0.offboard_control_loss_timeout);
-ylabel(' ')
-title('Offboard Control Loss Timeout')
-
-other_flags(5) = subplot(4,2,5);
+other_flags(end+1) = subplot(3,2,3);
 plot(sysvector.vehicle_status_flags_0.rc_signal_found_once);
 ylabel(' ')
 title('RC Signal Found Once')
 
-other_flags(6) = subplot(4,2,6);
+other_flags(end+1) = subplot(3,2,4);
 plot(sysvector.vehicle_status_flags_0.rc_input_blocked);
 ylabel(' ')
 title('RC Input Blocked')
 
-other_flags(7) = subplot(4,2,7);
+other_flags(end+1) = subplot(3,2,5);
 plot(sysvector.vehicle_status_flags_0.vtol_transition_failure);
 ylabel(' ')
 title('VTOL Transition Failure')
 
-other_flags(8) = subplot(4,2,8);
+other_flags(end+1) = subplot(3,2,6);
 plot(sysvector.vehicle_status_flags_0.usb_connected);
 ylabel(' ')
 title('USB Connected')
