@@ -85,8 +85,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % power plots
-    if (topics.battery_status.logged && plotvector.powerPlots)
-        PowerPlots(sysvector);
+    if plotvector.powerPlots
+        PowerPlots(sysvector, topics);
     end
 
     % Battery monitoring plots
