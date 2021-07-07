@@ -70,8 +70,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % mission result plots
-    if (topics.mission_result.logged && plotvector.missionResultPlots)
-        MissionResultPlots(sysvector);
+    if plotvector.missionResultPlots
+        MissionResultPlots(sysvector, topics);
     end
 
     % vehicle status flags
