@@ -95,8 +95,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % satcom plots
-    if (topics.iridiumsbd_status.logged && plotvector.iridiumsbdStatusPlots)
-        IridiumSBDStatusPlots(sysvector);
+    if plotvector.iridiumsbdStatusPlots
+        IridiumSBDStatusPlots(sysvector, topics);
     end
 
     % mppt plots

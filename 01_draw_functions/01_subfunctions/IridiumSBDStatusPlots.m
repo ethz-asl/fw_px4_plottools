@@ -1,5 +1,9 @@
-function IridiumSBDStatusPlots(sysvector)
+function IridiumSBDStatusPlots(sysvector, topics)
 % Display the power plots
+
+if ~topics.iridiumsbd_status.logged
+    return
+end
 
 fig1 = figure();
 fig1.Name = 'Iridium SatCom Plots';
