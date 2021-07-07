@@ -1,5 +1,9 @@
-function DistanceSensorPlots(sysvector)
+function DistanceSensorPlots(sysvector, topics)
 % Display the distance sensor data
+
+if ~topics.distance_sensor.logged
+   return 
+end
 
 fig1 = figure();
 fig1.Name = 'Distance Sensor';

@@ -65,8 +65,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % distance sensor plots
-    if (topics.distance_sensor.logged && plotvector.distanceSensorPlots)
-        DistanceSensorPlots(sysvector);
+    if plotvector.distanceSensorPlots
+        DistanceSensorPlots(sysvector, topics);
     end
 
     % mission result plots
