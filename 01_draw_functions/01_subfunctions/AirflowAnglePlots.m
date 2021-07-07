@@ -1,20 +1,31 @@
 function AirflowAnglePlots(sysvector, topics)
 % Display the airflow angle data.
 
-if (topics.estimator_status.logged)
-    va_n = sysvector.estimator_status_0.states_4.Data - sysvector.estimator_status_0.states_22.Data;
-    va_e = sysvector.estimator_status_0.states_5.Data - sysvector.estimator_status_0.states_23.Data;
-    if isfield(sysvector.estimator_status_0,'states_24')
-        % check if we have wind z estimates
-        va_d = sysvector.estimator_status_0.states_6.Data - sysvector.estimator_status_0.states_24.Data;
-    else
-        va_d = sysvector.estimator_status_0.states_6.Data; % assume zero down wind
+estimator_data_available = false;
+if topics.estimator_states.logged
+    estimator_data = sysvector.estimator_states_0;
+    estimator_data_available = true;
+elseif topics.estimator_status.logged
+    if isfield(sysvector.estimator_status_0, 'states_4')
+        estimator_data = sysvector.estimator_status_0;
+        estimator_data_available = true;
     end
-    Hbi = quat2dcm([sysvector.estimator_status_0.states_0.Data, ...
-        sysvector.estimator_status_0.states_1.Data, ...
-        sysvector.estimator_status_0.states_2.Data, ...
-        sysvector.estimator_status_0.states_3.Data]);
-    len_t = length(sysvector.estimator_status_0.states_0.Time);
+end
+
+if estimator_data_available
+    va_n = estimator_data.states_4.Data - estimator_data.states_22.Data;
+    va_e = estimator_data.states_5.Data - estimator_data.states_23.Data;
+    if isfield(estimator_data,'states_24')
+        % check if we have wind z estimates
+        va_d = estimator_data.states_6.Data - estimator_data.states_24.Data;
+    else
+        va_d = estimator_data.states_6.Data; % assume zero down wind
+    end
+    Hbi = quat2dcm([estimator_data.states_0.Data, ...
+        estimator_data.states_1.Data, ...
+        estimator_data.states_2.Data, ...
+        estimator_data.states_3.Data]);
+    len_t = length(estimator_data.states_0.Time);
     vb = zeros(len_t,3);
     for ii = 1:len_t
         vb(ii,:) = Hbi(:,:,ii) * [va_n(ii); va_e(ii); va_d(ii)];
@@ -24,7 +35,7 @@ end
 figure('color', 'w', 'name', 'Airflow Angles'); 
 
 airflow(1) = subplot(4,1,1); hold on; grid on; box on;
-if (topics.airflow_aoa.logged)
+if topics.airflow_aoa.logged
     ax_meas = plot(sysvector.airflow_aoa_0.aoa_rad.Time, ...
         rad2deg(sysvector.airflow_aoa_0.aoa_rad.Data));
     str_meas = {'Measurement'};
@@ -32,8 +43,8 @@ else
     ax_meas = [];
     str_meas = {};
 end
-if (topics.estimator_status.logged)
-    ax_est = plot(sysvector.estimator_status_0.states_0.Time, ...
+if estimator_data_available
+    ax_est = plot(estimator_data.states_0.Time, ...
         atan2d(vb(:,3), vb(:,1)));
     str_est = {'Estimate'};
 else
@@ -44,7 +55,7 @@ ylabel('Angle of attack [deg]');
 legend([ax_meas,ax_est], [str_meas,str_est]);
 
 airflow(2) = subplot(4,1,2); hold on; grid on; box on;
-if (topics.airflow_slip.logged)
+if topics.airflow_slip.logged
     ax_meas = plot(sysvector.airflow_slip_0.slip_rad.Time, ...
         rad2deg(sysvector.airflow_slip_0.slip_rad.Data));
     str_meas = {'Measurement'};
@@ -52,8 +63,8 @@ else
     ax_meas = [];
     str_meas = {};
 end
-if (topics.estimator_status.logged)
-    ax_est = plot(sysvector.estimator_status_0.states_0.Time, ...
+if estimator_data_available
+    ax_est = plot(estimator_data.states_0.Time, ...
         atan2d(vb(:,2), vb(:,1)));
     str_est = {'Estimate'};
 else
@@ -64,14 +75,14 @@ ylabel('Sideslip [deg]');
 legend([ax_meas,ax_est], [str_meas,str_est]);
 
 airflow(3) = subplot(4,1,3); hold on; grid on; box on;
-if (topics.airflow_aoa.logged)
+if topics.airflow_aoa.logged
     ax_aoa = plot(sysvector.airflow_aoa_0.valid.Time, sysvector.airflow_aoa_0.valid.Data);
     str_aoa = {'AoA'};
 else
     ax_aoa = [];
     str_aoa = {};
 end
-if (topics.airflow_slip.logged)
+if topics.airflow_slip.logged
     ax_aos = plot(sysvector.airflow_slip_0.valid.Time, sysvector.airflow_slip_0.valid.Data);
     str_aos = {'Slip'};
 else
@@ -82,21 +93,26 @@ legend([ax_aoa,ax_aos],[str_aoa,str_aos]);
 ylabel('Valid Meas. [~]');
 
 airflow(4) = subplot(4,1,4); hold on; grid on; box on;
-if (topics.sensor_hall.logged)
-    ax_aoa = plot(sysvector.sensor_hall_0.mag_T.Time, sysvector.sensor_hall_0.mag_T.Data);
-    str_aoa = {'AoA'};
+if topics.sensor_hall.logged
+    ax_hall = [];
+    str_hall = {};
+    for i = 0:topics.sensor_hall.num_instances-1
+        data = getfield(sysvector, 'sensor_hall_' + string(i));
+        ax_hall(end+1) = plot(data.mag_t.Time, data.mag_t.Data);
+        str_hall(end+1) = {'hall ' + string(i)};
+    end
 else
-    ax_aoa = [];
-    str_aoa = {};
+    ax_hall = [];
+    str_hall = {};
 end
-if (topics.sensor_hall_01.logged)
-    ax_aos = plot(sysvector.sensor_hall_01_0.mag_T.Time, sysvector.sensor_hall_01_0.mag_T.Data);
-    str_aos = {'Slip'};
+if topics.sensor_hall_01.logged
+    ax_hall_01 = plot(sysvector.sensor_hall_01_0.mag_t.Time, sysvector.sensor_hall_01_0.mag_t.Data);
+    str_hall_01 = {'hall 01'};
 else
-    ax_aos = [];
-    str_aos = {};
+    ax_hall_01 = [];
+    str_hall_01 = {};
 end
-legend([ax_aoa,ax_aos],[str_aoa,str_aos]);
+legend([ax_hall,ax_hall_01],[str_hall,str_hall_01]);
 ylabel('Hall Effect [mT]');
 
 linkaxes(airflow(:),'x');
