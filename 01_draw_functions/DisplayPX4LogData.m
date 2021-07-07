@@ -90,7 +90,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % Battery monitoring plots
-    if (topics.sensor_bat_mon.logged && plotvector.BatMonPlots)
+    if plotvector.BatMonPlots
          BatMonPlots(sysvector, topics);
     end
 
