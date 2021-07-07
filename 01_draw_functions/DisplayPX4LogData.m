@@ -105,9 +105,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % airflow angle plots
-    if ((topics.airflow_aoa.logged || topics.airflow_slip.logged || ...
-        topics.sensor_hall.logged) && ...
-        plotvector.airflowAnglePlots)
+    if plotvector.airflowAnglePlots
         AirflowAnglePlots(sysvector, topics);
     end
 
