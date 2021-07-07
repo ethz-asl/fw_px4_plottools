@@ -100,7 +100,7 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % mppt plots
-    if (topics.sensor_mppt.logged && plotvector.mpptPlots)
+    if plotvector.mpptPlots
         MpptPlots(sysvector, topics);
     end
 
