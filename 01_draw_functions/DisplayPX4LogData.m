@@ -75,8 +75,8 @@ function DisplayPX4LogData(sysvector, topics, paramvector, params, plainFileName
     end
 
     % vehicle status flags
-    if (topics.vehicle_status_flags.logged && plotvector.vehicleStatusFlags)
-        VehicleStatusFlagsPlots(sysvector);
+    if plotvector.vehicleStatusFlags
+        VehicleStatusFlagsPlots(sysvector, topics);
     end
 
     % mag norm versus thrust plot
