@@ -1,5 +1,9 @@
-function PowerPlots(sysvector)
+function PowerPlots(sysvector, topics)
 % Display the power plots
+
+if ~topics.battery_status.logged
+    return
+end
 
 fig1 = figure();
 fig1.Name = 'Power Statistics';
