@@ -2,13 +2,13 @@ function [tspan1] = PreviewHallData(sysvector, topics, sensor_index, tspan, plot
 
 switch sensor_index
    case 0
-      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_t;
    case 1
-      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_t;
    case 2
-      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_t;
    case 3
-      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_t;
    otherwise
       disp('HALL SENS PREV: Invalid sensor_index')
 end

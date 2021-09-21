@@ -54,7 +54,7 @@ cal_opt.angle_st = -24;         % deg
 cal_opt.angle_ed = 24;          % deg
 
 % discretization
-cal_opt.large_step_size = 4;    % deg
+cal_opt.large_step_size = 2;    % deg
 cal_opt.small_step_size = 2;    % deg
 cal_opt.small_step_range = 12;   % deg (this is the +/- range containing the small steps)
 
@@ -87,7 +87,7 @@ cal_opt.step_detection_mode = 1;
 
 % minimum step time (tune this to make sure all calibration steps are
 % captured, but small perturbations are not)
-cal_opt.t_step_min = 5;       % s
+cal_opt.t_step_min = 1;       % s
 
 % step change threshold
 cal_opt.step_thres = 0.15;      % mT

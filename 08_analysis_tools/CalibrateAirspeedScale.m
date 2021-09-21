@@ -22,8 +22,8 @@
 % - wind speeds are assumed to be constant within the seleted data
 
 % start and end times (modify these)
-t_st_cal = -1;
-t_ed_cal = 10000;
+t_st_cal = 500;
+t_ed_cal = 900;
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
@@ -41,14 +41,14 @@ end
 
 % load tube diameter and length from logs (implies these parameters have
 % been previously measured and set to the airframe for the given flight)
-tube_params_from_logs = false;
+tube_params_from_logs = true;
 
 % select airframe / pitot configuration (see AirframePitotConfig.m):
 % - 'manual-input'
 % - 'techpod_long-probe_pre-05-2019'
 % - 'ezg3_drotek'
 % - 'techpod-agrofly_drotek'
-airframe_pitot_config = 'manual-input';
+airframe_pitot_config = 'ezg3_drotek';
 % NOTE: this config does not affect the resulting calibration - only
 %       compares with potential flow theory as a "sanity check"
 if strcmp(airframe_pitot_config, 'manual-input')

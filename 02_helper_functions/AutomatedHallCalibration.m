@@ -2,13 +2,13 @@ function cal_data = AutomatedHallCalibration(sysvector, topics, sensor_index, ca
 
 switch sensor_index
    case 0
-      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_0.mag_t;
    case 1
-      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_1.mag_t;
    case 2
-      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_2.mag_t;
    case 3
-      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_T;
+      sensor_hall_mag_T = sysvector.sensor_hall_3.mag_t;
    otherwise
       disp('HALL SENS PREV: Invalid sensor_index')
 end
@@ -182,10 +182,6 @@ else
     error('Unkown step detection mode: ' + string(cal_opt.step_detection_mode))
 end
 
-if i_cal ~= len_cal_data
-    error('Only ' + string(i_cal) + '/' + string(len_cal_data) + ' steps were detected')
-end
-
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % plot
@@ -212,5 +208,9 @@ xlim(sensor_hall_mag_T.Time([cal_data(1,4), cal_data(last_populated_idx,5)]));
 
 if (last_populated_idx == len_cal_data)
     disp('HALL SENS CAL: All calibration steps populated.');
+end
+
+if i_cal ~= len_cal_data
+    error('Only ' + string(i_cal) + '/' + string(len_cal_data) + ' steps were detected')
 end
 
