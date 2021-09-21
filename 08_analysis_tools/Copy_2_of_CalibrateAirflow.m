@@ -22,8 +22,8 @@
 % - wind speeds are assumed to be constant within the seleted data
 
 % start and end times (modify these)
-t_st_cal = 0;
-t_ed_cal = 100000;
+t_st_cal = 540;
+t_ed_cal = 1230;
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
@@ -102,46 +102,21 @@ end
 % Solve nonlinear least squares regression for sensor calibration
 % (these settings may be adjusted, but typically do not need to be)
 
-force_zero_wd = true;       % if true wd is optimized to equal zero instead of a nonzero constant value
-pitching_calibration = false; % aoa calibration based on pitching maneuvers
-slip_bias_deg = 1.0;         % slip bias for the pitching maneuvers [deg]
-aoa_offset_x = 0.185;          % aoa vane x offset with respect to the body frame [m]
-aoa_offset_y = 0.455;          % aoa vane z offset with respect to the body frame [m]
-slip_offset_x = 0.185;         % slip vane x offset with respect to the body frame [m]
-slip_offset_z = -0.08;         % slip vane y offset with respect to the body frame [m]
-
 % initial guesses
 sf0 = 1;                    % scale factor
 ba0 = 0;                    % bias alpha vane [rad]
 bs0 = 0;                    % bias slip vane [rad]
 wn0 = mean_raw_wind(1);     % wind speed north [m/s]
 we0 = mean_raw_wind(2);     % wind speed east [m/s]
-wd0 = mean_raw_wind(3);     % wind speed down [m/s]
-slip_bias_rad = deg2rad(slip_bias_deg);
-if pitching_calibration
-    x0 = [sf0; ba0; wd0];
-    
-    % bounds
-    lb = [0.1; -0.2; -5];
-    ub = [  2;  0.2;  5];
-    
-elseif force_zero_wd
-    x0 = [wn0; we0; sf0; ba0; bs0];
-    
-    % bounds
-    lb = [-20; -20; 0.1; -0.2; -0.2];
-    ub = [ 20;  20;   2;  0.2;  0.2];
-else
-    x0 = [wn0; we0; sf0; ba0; bs0; wd0];
-    
-    % bounds
-    lb = [-20; -20; 0.1; -0.2; -0.2; -5];
-    ub = [ 20;  20;   2;  0.2;  0.2;  5];
-end
+x0 = [wn0; we0; sf0; ba0; bs0];
 
 disp(['wn initial = ',num2str(wn0),' m/s']);
 disp(['we initial = ',num2str(we0),' m/s']);
-disp(['wd initial = ',num2str(wd0),' m/s']);
+
+
+% bounds
+lb = [-20; -20; 0.1; -0.2; -0.2];
+ub = [ 20;  20;   2;  0.2;  0.2];
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
@@ -151,51 +126,22 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
     
     % solve
     [xopt, opt_info, mean_gsp_err, std_gsp_err, mean_wind_d] = ...
-        SolveAirflowCalibration(sysvector, tube_dia, tube_len, pitot_type, tspan, x0, lb, ub, force_zero_wd,...
-        pitching_calibration, slip_bias_rad, [aoa_offset_x, aoa_offset_y], [slip_offset_x, slip_offset_z]);
+        SolveAirflowCalibration(sysvector, tube_dia, tube_len, pitot_type, tspan, x0, lb, ub);
     
-    if pitching_calibration
-        disp(['SF = ',num2str(xopt(1)),'; SF(theory) = ',num2str(sf_theory)]);
-        disp(['wd = ',num2str(xopt(3)),' m/s']);
-        disp(['aoa bias (State Estimate Frame) = ',num2str(rad2deg(xopt(2))),' deg']);
-        if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame) = ',num2str(rad2deg(xopt(2)) - paramvector.sens_board_y_off.Data(1)),' deg']);
-        end
-        bounds_exceeded = xopt >= ub | xopt <= lb;
-        if sum(bounds_exceeded)>0
-            % bounds exceeded 
-            disp(['WARNING: optimization bounds exceeded: [',int2str(bounds_exceeded'),']']);
-        end
-        disp(['Mean of gsp. errors: ',num2str(mean_gsp_err),' m/s']);
-        disp(['Standard deviation of gsp. errors: ',num2str(std_gsp_err),' m/s']);
-        disp(['Set CAL_AIR_SCALE = ',num2str(xopt(1))]);
-        
-    else
-        disp(['wn = ',num2str(xopt(1)),' m/s']);
-        disp(['we = ',num2str(xopt(2)),' m/s']);
-        if ~force_zero_wd
-            disp(['wd = ',num2str(xopt(6)),' m/s']);
-        end
-        disp(['SF = ',num2str(xopt(3)),'; SF(theory) = ',num2str(sf_theory)]);
-        disp(['aoa bias (State Estimate Frame) = ',num2str(rad2deg(xopt(4))),' deg']);
-        disp(['slip bias (State Estimate Frame) = ',num2str(rad2deg(xopt(5))),' deg']);
-        if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame) = ',num2str(rad2deg(xopt(4)) - paramvector.sens_board_y_off.Data(1)),' deg']);
-        end
-        if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame) = ',num2str(rad2deg(xopt(5)) - paramvector.sens_board_z_off.Data(1)),' deg']);
-        end
-        bounds_exceeded = xopt >= ub | xopt <= lb;
-        if sum(bounds_exceeded)>0
-            % bounds exceeded 
-            disp(['WARNING: optimization bounds exceeded: [',int2str(bounds_exceeded'),']']);
-        end
-        disp(['Mean of gsp. errors: ',num2str(mean_gsp_err),' m/s']);
-        disp(['Standard deviation of gsp. errors: ',num2str(std_gsp_err),' m/s']);
-        disp(['Average wind down: ',num2str(mean_wind_d),' m/s']);
-        disp(['Set CAL_AIR_SCALE = ',num2str(xopt(3))]);    
+    disp(['wn = ',num2str(xopt(1)),' m/s']);
+    disp(['we = ',num2str(xopt(2)),' m/s']);
+    disp(['SF = ',num2str(xopt(3)),'; SF(theory) = ',num2str(sf_theory)]);
+    disp(['aoa bias = ',num2str(rad2deg(xopt(4))),' deg']);
+    disp(['slip bias = ',num2str(rad2deg(xopt(5))),' deg']);
+    bounds_exceeded = xopt >= ub | xopt <= lb;
+    if sum(bounds_exceeded)>0
+        % bounds exceeded 
+        disp(['WARNING: optimization bounds exceeded: [',int2str(bounds_exceeded'),']']);
     end
-    
+    disp(['Mean of gsp. errors: ',num2str(mean_gsp_err),' m/s']);
+    disp(['Standard deviation of gsp. errors: ',num2str(std_gsp_err),' m/s']);
+    disp(['Average wind down: ',num2str(mean_wind_d),' m/s']);
+    disp(['Set CAL_AIR_SCALE = ',num2str(xopt(3))]);
 else
     disp('ERROR: logged topics are not sufficient for airspeed calibration.');
 end
