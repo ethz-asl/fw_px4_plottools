@@ -1,0 +1,36 @@
+% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
+% Convert WGS84 to LV03 coordinates. The inputs are to be expected either
+% deg (lat, lon) or m (alt)
+% The output is easting, north, up
+
+function [x, y, z] = WGS84_to_LV03(lat, lon, alt, height_amsl)
+
+lat_offset = (lat * 3600 - 169028.66)/10000.0;
+lon_offset = (lon * 3600 - 26782.5)/10000.0;
+
+E = 2600072.37 ...
+    + 211455.93 * lon_offset ...
+    - 10938.51 * lon_offset .* lat_offset ...
+    - 0.36 * lon_offset .* (lat_offset.^2) ...
+    - 44.54 * lon_offset.^3;
+
+x = E - 2000000.00;
+
+N = 1200147.07 ...
+    + 308807.95 * lat_offset ...
+    + 3745.25 * lon_offset.^2 ...
+    + 76.63 * lat_offset.^2 ...
+    - 194.56 * (lon_offset.^2) .* lat_offset ...
+    + 119.79 * lat_offset.^3;
+
+y = N - 1000000.00;
+
+if height_amsl
+    z = alt;
+else
+    z = alt - 49.55 ...
+        + 2.73 * lon_offset ...
+        + 6.94 * lat_offset;
+end
+
+end
