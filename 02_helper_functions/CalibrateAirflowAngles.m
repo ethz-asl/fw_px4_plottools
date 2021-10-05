@@ -36,7 +36,7 @@ if new_params
         params.cal_av_aoa_p3.logged);
 
     if (config.use_cal_av_params && aoa_params_logged)
-       aoa_rev =  paramvector.cal_av_aoa_rev.Data(1);
+       aoa_rev = paramvector.cal_av_aoa_rev.Data(1);
        aoa_p0 = paramvector.cal_av_aoa_p0.Data(1);
        aoa_p1 = paramvector.cal_av_aoa_p1.Data(1);
        aoa_p2 = paramvector.cal_av_aoa_p2.Data(1);
@@ -53,7 +53,7 @@ if new_params
         params.cal_av_slip_p3.logged);
     
     if (config.use_cal_av_params && slip_params_logged)
-       slip_rev =  paramvector.cal_av_slip_rev.Data(1);
+       slip_rev = paramvector.cal_av_slip_rev.Data(1);
        slip_p0 = paramvector.cal_av_slip_p0.Data(1);
        slip_p1 = paramvector.cal_av_slip_p1.Data(1);
        slip_p2 = paramvector.cal_av_slip_p2.Data(1);
@@ -68,12 +68,12 @@ if new_params
         hall_name = strcat('sensor_hall_', num2str(i));
         
         if sysvector.(hall_name).instance.Data(1) == aoa_id
-            aoa_hall_data = sysvector.(hall_name).mag_T;
+            aoa_hall_data = sysvector.(hall_name).mag_t;
             aoa_hall_logged = true;
         end
 
         if sysvector.(hall_name).instance.Data(1) == slip_id
-            slip_hall_data = sysvector.(hall_name).mag_T;
+            slip_hall_data = sysvector.(hall_name).mag_t;
             slip_hall_logged = true;
         end
     end
@@ -97,7 +97,7 @@ else
     aoa_hall_logged = topics.sensor_hall.logged;
     
     if aoa_hall_logged
-        aoa_hall_data = sysvector.sensor_hall_0.mag_T;
+        aoa_hall_data = sysvector.sensor_hall_0.mag_t;
     end
     
     % legacy slip params
@@ -119,7 +119,7 @@ else
     slip_hall_logged = topics.sensor_hall_01.logged;
     
     if slip_hall_logged
-        slip_hall_data = sysvector.sensor_hall_01_0.mag_T;
+        slip_hall_data = sysvector.sensor_hall_01_0.mag_t;
     end
 end
 

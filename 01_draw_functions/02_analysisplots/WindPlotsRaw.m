@@ -1,5 +1,15 @@
-function [mean_raw_wind, tspan1] = WindPlotsRaw(sysvector, topics, tspan)
+function [mean_raw_wind, tspan1] = WindPlotsRaw(sysvector, topics, paramvector, params, config)
 % Display the wind data.
+
+tspan = [config.t_st_cal, config.t_ed_cal];
+
+% get the aoa and slip angles if logged
+if config.use_airflow_angles
+    [aoa, slip, aoa_logged, slip_logged] = CalibrateAirflowAngles(sysvector, topics, paramvector, params, config);
+else
+    aoa_logged = false;
+    slip_logged = false;
+end
 
 figure('color', 'w', 'name', 'Reconstructed Wind 3D');
 % synchronise the data
@@ -18,6 +28,17 @@ max_time = min([tspan(2), ...
     sysvector.airflow_aoa_0.aoa_rad.Time(end),...
     sysvector.airflow_slip_0.slip_rad.Time(end),...
     sysvector.vehicle_attitude_0.q_0.Time(end)]);
+
+if (aoa_logged)
+    min_time = max([min_time, aoa.Time(1)]);
+    max_time = min([max_time, aoa.Time(end)]);
+end
+
+if (slip_logged)
+    min_time = max([min_time, slip.Time(1)]);
+    max_time = min([max_time, slip.Time(end)]);
+end
+
 if (topics.vehicle_local_position.logged)
     min_time = max([min_time, sysvector.vehicle_local_position_0.x.Time(1)]);
     max_time = min([max_time, sysvector.vehicle_local_position_0.x.Time(end)]);
@@ -29,15 +50,15 @@ vel_n = resample(sysvector.vehicle_gps_position_0.vel_n_m_s, time_resampled);
 vel_e = resample(sysvector.vehicle_gps_position_0.vel_e_m_s, time_resampled);
 vel_d = resample(sysvector.vehicle_gps_position_0.vel_d_m_s, time_resampled);
 airspeed = resample(sysvector.airspeed_0.true_airspeed_m_s, time_resampled);
-if topics.airflow_aoa.logged
-    aoa = resample(sysvector.airflow_aoa_0.aoa_rad, time_resampled);
+if aoa_logged
+    aoa = resample(aoa, time_resampled);
 else
-    aoa = timeseries(zeros(size(time_resampled)), time_resampled);
+    aoa = timeseries(zeros(size(time_resampled')), time_resampled);
 end
-if topics.airflow_slip.logged
-    slip = resample(sysvector.airflow_slip_0.slip_rad, time_resampled);
+if slip_logged
+    slip = resample(slip, time_resampled);
 else
-    slip = timeseries(zeros(size(time_resampled)), time_resampled);
+    slip = timeseries(zeros(size(time_resampled')), time_resampled);
 end
 q_0 = resample(sysvector.vehicle_attitude_0.q_0, time_resampled);
 q_1 = resample(sysvector.vehicle_attitude_0.q_1, time_resampled);
@@ -55,11 +76,33 @@ end
 
 R_I_B = quat2rotm([q_0.Data, q_1.Data, q_2.Data, q_3.Data]);
 
+
+
 % reconstructed wind
+if (isfield(config, 'slip_offset_x'))
+   slip_offset_x = config.slip_offset_x; 
+else
+    slip_offset_x = 0.0;
+end
+if (isfield(config, 'slip_offset_z'))
+   slip_offset_z = config.slip_offset_z; 
+else
+    slip_offset_z = 0.0;
+end
+if (isfield(config, 'aoa_offset_x'))
+   aoa_offset_x = config.aoa_offset_x; 
+else
+    aoa_offset_x = 0.0;
+end
+if (isfield(config, 'aoa_offset_y'))
+   aoa_offset_y = config.aoa_offset_y; 
+else
+    aoa_offset_y = 0.0;
+end
 v_air_body = [ ...
     airspeed.Data'; ...
-    (airspeed.Data .* tan(slip.Data) - 0.0 * gyro_z.Data + 0.0 * gyro_x.Data)'; ...
-    (airspeed.Data .* tan(aoa.Data) + 0.0 * gyro_y.Data - 0.0 * gyro_x.Data)'];
+    (airspeed.Data .* tan(slip.Data) - slip_offset_x * gyro_z.Data + slip_offset_z * gyro_x.Data)'; ...
+    (airspeed.Data .* tan(aoa.Data) + aoa_offset_x * gyro_y.Data - aoa_offset_y * gyro_x.Data)'];
 
 v_air = [...
     sum(squeeze(R_I_B(1,:,:)) .* v_air_body, 1); ...
@@ -70,7 +113,7 @@ v_air = [...
 v_gnd = [vel_n.Data'; vel_e.Data'; vel_d.Data'];
 wind = v_gnd - v_air;
 
-if ~topics.airflow_aoa.logged
+if ~aoa_logged
     % if the aoa is not logged set the vertical wind to 0
     wind(3, :) = 0.0 * wind(3, :);
 end
@@ -116,7 +159,7 @@ end
 % / wind plot / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 figure('color','w','name','Reconstructed Wind Plot');
 
-if (topics.airflow_aoa.logged || topics.airflow_slip.logged)
+if (aoa_logged || slip_logged)
     num_plots = 4;
 else
     num_plots = 3;
@@ -148,7 +191,7 @@ else
     ylim([-1, 1]);
 end
 
-if (topics.airflow_aoa.logged || topics.airflow_slip.logged)
+if (aoa_logged || slip_logged)
     wind_plot(4) = subplot(num_plots,1,4); hold on; grid on; box on;
     ylabel('Airflow Angles [deg]');
     plot(time_resampled, rad2deg(aoa.Data));
