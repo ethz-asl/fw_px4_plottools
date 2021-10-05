@@ -39,6 +39,9 @@ config.auto_loiter_detections = true;
 % If true activates additional outputs and plots
 config.verbose = false;
 
+% If true, the data between successive runs are stacked and used in fitting
+% the biases
+config.stack_data = true;
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
 % - 'manual-input'
@@ -106,6 +109,11 @@ config.n_loiters_required = 1.0;        % Number of loiters required, can be a f
 % - wind speeds are assumed to be constant within the seleted data
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+% copy over the start and end time such that the script will not fail if
+% the airflow measurements are not logged
+config.st_time = config.t_st_cal;
+config.end_time = config.t_ed_cal;
+
 clc;
 if (topics.airspeed.logged && topics.vehicle_gps_position.logged && topics.vehicle_attitude.logged)
     [mean_raw_wind, tspan] = WindPlotsRaw(sysvector, topics, paramvector, params, config);
@@ -297,6 +305,20 @@ for i=1:length(t_starts)
 end
 % ! END do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
+%% Stack data from previous runs if required
+if config.stack_data
+    if exist('previous_optimization_data','var')
+        fn = fieldnames(previous_optimization_data);
+        for k=1:numel(fn)
+            if isfield(optimization_data, fn(k))
+                optimization_data.(fn{k}) = [optimization_data.(fn{k}), previous_optimization_data.(fn{k})];
+            else
+                optimization_data.(fn{k}) = previous_optimization_data.(fn{k});
+            end
+        end
+    end
+    previous_optimization_data = optimization_data;
+end
 
 %% Display the optimization results for more than one loiter
 if length(t_starts) > 1
@@ -429,23 +451,114 @@ if length(t_starts) > 1
     xlabel('throttle [-]')
     legend('wn','we');
     
-    figure('color','w'); hold on; grid on; box on;
-    title('AoA - Throttle - Roll')
-    [xq,yq] = meshgrid(min(optimization_data.throttle):.01:max(optimization_data.throttle), min(rad2deg(optimization_data.roll)):1:max(rad2deg(optimization_data.roll)));
-    aoa_mesh = griddata(optimization_data.throttle,rad2deg(optimization_data.roll),rad2deg(optimization_data.aoa_bias),xq,yq);
-    scatter3(optimization_data.throttle, rad2deg(optimization_data.roll), rad2deg(optimization_data.aoa_bias))
-    mesh(xq,yq,aoa_mesh)
-    xlabel('throttle [-]')
-    ylabel('roll [deg]')
-    zlabel('aoa offset [deg]')
+    try
+        figure('color','w'); hold on; grid on; box on;
+        title('Slip Bias - Throttle - Roll')
+        [xq,yq] = meshgrid(min(optimization_data.throttle):.01:max(optimization_data.throttle), min(rad2deg(optimization_data.roll)):1:max(rad2deg(optimization_data.roll)));
+        aoa_mesh = griddata(optimization_data.throttle,rad2deg(optimization_data.roll),rad2deg(optimization_data.slip_bias),xq,yq);
+        scatter3(optimization_data.throttle, rad2deg(optimization_data.roll), rad2deg(optimization_data.slip_bias))
+        mesh(xq,yq,aoa_mesh)
+        xlabel('throttle [-]')
+        ylabel('roll [deg]')
+        zlabel('slip offset [deg]')
     
-    figure('color','w'); hold on; grid on; box on;
-    title('AoA - Throttle - G-Load')
-    [xq,yq] = meshgrid(min(optimization_data.throttle):.01:max(optimization_data.throttle), min(optimization_data.g_load):0.01:max(optimization_data.g_load));
-    aoa_mesh = griddata(optimization_data.throttle,optimization_data.g_load,rad2deg(optimization_data.aoa_bias),xq,yq);
-    scatter3(optimization_data.throttle, optimization_data.g_load, rad2deg(optimization_data.aoa_bias))
-    mesh(xq,yq,aoa_mesh)
+        figure('color','w'); hold on; grid on; box on;
+        title('AoA Bias - Airspeed - G-Load')
+        [xq,yq] = meshgrid(min(optimization_data.airspeed):0.1:max(optimization_data.airspeed), min(optimization_data.g_load):0.01:max(optimization_data.g_load));
+        aoa_mesh = griddata(optimization_data.airspeed,optimization_data.g_load,rad2deg(optimization_data.aoa_bias),xq,yq);
+        scatter3(optimization_data.airspeed, optimization_data.g_load, rad2deg(optimization_data.aoa_bias))
+        mesh(xq,yq,aoa_mesh)
+        xlabel('airspeed [m/s]')
+        ylabel('roll [deg]')
+        zlabel('aoa offset [deg]')
+    
+        figure('color','w'); hold on; grid on; box on;
+        title('AoA Bias - Throttle - G-Load')
+        [xq,yq] = meshgrid(min(optimization_data.throttle):.01:max(optimization_data.throttle), min(optimization_data.g_load):0.01:max(optimization_data.g_load));
+        aoa_mesh = griddata(optimization_data.throttle,optimization_data.g_load,rad2deg(optimization_data.aoa_bias),xq,yq);
+        scatter3(optimization_data.throttle, optimization_data.g_load, rad2deg(optimization_data.aoa_bias))
+        mesh(xq,yq,aoa_mesh)
+        xlabel('throttle [-]')
+        ylabel('g-load [-]')
+        zlabel('aoa offset [deg]')
+    catch
+    end
+end
+
+%% Fit a curve through the biases
+
+if length(t_starts) > 1
+    % aoa as a function of the g_load
+    p_aoa = polyfit(optimization_data.g_load, optimization_data.aoa_bias, 1);
+    
+    x1 = linspace(min(optimization_data.g_load),max(optimization_data.g_load));
+    y1 = polyval(p_aoa,x1);
+    
+    aoa_bias_g_load = polyval(p_aoa,optimization_data.g_load);
+    
+%     fo = fitoptions('Method','NonlinearLeastSquares', 'StartPoint', [1 1]);
+%     ft = fittype('a*(1+x)^2+b','options',fo);
+%     [curve1,gof1] = fit(optimization_data.g_load', optimization_data.aoa_bias', ft);
+%     y12 = curve1.a .* (1.0 + x1) .^2 + curve1.b;
+    
+    figure('color','w');
+    curve_fit_aoa(1) = subplot(3,1,1); hold on; grid on; box on;
+    plot(x1,rad2deg(y1))
+%     plot(x1,rad2deg(y12))
+    plot(optimization_data.g_load, rad2deg(optimization_data.aoa_bias), 'o')
+    xlabel('g-load [-]')
+    ylabel('aoa bias [deg]')
+
+    curve_fit_aoa(end+1) = subplot(3,1,2); hold on; grid on; box on;
+    plot(optimization_data.throttle, rad2deg(optimization_data.aoa_bias - aoa_bias_g_load), 'o')
     xlabel('throttle [-]')
-    ylabel('g-load [-]')
-    zlabel('aoa offset [deg]')
+    ylabel('delta aoa bias [deg]')
+    
+    curve_fit_aoa(end+1) = subplot(3,1,3); hold on; grid on; box on;
+    plot(optimization_data.airspeed, rad2deg(optimization_data.aoa_bias - aoa_bias_g_load), 'o')
+    xlabel('airspeed [-]')
+    ylabel('delta aoa bias [deg]')
+    
+    % slip as a function of the roll
+    fo = fitoptions('Method','NonlinearLeastSquares', 'StartPoint', [1 1 1]);
+    ft = fittype('a*tanh(b*x)+c','options',fo);
+    
+    [curve,gof] = fit(optimization_data.roll', optimization_data.slip_bias', ft);
+    
+    x2 = linspace(min(optimization_data.roll),max(optimization_data.roll));
+    y2 = curve.a .* tanh(curve.b * x2) + curve.c;
+    
+    slip_bias_g_load = curve.a .* tanh(curve.b * optimization_data.roll) + curve.c;
+ 
+    figure('color','w');
+    curve_fit_slip(1) = subplot(3,1,1); hold on; grid on; box on;
+    plot(rad2deg(x2),rad2deg(y2))
+    plot(rad2deg(optimization_data.roll), rad2deg(optimization_data.slip_bias), 'o')
+    xlabel('roll [deg]')
+    ylabel('slip bias [deg]')
+
+    curve_fit_slip(end+1) = subplot(3,1,2); hold on; grid on; box on;
+    plot(optimization_data.throttle, rad2deg(optimization_data.slip_bias - slip_bias_g_load), 'o')
+    xlabel('throttle [-]')
+    ylabel('delta slip bias [deg]')
+    
+    curve_fit_slip(end+1) = subplot(3,1,3); hold on; grid on; box on;
+    plot(optimization_data.airspeed, rad2deg(optimization_data.slip_bias - slip_bias_g_load), 'o')
+    xlabel('airspeed [-]')
+    ylabel('delta slip bias [deg]')
+    
+    disp('====================================')
+    disp('Fitting results')
+    disp('====================================')
+    disp(['SF = ',num2str(mean(optimization_data.scale_factor)),'; SF(theory) = ',num2str(sf_theory)])
+    disp(['Set CAL_AIR_SCALE = ',num2str(mean(optimization_data.scale_factor))])
+    disp(' ')
+    disp('aoa_bias = P1 * g_load + P0')
+    disp(['P1 = ', num2str(p_aoa(1))])
+    disp(['P0 = ', num2str(p_aoa(2))])
+    disp(' ')
+    disp('slip_bias = A * tanh(B * rol) + C')
+    disp(['A = ', num2str(curve.a)])
+    disp(['B = ', num2str(curve.b)])
+    disp(['C = ', num2str(curve.c)])
 end
