@@ -10,6 +10,35 @@
 % NOTE: this script is segmented into cells which should be run
 %       sequentially after modifying settings at the top of each section
 
+%% General Optimization Configuration
+
+% start and end times of the data used
+config.t_st_cal = 0;
+config.t_ed_cal = 10000;
+
+% load tube diameter and length from logs (implies these parameters have
+% been previously measured and set to the airframe for the given flight)
+config.tube_params_from_logs = true;
+
+%% Pitot Tube Configuration
+% select airframe / pitot configuration (see AirframePitotConfig.m):
+% - 'manual-input'
+% - 'techpod_long-probe_pre-05-2019'
+% - 'ezg3_drotek'
+% - 'techpod-agrofly_drotek'
+config.airframe_pitot_config = 'manual-input';
+
+config.radius_profile_cm = 1;      % radius of profile on which the probe is mounted (sphere or cylinder) [cm]
+config.r_probe_tip_cm = 100;       % length of radial vector from center of profile to probe tip [cm]
+config.theta_probe_tip_deg = 0;    % angle between horizon and radial vector [deg]
+config.tube_dia = 1.5/1000;        % tube diameter [m] !!-this param is overwritten if loading tube params from logs
+config.tube_len = 0.5;             % tube length [m]   !!-this param is overwritten if loading tube params from logs
+config.pitot_type = 1;             % pitot type (drotek pitot = 0; custom pitot = 1)
+config.mount_location = 1;         % 0 = wing (2D cylinder assumption), 1 = nose (3D sphere assumption)
+
+%% Airflow Angles Config
+config.use_airflow_angles = false; % must be false for this script
+
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 % Plot wind reconstructions from (uncalibrated) true airspeed and ground
 % speed measurements to approximate initial guess of NE wind components and
@@ -21,14 +50,10 @@
 %   modes for collecting this data)
 % - wind speeds are assumed to be constant within the seleted data
 
-% start and end times (modify these)
-t_st_cal = 500;
-t_ed_cal = 900;
-
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
 if (topics.airspeed.logged && topics.vehicle_gps_position.logged && topics.vehicle_attitude.logged)
-    [mean_raw_wind, tspan] = WindPlotsRaw(sysvector, topics, [t_st_cal, t_ed_cal]);
+    [mean_raw_wind, tspan] = WindPlotsRaw(sysvector, topics, paramvector, params, config);
     disp(['Mean wind east = ', num2str(mean_raw_wind(1)), ' m/s']);
     disp(['Mean wind north = ', num2str(mean_raw_wind(2)), ' m/s']);
 else
@@ -37,44 +62,21 @@ end
 % ! END do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-% Setup optimization (modify these settings for the optimiziation)
-
-% load tube diameter and length from logs (implies these parameters have
-% been previously measured and set to the airframe for the given flight)
-tube_params_from_logs = true;
-
-% select airframe / pitot configuration (see AirframePitotConfig.m):
-% - 'manual-input'
-% - 'techpod_long-probe_pre-05-2019'
-% - 'ezg3_drotek'
-% - 'techpod-agrofly_drotek'
-airframe_pitot_config = 'ezg3_drotek';
-% NOTE: this config does not affect the resulting calibration - only
-%       compares with potential flow theory as a "sanity check"
-if strcmp(airframe_pitot_config, 'manual-input')
-    % enter config manually
-    radius_profile_cm = 1;      % radius of profile on which the probe is mounted (sphere or cylinder) [cm]
-    r_probe_tip_cm = 100;       % length of radial vector from center of profile to probe tip [cm]
-    theta_probe_tip_deg = 0;    % angle between horizon and radial vector [deg]
-    tube_dia = 1.5/1000;        % tube diameter [m] !!-this param is overwritten if loading tube params from logs
-    tube_len = 0.5;             % tube length [m]   !!-this param is overwritten if loading tube params from logs
-    pitot_type = 1;             % pitot type (drotek pitot = 0; custom pitot = 1)
-    mount_location = 1;         % 0 = wing (2D cylinder assumption), 1 = nose (3D sphere assumption)
-else
-    % load airframe / pitot config from file
+if ~strcmp(config.airframe_pitot_config, 'manual-input')
+    % Load the predefined airframe params
     AirframePitotConfig;
 end
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 % load tube len/dia from params
-if (tube_params_from_logs)
+if (config.tube_params_from_logs)
     if (params.cal_air_cmodel.logged && params.cal_air_tubelen.logged && params.cal_air_tubed_mm.logged)
-        tube_dia = paramvector.cal_air_tubed_mm.Data(1)/1000;
-        tube_len = paramvector.cal_air_tubelen.Data(1);
+        config.tube_dia = paramvector.cal_air_tubed_mm.Data(1)/1000;
+        config.tube_len = paramvector.cal_air_tubelen.Data(1);
         if paramvector.cal_air_cmodel.Data(1) == 2
-            pitot_type = 1;
+            config.pitot_type = 1;
         else
-            pitot_type = 0;
+            config.pitot_type = 0;
         end
     else
         disp('ERROR: logged params are not sufficient for airspeed calibration.');    
@@ -82,16 +84,16 @@ if (tube_params_from_logs)
 end
 
 % scale factor from potential flow theory
-if (mount_location == 0)
+if (config.mount_location == 0)
     % potential flow scales (cylinder, 2D)
     sf_theory = 1 / ( ...
-        (1 - radius_profile_cm^2 / r_probe_tip_cm^2) * cosd(theta_probe_tip_deg)^2 + ...
-        (1 + radius_profile_cm^2 / r_probe_tip_cm^2) * sind(theta_probe_tip_deg)^2 );
-elseif (mount_location == 1)
+        (1 - config.radius_profile_cm^2 / config.r_probe_tip_cm^2) * cosd(config.theta_probe_tip_deg)^2 + ...
+        (1 + config.radius_profile_cm^2 / config.r_probe_tip_cm^2) * sind(config.theta_probe_tip_deg)^2 );
+elseif (config.mount_location == 1)
 % potential flow scales (sphere, 3D)
     sf_theory = 1 / ( ...
-        (1 - radius_profile_cm^3 / r_probe_tip_cm^3) * cosd(theta_probe_tip_deg)^2 + ...
-        (1 + radius_profile_cm^3 / r_probe_tip_cm^3 / 2) * sind(theta_probe_tip_deg)^2 );
+        (1 - config.radius_profile_cm^3 / config.r_probe_tip_cm^3) * cosd(config.theta_probe_tip_deg)^2 + ...
+        (1 + config.radius_profile_cm^3 / config.r_probe_tip_cm^3 / 2) * sind(config.theta_probe_tip_deg)^2 );
 else
     disp('ERROR: not a valid mounting location');
 end
@@ -119,7 +121,7 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
     
     % solve
     [xopt, opt_info, mean_gsp_err, std_gsp_err] = ...
-        SolveAirspeedScale(sysvector, tube_dia, tube_len, pitot_type, tspan, x0, lb, ub);
+        SolveAirspeedScale(sysvector, x0, lb, ub, config);
     
     disp(['wn = ',num2str(xopt(1)),' m/s']);
     disp(['we = ',num2str(xopt(2)),' m/s']);

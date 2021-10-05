@@ -19,8 +19,8 @@
 % - wind speeds are assumed to be constant within the seleted data
 
 % start and end times (modify these)
-t_st_cal = 0;
-t_ed_cal = 10000;
+t_st_cal = 740;
+t_ed_cal = 770;
 
 % ! START do not modify ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 clc;
@@ -115,7 +115,7 @@ if (topics.airspeed.logged && topics.vehicle_gps_position.logged && ...
     % compute the offset
     disp(['Mean of Pitch: ',num2str(mean(rad2deg(pitch.Data))),' m/s']);
     disp(['Mean of AoA: ',num2str(mean(rad2deg(aoa.Data))),' m/s']);
-    disp(['AoA offset: ',num2str(mean(rad2deg(aoa.Data) - rad2deg(pitch.Data))),' m/s']);
+    disp(['AoA offset: ',num2str(mean(rad2deg(aoa.Data) - rad2deg(pitch.Data))),' deg']);
 else
     disp('ERROR: logged topics are not sufficient for airspeed calibration.');
 end
