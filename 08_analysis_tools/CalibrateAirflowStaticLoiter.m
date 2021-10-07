@@ -489,18 +489,14 @@ end
 
 if length(t_starts) > 1
     % aoa as a function of the g_load
-    p_aoa = polyfit(optimization_data.g_load, optimization_data.aoa_bias, 1);
-    
+    fo = fitoptions('Method','NonlinearLeastSquares', 'StartPoint', [0 1]);
+    ft = fittype('P0 + (1 + x) * P1','options',fo);
+    [curve1,gof1] = fit(optimization_data.g_load', optimization_data.aoa_bias', ft);
     x1 = linspace(min(optimization_data.g_load),max(optimization_data.g_load));
-    y1 = polyval(p_aoa,x1);
-    
-    aoa_bias_g_load = polyval(p_aoa,optimization_data.g_load);
-    
-%     fo = fitoptions('Method','NonlinearLeastSquares', 'StartPoint', [1 1]);
-%     ft = fittype('a*(1+x)^2+b','options',fo);
-%     [curve1,gof1] = fit(optimization_data.g_load', optimization_data.aoa_bias', ft);
-%     y12 = curve1.a .* (1.0 + x1) .^2 + curve1.b;
-    
+    y1 = curve1.P0 + (1.0 + x1) * curve1.P1;
+
+    aoa_bias_g_load = curve1.P0 + (1.0 + optimization_data.g_load) * curve1.P1;
+
     figure('color','w');
     curve_fit_aoa(1) = subplot(3,1,1); hold on; grid on; box on;
     plot(x1,rad2deg(y1))
@@ -553,11 +549,11 @@ if length(t_starts) > 1
     disp(['SF = ',num2str(mean(optimization_data.scale_factor)),'; SF(theory) = ',num2str(sf_theory)])
     disp(['Set CAL_AIR_SCALE = ',num2str(mean(optimization_data.scale_factor))])
     disp(' ')
-    disp('aoa_bias = P1 * g_load + P0')
-    disp(['P1 = ', num2str(p_aoa(1))])
-    disp(['P0 = ', num2str(p_aoa(2))])
+    disp('aoa_bias = P1 * (1 + g_load) + P0')
+    disp(['P1 = ', num2str(curve1.P1)])
+    disp(['P0 = ', num2str(curve1.P0)])
     disp(' ')
-    disp('slip_bias = A * tanh(B * rol) + C')
+    disp('slip_bias = A * tanh(B * roll) + C')
     disp(['A = ', num2str(curve.a)])
     disp(['B = ', num2str(curve.b)])
     disp(['C = ', num2str(curve.c)])
