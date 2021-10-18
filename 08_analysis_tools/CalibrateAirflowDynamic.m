@@ -44,7 +44,7 @@ config.auto_loiter_detections = true;
 config.verbose = false;
 
 % Different function definitions for the aoa and slip bias
-config.calibration_function = 0;
+config.calibration_function = 2;
 
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
@@ -294,6 +294,10 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         % bounds exceeded 
         disp(['WARNING: optimization bounds exceeded: [',int2str(bounds_exceeded'),']']);
     end
+    
+    disp(['Wn std: ', num2str(std(optimization_data.wn - optimization_data.wn_fit))])
+    disp(['We std: ', num2str(std(optimization_data.we - optimization_data.we_fit))])
+    disp(['Wd std: ', num2str(std(optimization_data.wd))])
 
     disp(['SF = ',num2str(xopt(1)),'; SF(theory) = ',num2str(sf_theory)]);
     
