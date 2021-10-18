@@ -136,6 +136,8 @@ optimization_data.slip_bias = slip_bias;
 optimization_data.scale_factor = scale_factor;
 optimization_data.wn = out.wind_n;
 optimization_data.we = out.wind_e;
+optimization_data.wn_fit = out.wn;
+optimization_data.we_fit = out.we;
 optimization_data.wd = out.wind_d;
 optimization_data.wn_raw = out_before.wind_n;
 optimization_data.we_raw = out_before.wind_e;
@@ -261,6 +263,9 @@ elseif config.calibration_function == 2
     bsP7 = x(18);
     bsP8 = x(19);
     start_idx_wind = 20;
+    
+    config.sfPdp = sfPdp;
+    config.sfPgyrz = sfPgyrz;
 else
     error('Unknown calibration function')
 end
@@ -274,8 +279,6 @@ else
 end
 
 config.airspeed_scale_factor = sf;
-config.sfPdp = sfPdp;
-config.sfPgyrz = sfPgyrz;
 
 [out.airspeed_true, ~] = CalculateAirspeed(input.dp, input.baro, input.temp, input.gyro_z, config);
 
