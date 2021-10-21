@@ -28,13 +28,13 @@ gyr_x = resample(sysvector.sensor_gyro_0.x, time_resampled(1):dt_rs:time_resampl
 gyr_y = resample(sysvector.sensor_gyro_0.y, time_resampled(1):dt_rs:time_resampled(end));
 gyr_z = resample(sysvector.sensor_gyro_0.z, time_resampled(1):dt_rs:time_resampled(end));
 
-if config.t_movmean_accz > 0
-    acc_x.Data = movmean(acc_x.Data, ceil(config.t_movmean_accz / dt_rs));
-    acc_y.Data = movmean(acc_y.Data, ceil(config.t_movmean_accz / dt_rs));
-    acc_z.Data = movmean(acc_z.Data, ceil(config.t_movmean_accz / dt_rs));
-    gyr_x.Data = movmean(gyr_x.Data, ceil(config.t_movmean_accz / dt_rs));
-    gyr_y.Data = movmean(gyr_y.Data, ceil(config.t_movmean_accz / dt_rs));
-    gyr_z.Data = movmean(gyr_z.Data, ceil(config.t_movmean_accz / dt_rs));
+if config.t_movmean > 0
+    acc_x.Data = movmean(acc_x.Data, ceil(config.t_movmean / dt_rs));
+    acc_y.Data = movmean(acc_y.Data, ceil(config.t_movmean / dt_rs));
+    acc_z.Data = movmean(acc_z.Data, ceil(config.t_movmean / dt_rs));
+    gyr_x.Data = movmean(gyr_x.Data, ceil(config.t_movmean / dt_rs));
+    gyr_y.Data = movmean(gyr_y.Data, ceil(config.t_movmean / dt_rs));
+    gyr_z.Data = movmean(gyr_z.Data, ceil(config.t_movmean / dt_rs));
 end
 
 input.window_lengths = window_lengths;
@@ -123,6 +123,12 @@ elseif config.calibration_function == 1
 elseif config.calibration_function == 2
     aoa_bias = xopt(4) + xopt(5) * tanh(xopt(6) * input.aoa) + xopt(7) * tanh(xopt(8) * input.gyro_y) + xopt(9) * tanh(xopt(10) * (1 + optimization_data.g_load));
     slip_bias = xopt(11) + xopt(12) * tanh(xopt(13) * input.slip) + xopt(14) * tanh(xopt(15) * input.gyro_y) + xopt(16) * tanh(xopt(17) * input.gyro_z) + xopt(18) * tanh(xopt(19) *(1 + optimization_data.g_load));
+elseif config.calibration_function == 3
+    aoa_bias = xopt(4) + xopt(5) * (1 + optimization_data.g_load);
+    slip_bias = xopt(6) * tanh(xopt(7) * input.roll) + xopt(8) + xopt(9) * (1 + optimization_data.g_load);
+elseif config.calibration_function == 4
+    aoa_bias = xopt(6) + xopt(7) * (1 + optimization_data.g_load);
+    slip_bias = xopt(8) * tanh(xopt(9) * input.roll) + xopt(10) + xopt(11) * (1 + optimization_data.g_load);
 else
     error('Unknown calibration function')
 end
@@ -233,6 +239,10 @@ if config.calibration_function == 0
     bsB = x(5);
     bsC = x(6);
     start_idx_wind = 7;
+    
+    g_load = input.acc_z / 9.81;
+    b_aoa = baP0 + baP1 * (1 + g_load);
+    b_slip = bsA * tanh(bsB * input.roll) + bsC;
 elseif config.calibration_function == 1
     baP0 = x(2);
     baP1 = x(3);
@@ -241,6 +251,9 @@ elseif config.calibration_function == 1
     bsP1 = x(6);
     bsP2 = x(7);
     start_idx_wind = 8;
+
+    b_aoa = baP0 + baP1 * input.aoa + baP2 * input.aoa .* input.aoa;
+    b_slip = bsP0 + bsP1 * input.slip + bsP2 * input.slip .* input.slip;
 elseif config.calibration_function == 2
     sfPdp = x(2);
     sfPgyrz = x(3);
@@ -266,6 +279,43 @@ elseif config.calibration_function == 2
     
     config.sfPdp = sfPdp;
     config.sfPgyrz = sfPgyrz;
+
+    g_load = input.acc_z / 9.81;
+    b_aoa = baP0 + baP1 * tanh(baP2 * input.aoa) + baP3 * tanh(baP4 * input.gyro_y) + baP5 * tanh(baP6 * (1 + g_load));
+    b_slip = bsP0 + bsP1 * tanh(bsP2 * input.slip) + bsP3 * tanh(bsP4 * input.gyro_y) + bsP5 * tanh(bsP6 * input.gyro_z) + bsP7 * tanh(bsP8 *(1 + g_load));
+elseif config.calibration_function == 3
+    config.sfPgyrz = x(2);
+    config.sfPslip = x(3);
+    
+    baP0 = x(4);
+    baP1 = x(5);
+    bsA = x(6);
+    bsB = x(7);
+    bsC = x(8);
+    bsD = x(9);
+    start_idx_wind = 10;
+
+    g_load = input.acc_z / 9.81;
+    b_aoa = baP0 + baP1 * (1 + g_load);
+    b_slip = bsA * tanh(bsB * input.roll) + bsC + bsD * (1 + g_load);
+
+elseif config.calibration_function == 4
+    config.sfPgyrz = x(2);
+    config.sfAslip = x(3);
+    config.sfBslip = x(4);
+    config.sfCslip = x(5);
+    
+    baP0 = x(6);
+    baP1 = x(7);
+    bsA = x(8);
+    bsB = x(9);
+    bsC = x(10);
+    bsD = x(11);
+    start_idx_wind = 12;
+
+    g_load = input.acc_z / 9.81;
+    b_aoa = baP0 + baP1 * (1 + g_load);
+    b_slip = bsA * tanh(bsB * input.roll) + bsC + bsD * (1 + g_load);
 else
     error('Unknown calibration function')
 end
@@ -280,27 +330,13 @@ end
 
 config.airspeed_scale_factor = sf;
 
-[out.airspeed_true, ~] = CalculateAirspeed(input.dp, input.baro, input.temp, input.gyro_z, config);
+[out.airspeed_true, ~] = CalculateAirspeed(input.dp, input.baro, input.temp, input.gyro_z, input.slip - b_slip, config);
 
-if config.calibration_function == 0
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * (1 + g_load);
-    b_slip = bsA * tanh(bsB * input.roll) + bsC;
-elseif config.calibration_function == 1
-    b_aoa = baP0 + baP1 * input.aoa + baP2 * input.aoa .* input.aoa;
-    b_slip = bsP0 + bsP1 * input.slip + bsP2 * input.slip .* input.slip;
-elseif config.calibration_function == 2
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * tanh(baP2 * input.aoa) + baP3 * tanh(baP4 * input.gyro_y) + baP5 * tanh(baP6 * (1 + g_load));
-    b_slip = bsP0 + bsP1 * tanh(bsP2 * input.slip) + bsP3 * tanh(bsP4 * input.gyro_y) + bsP5 * tanh(bsP6 * input.gyro_z) + bsP7 * tanh(bsP8 *(1 + g_load));
-else
-    error('Unknown calibration function')
-end
-
+u = out.airspeed_true + input.gyro_z * config.airspeed_offset_y - input.gyro_y * config.airspeed_offset_z;
 v_air_body = [ ...
-    out.airspeed_true'; ...
-    (out.airspeed_true .* tan(input.slip - b_slip) + config.slip_offset_x * input.gyro_z - config.slip_offset_z * input.gyro_x)'; ...
-    (out.airspeed_true .* tan(input.aoa - b_aoa) - config.aoa_offset_x * input.gyro_y + config.aoa_offset_y * input.gyro_x)'];
+    u'; ...
+    (u .* tan(input.slip - b_slip) + config.slip_offset_x * input.gyro_z - config.slip_offset_z * input.gyro_x)'; ...
+    (u .* tan(input.aoa - b_aoa) - config.aoa_offset_x * input.gyro_y + config.aoa_offset_y * input.gyro_x)'];
 
 % true airsp vector (assumes zero slip)
 out.va_n = sum(squeeze(input.rotm(1,:,:)) .* v_air_body, 1)';

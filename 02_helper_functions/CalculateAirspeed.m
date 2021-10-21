@@ -1,4 +1,4 @@
-function [airspeed_true, airspeed_indicated] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, config)
+function [airspeed_true, airspeed_indicated] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, slip_data, config)
 % Calculate airspeed from the raw dp measurements and correct it according
 % to the compensation model
 
@@ -70,8 +70,11 @@ end
 
 % compute indicated airspeed
 scale_factor = config.airspeed_scale_factor;
-if isfield(config ,'sfPdp')
-    scale_factor = scale_factor + config.sfPdp * dp_corr;
+if isfield(config ,'sfPslip')
+    scale_factor = scale_factor + config.sfPslip * slip_data;
+end
+if isfield(config ,'sfAslip') && isfield(config ,'sfBslip') && isfield(config ,'sfCslip')
+    scale_factor = scale_factor + config.sfAslip * tanh(config.sfBslip * slip_data + config.sfCslip);
 end
 if isfield(config ,'sfPgyrz')
     scale_factor = scale_factor + config.sfPgyrz * gyro_z_data;

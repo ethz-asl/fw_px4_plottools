@@ -37,11 +37,11 @@ config.use_cal_av_params = false;
 config.auto_loiter_detections = true;
 
 % If true activates additional outputs and plots
-config.verbose = false;
+config.verbose = true;
 
 % If true, the data between successive runs are stacked and used in fitting
 % the biases
-config.stack_data = true;
+config.stack_data = false;
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
 % - 'manual-input'

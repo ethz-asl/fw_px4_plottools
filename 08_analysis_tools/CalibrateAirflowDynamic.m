@@ -16,8 +16,8 @@ clc
 %% General Optimization Configuration
 
 % start and end times of the data used
-config.t_st_cal = 550;
-config.t_ed_cal = 2080;
+config.t_st_cal = 0;
+config.t_ed_cal = 10000;
 
 % load tube diameter and length from logs (implies these parameters have
 % been previously measured and set to the airframe for the given flight)
@@ -44,7 +44,7 @@ config.auto_loiter_detections = true;
 config.verbose = false;
 
 % Different function definitions for the aoa and slip bias
-config.calibration_function = 2;
+config.calibration_function = 0;
 
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
@@ -75,6 +75,20 @@ config.cal_hall_slip_p1 = 29965695;
 config.cal_hall_slip_p2 = 141878;
 config.cal_hall_slip_p3 = 19035;
 config.cal_hall_slip_id = 48;
+
+% EZG3 Config 2
+% config.cal_hall_aoa_rev = 1;
+% config.cal_hall_aoa_p0 = 106825944;
+% config.cal_hall_aoa_p1 = -27144586;
+% config.cal_hall_aoa_p2 = -45294;
+% config.cal_hall_aoa_p3 = 1557;
+% config.cal_hall_aoa_id = 50;
+% config.cal_hall_slip_rev = 1;
+% config.cal_hall_slip_p0 = 36081038;
+% config.cal_hall_slip_p1 = 29965695;
+% config.cal_hall_slip_p2 = 141878;
+% config.cal_hall_slip_p3 = 19035;
+% config.cal_hall_slip_id = 48;
 
 % EZG5
 % config.cal_hall_aoa_rev = 1;
@@ -112,7 +126,9 @@ config.aoa_offset_x = 0.170;            % aoa vane x offset with respect to the 
 config.aoa_offset_y = 0.225;            % aoa vane y offset with respect to the body frame [m]
 config.slip_offset_x = 0.170;           % slip vane x offset with respect to the body frame [m]
 config.slip_offset_z = -0.03;           % slip vane z offset with respect to the body frame [m]
-config.t_movmean_accz = 2;              % time window for the movmean filter for the z accelerations [s]
+config.airspeed_offset_y = -0.25;       % airspeed sensor y offset with respect to the body frame [m]
+config.airspeed_offset_z = 0.05;        % airspeed sensor z offset with respect to the body frame [m]
+config.t_movmean = 2;                   % time window for the movmean filter for the imu data [s]
 config.weighting_sigma = 0.05;
 config.segment_length = 100;
 
@@ -258,6 +274,14 @@ elseif config.calibration_function == 2
     init_params = [0; 0; 0; 0; 1; 0; 1; 0; 1; 0; 0; 1; 0; 1; 0; 1; 0; 1];
     lb_params = [-0.2; -30; -30; -30; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -30; -30; -30; -30; -30];
     ub_params = [ 0.2;  30;  30;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30;  30;  30;  30];
+elseif config.calibration_function == 3
+    init_params = [0; 0; 0; 0; 0; 1; 0; 0];
+    lb_params = [-30; -30; -0.2; -30; -30; -30; -0.2; -30];
+    ub_params = [ 30;  30;  0.2;  30;  30;  30;  0.2;  30];
+elseif config.calibration_function == 4
+    init_params = [0; 0; 1; 0; 0; 0; 0; 1; 0; 0];
+    lb_params = [-30; -30; -30; -30; -0.2; -30; -30; -30; -0.2; -30];
+    ub_params = [ 30;  30;  30;  30;  0.2;  30;  30;  30;  0.2;  30];
 else
     error('Unknown calibration function')
 end
@@ -353,6 +377,42 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         end
         if (params.sens_board_z_off.logged)
             disp(['slip bias (IMU Frame), P0 = ',num2str(xopt(9) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
+        end
+    elseif config.calibration_function == 3
+        disp(['scale factor, sfPgyrz = ',num2str(xopt(2))]);
+        disp(['scale factor, sfPslip = ',num2str(xopt(3))]);
+        
+        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(4))]);
+        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(5))]);
+
+        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(6))]);
+        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(7))]);
+        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(8))]);
+        disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(9))]);
+        if (params.sens_board_y_off.logged)
+            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(4) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
+        end
+        if (params.sens_board_z_off.logged)
+            disp(['slip bias (IMU Frame), D = ',num2str(xopt(9) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
+        end
+    elseif config.calibration_function == 4
+        disp(['scale factor, sfPgyrz = ',num2str(xopt(2))]);
+        disp(['scale factor, sfAslip = ',num2str(xopt(3))]);
+        disp(['scale factor, sfBslip = ',num2str(xopt(4))]);
+        disp(['scale factor, sfCslip = ',num2str(xopt(5))]);
+        
+        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(6))]);
+        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(7))]);
+
+        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(8))]);
+        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(9))]);
+        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(10))]);
+        disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(11))]);
+        if (params.sens_board_y_off.logged)
+            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(6) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
+        end
+        if (params.sens_board_z_off.logged)
+            disp(['slip bias (IMU Frame), D = ',num2str(xopt(11) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
         end
     end
 
@@ -451,8 +511,10 @@ ylabel('wind estimate [m/s]')
 
 %%
 figure()
-hold on
-plot(sysvector.sensor_gyro_0.x)
-plot(sysvector.sensor_gyro_0.y)
-plot(sysvector.sensor_gyro_0.z)
-legend('x', 'y','z')
+test(1) = subplot(2,1,1); hold on; grid on; box on;
+plot(optimization_data.time, optimization_data.wd)
+
+test(2) = subplot(2,1,2); hold on; grid on; box on;
+plot(sysvector.vehicle_local_position_0.vz.Time, sysvector.vehicle_local_position_0.vz.Data)
+
+linkaxes(test(:),'x');
