@@ -38,13 +38,29 @@ config.use_accz_weighting = true;
 
 % If true loiters are automatically detected and an individual bias and
 % scale parameter is estimated for each detected loiter
-config.auto_loiter_detections = true;
+config.auto_loiter_detections = false;
 
 % If true activates additional outputs and plots
 config.verbose = false;
 
 % Different function definitions for the aoa and slip bias
-config.calibration_function = 0;
+% 0: b_aoa = P0 + P1 * (1 + g_load)
+%    b_slip = A * tanh(B * roll) + C
+% 1: b_aoa = P0 + P1 * aoa + P2 * (aoa + P3) * (airspeed + P4) + P5 * throttle
+%    b_slip = P0 + P1 * (P2 * airspeed - P3) * (1 + tanh(P4 * (aoa - P5)) + P6 * slip
+% 2: b_aoa = P0 + P1 * aoa + P2 * (aoa + P3) * (airspeed + P4) + P5 * throttle
+%    b_slip = P0 + P1 * (P2 * airspeed - P3) * (1 + tanh(P4 * (aoa - P5)) + P6 * slip + P7 * tanh(P8 * (roll - P9));
+config.calibration_function = 2;
+
+% Allow a dynamic airspeed scale
+% False: scale = P0
+% True: scale = P0 + P1 * gyro_z + P2 * airspeed
+config.airspeed_scale_dynamic = true;
+
+% If true the airspeed is corrected by an offset depending on the airflow
+% angles (determined from wind tunnel data):
+% dv = (0.15 * angles_norm - 0.0044 * angles_norm .^2)
+config.airspeed_angle_correction = false;
 
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
@@ -76,48 +92,6 @@ config.cal_hall_slip_p2 = 141878;
 config.cal_hall_slip_p3 = 19035;
 config.cal_hall_slip_id = 48;
 
-% EZG3 Config 2
-% config.cal_hall_aoa_rev = 1;
-% config.cal_hall_aoa_p0 = 106825944;
-% config.cal_hall_aoa_p1 = -27144586;
-% config.cal_hall_aoa_p2 = -45294;
-% config.cal_hall_aoa_p3 = 1557;
-% config.cal_hall_aoa_id = 50;
-% config.cal_hall_slip_rev = 1;
-% config.cal_hall_slip_p0 = 36081038;
-% config.cal_hall_slip_p1 = 29965695;
-% config.cal_hall_slip_p2 = 141878;
-% config.cal_hall_slip_p3 = 19035;
-% config.cal_hall_slip_id = 48;
-
-% EZG5
-% config.cal_hall_aoa_rev = 1;
-% config.cal_hall_aoa_p0 = 42662393;
-% config.cal_hall_aoa_p1 = 51695989;
-% config.cal_hall_aoa_p2 = 76009;
-% config.cal_hall_aoa_p3 = 117747;
-% config.cal_hall_aoa_id = 50;
-% config.cal_hall_slip_rev = 1;
-% config.cal_hall_slip_p0 = 67376245;
-% config.cal_hall_slip_p1 = 33273923;
-% config.cal_hall_slip_p2 = 55112;
-% config.cal_hall_slip_p3 = 28187;
-% config.cal_hall_slip_id = 48;
-
-% EZG6
-% config.cal_hall_aoa_rev = 1;
-% config.cal_hall_aoa_p0 = 62943722;
-% config.cal_hall_aoa_p1 = -29432471;
-% config.cal_hall_aoa_p2 = 57698;
-% config.cal_hall_aoa_p3 = -10655;
-% config.cal_hall_aoa_id = 49;
-% config.cal_hall_slip_rev = 1;
-% config.cal_hall_slip_p0 = 48716976;
-% config.cal_hall_slip_p1 = 33793644;
-% config.cal_hall_slip_p2 = 26796;
-% config.cal_hall_slip_p3 = 13161;
-% config.cal_hall_slip_id = 50;
-
 config.use_airflow_angles = true; % must be true for this script
 
 %% Optimization Config
@@ -131,6 +105,8 @@ config.airspeed_offset_z = 0.05;        % airspeed sensor z offset with respect 
 config.t_movmean = 2;                   % time window for the movmean filter for the imu data [s]
 config.weighting_sigma = 0.05;
 config.segment_length = 100;
+config.global_search = false;
+config.global_search_num_points = 50;
 
 %% Loiter Detection Config
 config.window_size = 10;                % Window size to check if the segment is a circle [s]
@@ -262,41 +238,44 @@ wn0 = mean_raw_wind(1);     % wind speed north [m/s]
 we0 = mean_raw_wind(2);     % wind speed east [m/s]
 wd0 = mean_raw_wind(3);     % wind speed down [m/s]
 
+if config.airspeed_scale_dynamic
+    init_scale = [1; 0; 0];
+    lb_scale = [0.1; -30; -30];
+    ub_scale = [2.0;  30;  30];
+else
+    init_scale = [1];
+    lb_scale = [0.1];
+    ub_scale = [2.0];
+end
+
 if config.calibration_function == 0
-    init_params = [0; 0; 0; 1; 0];
-    lb_params = [-0.2; -30; -30; -30; -0.2];
-    ub_params = [ 0.2;  30;  30;  30;  0.2];
+    init_params = [0; 0; 0; 1; 0; 0];
+    lb_params = [-0.2; -30; -30; -30; -30; -0.2];
+    ub_params = [ 0.2;  30;  30;  30;  30;  0.2];
 elseif config.calibration_function == 1
-    init_params = [0; 0; 0; 0; 0; 0];
-    lb_params = [-0.2; -30; -30; -0.2; -30; -30];
-    ub_params = [ 0.2;  30;  30;  0.2;  30;  30];
+    init_params = [0; 0; 0; 0; 0; 0; 0; 1; 0; 0; 1; 0; 0];
+    lb_params = [-0.2; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -30; -30; -30];
+    ub_params = [ 0.2;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30];
 elseif config.calibration_function == 2
-    init_params = [0; 0; 0; 0; 1; 0; 1; 0; 1; 0; 0; 1; 0; 1; 0; 1; 0; 1];
-    lb_params = [-0.2; -30; -30; -30; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -30; -30; -30; -30; -30];
-    ub_params = [ 0.2;  30;  30;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30;  30;  30;  30];
-elseif config.calibration_function == 3
-    init_params = [0; 0; 0; 0; 0; 1; 0; 0];
-    lb_params = [-30; -30; -0.2; -30; -30; -30; -0.2; -30];
-    ub_params = [ 30;  30;  0.2;  30;  30;  30;  0.2;  30];
-elseif config.calibration_function == 4
-    init_params = [0; 0; 1; 0; 0; 0; 0; 1; 0; 0];
-    lb_params = [-30; -30; -30; -30; -0.2; -30; -30; -30; -0.2; -30];
-    ub_params = [ 30;  30;  30;  30;  0.2;  30;  30;  30;  0.2;  30];
+    init_params = [0; 0; 0; 0; 0; 0; 0; 1; 0; 0; 1; 0; 0; 0; 1; 0];
+    lb_params = [-0.2; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -30; -30; -30; -30; -30; -30];
+    ub_params = [ 0.2;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30;  30;  30;  30];
 else
     error('Unknown calibration function')
 end
+
 if config.force_zero_wd
-    x0 = [sf0; init_params; wn0 * ones(length(config.t_starts), 1); we0 * ones(length(config.t_starts), 1)];
+    x0 = [init_scale; init_params; wn0 * ones(length(config.t_starts), 1); we0 * ones(length(config.t_starts), 1)];
 
     % bounds
-    lb = [0.1; lb_params; -20 * ones(length(config.t_starts), 1); -20 * ones(length(config.t_starts), 1)];
-    ub = [  2; ub_params;  20 * ones(length(config.t_starts), 1);  20 * ones(length(config.t_starts), 1)];
+    lb = [lb_scale; lb_params; -20 * ones(length(config.t_starts), 1); -20 * ones(length(config.t_starts), 1)];
+    ub = [ub_scale; ub_params;  20 * ones(length(config.t_starts), 1);  20 * ones(length(config.t_starts), 1)];
 else
-    x0 = [sf0; init_params; wn0 * ones(length(config.t_starts), 1); we0 * ones(length(config.t_starts), 1); wd0 * ones(length(config.t_starts), 1)];
+    x0 = [init_scale; init_params; wn0 * ones(length(config.t_starts), 1); we0 * ones(length(config.t_starts), 1); wd0 * ones(length(config.t_starts), 1)];
 
     % bounds
-    lb = [0.1; lb_params; -20 * ones(length(config.t_starts), 1); -20 * ones(length(config.t_starts), 1); -5 * ones(length(config.t_starts), 1)];
-    ub = [  2; ub_params;  20 * ones(length(config.t_starts), 1);  20 * ones(length(config.t_starts), 1);  5 * ones(length(config.t_starts), 1)];
+    lb = [lb_scale; lb_params; -20 * ones(length(config.t_starts), 1); -20 * ones(length(config.t_starts), 1); -5 * ones(length(config.t_starts), 1)];
+    ub = [ub_scale; ub_params;  20 * ones(length(config.t_starts), 1);  20 * ones(length(config.t_starts), 1);  5 * ones(length(config.t_starts), 1)];
 end
 
 disp(['wn initial = ',num2str(wn0),' m/s']);
@@ -322,97 +301,80 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
     disp(['Wn std: ', num2str(std(optimization_data.wn - optimization_data.wn_fit))])
     disp(['We std: ', num2str(std(optimization_data.we - optimization_data.we_fit))])
     disp(['Wd std: ', num2str(std(optimization_data.wd))])
+    
+    disp(['Wn std filtered: ', num2str(std(movmean(optimization_data.wn - optimization_data.wn_fit, 200)))])
+    disp(['We std filtered: ', num2str(std(movmean(optimization_data.we - optimization_data.we_fit, 200)))])
+    disp(['Wd std filtered: ', num2str(std(movmean(optimization_data.wd, 200)))])
 
-    disp(['SF = ',num2str(xopt(1)),'; SF(theory) = ',num2str(sf_theory)]);
+    if config.airspeed_scale_dynamic
+        disp(['SF P0 = ',num2str(xopt(1))]);
+        disp(['SF sfPaspd = ',num2str(xopt(2))]);
+        disp(['SF sfPgyrz = ',num2str(xopt(3))]);
+        start_idx = 4;
+    else
+        disp(['SF = ',num2str(xopt(1)),'; SF(theory) = ',num2str(sf_theory)]);
+        start_idx = 2;
+    end
     
     if config.calibration_function == 0
-        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(2))]);
-        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(3))]);
-        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(4))]);
-        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(5))]);
-        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(6))]);
+        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(start_idx+0))]);
+        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(start_idx+1))]);
+        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(start_idx+2))]);
+        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(start_idx+3))]);
+        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(start_idx+4))]);
+        disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(start_idx+5))]);
         if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(2) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
+            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
         end
         if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame), C = ',num2str(xopt(6) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
+            disp(['slip bias (IMU Frame), D = ',num2str(xopt(start_idx+5) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
         end
     elseif config.calibration_function == 1
-        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(2))]);
-        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(3))]);
-        disp(['aoa bias (State Estimate Frame), P2 = ',num2str(xopt(4))]);
+        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(start_idx+0))]);
+        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(start_idx+1))]);
+        disp(['aoa bias (State Estimate Frame), P2 = ',num2str(xopt(start_idx+2))]);
+        disp(['aoa bias (State Estimate Frame), P3 = ',num2str(xopt(start_idx+3))]);
+        disp(['aoa bias (State Estimate Frame), P4 = ',num2str(xopt(start_idx+4))]);
+        disp(['aoa bias (State Estimate Frame), P5 = ',num2str(xopt(start_idx+5))]);
 
-        disp(['slip bias (State Estimate Frame), P0 = ',num2str(xopt(5))]);
-        disp(['slip bias (State Estimate Frame), P1 = ',num2str(xopt(6))]);
-        disp(['slip bias (State Estimate Frame), P2 = ',num2str(xopt(7))]);
+        disp(['slip bias (State Estimate Frame), P0 = ',num2str(xopt(start_idx+6))]);
+        disp(['slip bias (State Estimate Frame), P1 = ',num2str(xopt(start_idx+7))]);
+        disp(['slip bias (State Estimate Frame), P2 = ',num2str(xopt(start_idx+8))]);
+        disp(['slip bias (State Estimate Frame), P3 = ',num2str(xopt(start_idx+9))]);
+        disp(['slip bias (State Estimate Frame), P4 = ',num2str(xopt(start_idx+10))]);
+        disp(['slip bias (State Estimate Frame), P5 = ',num2str(xopt(start_idx+11))]);
+        disp(['slip bias (State Estimate Frame), P6 = ',num2str(xopt(start_idx+12))]);
+
         if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(2) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
+            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
         end
         if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame), P0 = ',num2str(xopt(5) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
+            disp(['slip bias (IMU Frame), P0 = ',num2str(xopt(start_idx+6) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
         end
     elseif config.calibration_function == 2
-        disp(['scale factor, sfPdp = ',num2str(xopt(2))]);
-        disp(['scale factor, sfPgyrz = ',num2str(xopt(3))]);
-        
-        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(4))]);
-        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(5))]);
-        disp(['aoa bias (State Estimate Frame), P2 = ',num2str(xopt(6))]);
-        disp(['aoa bias (State Estimate Frame), P3 = ',num2str(xopt(7))]);
-        disp(['aoa bias (State Estimate Frame), P4 = ',num2str(xopt(8))]);
-        disp(['aoa bias (State Estimate Frame), P5 = ',num2str(xopt(9))]);
-        disp(['aoa bias (State Estimate Frame), P6 = ',num2str(xopt(10))]);
+        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(start_idx+0))]);
+        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(start_idx+1))]);
+        disp(['aoa bias (State Estimate Frame), P2 = ',num2str(xopt(start_idx+2))]);
+        disp(['aoa bias (State Estimate Frame), P3 = ',num2str(xopt(start_idx+3))]);
+        disp(['aoa bias (State Estimate Frame), P4 = ',num2str(xopt(start_idx+4))]);
+        disp(['aoa bias (State Estimate Frame), P5 = ',num2str(xopt(start_idx+5))]);
 
-        disp(['slip bias (State Estimate Frame), P0 = ',num2str(xopt(11))]);
-        disp(['slip bias (State Estimate Frame), P1 = ',num2str(xopt(12))]);
-        disp(['slip bias (State Estimate Frame), P2 = ',num2str(xopt(13))]);
-        disp(['slip bias (State Estimate Frame), P3 = ',num2str(xopt(14))]);
-        disp(['slip bias (State Estimate Frame), P4 = ',num2str(xopt(15))]);
-        disp(['slip bias (State Estimate Frame), P5 = ',num2str(xopt(16))]);
-        disp(['slip bias (State Estimate Frame), P6 = ',num2str(xopt(17))]);
-        disp(['slip bias (State Estimate Frame), P7 = ',num2str(xopt(18))]);
-        disp(['slip bias (State Estimate Frame), P8 = ',num2str(xopt(19))]);
+        disp(['slip bias (State Estimate Frame), P0 = ',num2str(xopt(start_idx+6))]);
+        disp(['slip bias (State Estimate Frame), P1 = ',num2str(xopt(start_idx+7))]);
+        disp(['slip bias (State Estimate Frame), P2 = ',num2str(xopt(start_idx+8))]);
+        disp(['slip bias (State Estimate Frame), P3 = ',num2str(xopt(start_idx+9))]);
+        disp(['slip bias (State Estimate Frame), P4 = ',num2str(xopt(start_idx+10))]);
+        disp(['slip bias (State Estimate Frame), P5 = ',num2str(xopt(start_idx+11))]);
+        disp(['slip bias (State Estimate Frame), P6 = ',num2str(xopt(start_idx+12))]);
+        disp(['slip bias (State Estimate Frame), P7 = ',num2str(xopt(start_idx+13))]);
+        disp(['slip bias (State Estimate Frame), P8 = ',num2str(xopt(start_idx+14))]);
+        disp(['slip bias (State Estimate Frame), P9 = ',num2str(xopt(start_idx+15))]);
+
         if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(2) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
+            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
         end
         if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame), P0 = ',num2str(xopt(9) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
-        end
-    elseif config.calibration_function == 3
-        disp(['scale factor, sfPgyrz = ',num2str(xopt(2))]);
-        disp(['scale factor, sfPslip = ',num2str(xopt(3))]);
-        
-        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(4))]);
-        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(5))]);
-
-        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(6))]);
-        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(7))]);
-        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(8))]);
-        disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(9))]);
-        if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(4) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
-        end
-        if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame), D = ',num2str(xopt(9) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
-        end
-    elseif config.calibration_function == 4
-        disp(['scale factor, sfPgyrz = ',num2str(xopt(2))]);
-        disp(['scale factor, sfAslip = ',num2str(xopt(3))]);
-        disp(['scale factor, sfBslip = ',num2str(xopt(4))]);
-        disp(['scale factor, sfCslip = ',num2str(xopt(5))]);
-        
-        disp(['aoa bias (State Estimate Frame), P0 = ',num2str(xopt(6))]);
-        disp(['aoa bias (State Estimate Frame), P1 = ',num2str(xopt(7))]);
-
-        disp(['slip bias (State Estimate Frame), A = ',num2str(xopt(8))]);
-        disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(9))]);
-        disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(10))]);
-        disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(11))]);
-        if (params.sens_board_y_off.logged)
-            disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(6) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
-        end
-        if (params.sens_board_z_off.logged)
-            disp(['slip bias (IMU Frame), D = ',num2str(xopt(11) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
+            disp(['slip bias (IMU Frame), P0 = ',num2str(xopt(start_idx+6) - deg2rad(paramvector.sens_board_z_off.Data(1)))]);
         end
     end
 
@@ -432,16 +394,8 @@ if config.calibration_function == 0
     x_aoa = linspace(-2, -0.5);
     xlabel_aoa = 'g-loading [-]';
     xlabel_slip = 'roll [deg]';
-    aoa_bias = rad2deg(xopt(2) + xopt(3) * x_aoa);
-    slip_bias = rad2deg(xopt(4) * tanh(xopt(5) * deg2rad(x_slip)) + xopt(6));
-    plot_bias = true;
-elseif config.calibration_function == 1
-    x_slip = linspace(-24, 24);
-    x_aoa = linspace(-24, 24);
-    xlabel_aoa = 'aoa [deg]';
-    xlabel_slip = 'slip [deg]';
-    aoa_bias = rad2deg(xopt(2) + xopt(3) * deg2rad(x_aoa) + xopt(4) * deg2rad(x_aoa) .* deg2rad(x_aoa));
-    slip_bias = rad2deg(xopt(5) + xopt(6) * deg2rad(x_slip) + xopt(7) * deg2rad(x_slip) .* deg2rad(x_slip));
+    aoa_bias = rad2deg(xopt(start_idx+0) + xopt(start_idx+1) * x_aoa);
+    slip_bias = rad2deg(xopt(start_idx+2) * tanh(xopt(start_idx+3) * deg2rad(x_slip)) + xopt(start_idx+4));
     plot_bias = true;
 end
 
@@ -459,62 +413,56 @@ if (plot_bias)
     ylabel('slip bias [deg]')
 end
 
+wn_filt = movmean(optimization_data.wn, 200);
+we_filt = movmean(optimization_data.we, 200);
+wd_filt = movmean(optimization_data.wd, 200);
+
 figure('color','w');
 title('After optimization')
 validation_plots(1) = subplot(3,2,1); hold on; grid on; box on;
-plot(optimization_data.g_load, optimization_data.wn, 'o')
-plot(optimization_data.g_load, optimization_data.we, 'o')
-plot(optimization_data.g_load, optimization_data.wd, 'o')
+plot(optimization_data.g_load, wn_filt, 'o')
+plot(optimization_data.g_load, we_filt, 'o')
+plot(optimization_data.g_load, wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('g-loading [-]')
 ylabel('wind estimate [m/s]')
 
 validation_plots(end+1) = subplot(3,2,2); hold on; grid on; box on;
-plot(optimization_data.airspeed, optimization_data.wn, 'o')
-plot(optimization_data.airspeed, optimization_data.we, 'o')
-plot(optimization_data.airspeed, optimization_data.wd, 'o')
+plot(optimization_data.airspeed, wn_filt, 'o')
+plot(optimization_data.airspeed, we_filt, 'o')
+plot(optimization_data.airspeed, wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('airspeed [m/s]')
 ylabel('wind estimate [m/s]')
 
 validation_plots(end+1) = subplot(3,2,3); hold on; grid on; box on;
-plot(rad2deg(optimization_data.roll), optimization_data.wn, 'o')
-plot(rad2deg(optimization_data.roll), optimization_data.we, 'o')
-plot(rad2deg(optimization_data.roll), optimization_data.wd, 'o')
+plot(rad2deg(optimization_data.roll), wn_filt, 'o')
+plot(rad2deg(optimization_data.roll), we_filt, 'o')
+plot(rad2deg(optimization_data.roll), wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('roll [deg]')
 ylabel('wind estimate [m/s]')
 
 validation_plots(end+1) = subplot(3,2,4); hold on; grid on; box on;
-plot(rad2deg(optimization_data.aoa), optimization_data.wn, 'o')
-plot(rad2deg(optimization_data.aoa), optimization_data.we, 'o')
-plot(rad2deg(optimization_data.aoa), optimization_data.wd, 'o')
+plot(rad2deg(optimization_data.aoa), wn_filt, 'o')
+plot(rad2deg(optimization_data.aoa), we_filt, 'o')
+plot(rad2deg(optimization_data.aoa), wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('aoa [deg]')
 ylabel('wind estimate [m/s]')
 
 validation_plots(end+1) = subplot(3,2,5); hold on; grid on; box on;
-plot(rad2deg(optimization_data.slip), optimization_data.wn, 'o')
-plot(rad2deg(optimization_data.slip), optimization_data.we, 'o')
-plot(rad2deg(optimization_data.slip), optimization_data.wd, 'o')
+plot(rad2deg(optimization_data.slip), wn_filt, 'o')
+plot(rad2deg(optimization_data.slip), we_filt, 'o')
+plot(rad2deg(optimization_data.slip), wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('slip [deg]')
 ylabel('wind estimate [m/s]')
 
 validation_plots(end+1) = subplot(3,2,6); hold on; grid on; box on;
-plot(optimization_data.throttle, optimization_data.wn, 'o')
-plot(optimization_data.throttle, optimization_data.we, 'o')
-plot(optimization_data.throttle, optimization_data.wd, 'o')
+plot(optimization_data.throttle, wn_filt, 'o')
+plot(optimization_data.throttle, we_filt, 'o')
+plot(optimization_data.throttle, wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('throttle [-]')
 ylabel('wind estimate [m/s]')
-
-%%
-figure()
-test(1) = subplot(2,1,1); hold on; grid on; box on;
-plot(optimization_data.time, optimization_data.wd)
-
-test(2) = subplot(2,1,2); hold on; grid on; box on;
-plot(sysvector.vehicle_local_position_0.vz.Time, sysvector.vehicle_local_position_0.vz.Data)
-
-linkaxes(test(:),'x');

@@ -76,7 +76,7 @@ sf = x(3);
 
 config.airspeed_scale_factor = sf;
 
-[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, 0.0 * temp_data, 0.0 * temp_data, config);
+[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, 0.0 * temp_data, config);
 
 % true airsp vector (assumes zero slip)
 va_n = airspeed_true.*cos(yaw_data);

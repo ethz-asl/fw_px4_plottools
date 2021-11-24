@@ -215,7 +215,7 @@ end
 
 config.airspeed_scale_factor = sf;
 
-[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, slip_data - bs, config);
+[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, config);
 
 v_air_body = [ ...
     airspeed_true'; ...
@@ -258,7 +258,7 @@ wd = x(3);
 bs = deg2rad(config.slip_bias_deg);
 config.airspeed_scale_factor = sf;
 
-[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, slip_data - bs, config);
+[airspeed_true, ~] = CalculateAirspeed(dp_data, baro_data, temp_data, gyro_z_data, config);
 
 v_air_body = [ ...
     airspeed_true'; ...
