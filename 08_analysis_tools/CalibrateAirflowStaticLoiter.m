@@ -37,7 +37,7 @@ config.use_cal_av_params = false;
 config.auto_loiter_detections = true;
 
 % If true activates additional outputs and plots
-config.verbose = true;
+config.verbose = false;
 
 % If true, the data between successive runs are stacked and used in fitting
 % the biases

@@ -85,8 +85,18 @@ end
 
 [~,out_before] = Dp2SpAnglesDynamic(x0,input,config);
 
-[xopt,resnorm,residual,exitflag,output] = ...
-    lsqnonlin(@(x)Dp2SpAnglesDynamic(x,input,config), x0, lb, ub, options);
+if config.global_search
+    ms = MultiStart('PlotFcns',@gsplotbestf, 'UseParallel', true, 'StartPointsToRun','bounds-ineqs');
+    problem = createOptimProblem('lsqnonlin','x0',x0,'objective',@(x)Dp2SpAnglesDynamic(x,input,config),...
+        'lb',lb,'ub',ub', 'options', options);
+    [xopt,resnorm] = run(ms,problem,config.global_search_num_points);
+    residual = 0;
+    exitflag = 0;
+    output = 0;
+else
+    [xopt,resnorm,residual,exitflag,output] = ...
+        lsqnonlin(@(x)Dp2SpAnglesDynamic(x,input,config), x0, lb, ub, options); 
+end
 
 opt_info.resnorm = resnorm;
 opt_info.residual = residual;
@@ -114,24 +124,13 @@ else
 end
 
 scale_factor = xopt(1);
-if config.calibration_function == 0
-    aoa_bias = xopt(2) + xopt(3) * (1 + optimization_data.g_load);
-    slip_bias = xopt(4) * tanh(xopt(5) * input.roll) + xopt(6); 
-elseif config.calibration_function == 1
-    aoa_bias = xopt(2) + xopt(3) * input.aoa + xopt(4) * input.aoa .* input.aoa;
-    slip_bias = xopt(5) + xopt(6) * input.slip + xopt(7) * input.slip .* input.slip;
-elseif config.calibration_function == 2
-    aoa_bias = xopt(4) + xopt(5) * tanh(xopt(6) * input.aoa) + xopt(7) * tanh(xopt(8) * input.gyro_y) + xopt(9) * tanh(xopt(10) * (1 + optimization_data.g_load));
-    slip_bias = xopt(11) + xopt(12) * tanh(xopt(13) * input.slip) + xopt(14) * tanh(xopt(15) * input.gyro_y) + xopt(16) * tanh(xopt(17) * input.gyro_z) + xopt(18) * tanh(xopt(19) *(1 + optimization_data.g_load));
-elseif config.calibration_function == 3
-    aoa_bias = xopt(4) + xopt(5) * (1 + optimization_data.g_load);
-    slip_bias = xopt(6) * tanh(xopt(7) * input.roll) + xopt(8) + xopt(9) * (1 + optimization_data.g_load);
-elseif config.calibration_function == 4
-    aoa_bias = xopt(6) + xopt(7) * (1 + optimization_data.g_load);
-    slip_bias = xopt(8) * tanh(xopt(9) * input.roll) + xopt(10) + xopt(11) * (1 + optimization_data.g_load);
+if config.airspeed_scale_dynamic
+    start_idx_bias = 4;
 else
-    error('Unknown calibration function')
+    start_idx_bias = 2;
 end
+input.airspeed = out.airspeed_true;
+[aoa_bias, slip_bias, ~] = getAirflowAngleBias(xopt, config, input, start_idx_bias);
 
 optimization_data.slip = input.slip - slip_bias;
 optimization_data.uncorrected_slip = input.slip;
@@ -190,17 +189,20 @@ xlim(result_plots(:), time_resampled([1 end]));
 figure('color','w');
 validation_plots(1) = subplot(2,1,1); hold on; grid on; box on;
 plot(time_resampled, out.wind_n, 'color', lines_(1,:));
-plot(time_resampled, out.wind_e, 'color', lines_(2,:));
-plot(time_resampled, input.yaw, 'color', lines_(3,:));
-legend('w_n opt','w_e opt', 'yaw');
+plot(time_resampled, movmean(out.wind_n, 200), 'color', lines_(2,:));
+plot(time_resampled, out.wind_e, 'color', lines_(3,:));
+plot(time_resampled, movmean(out.wind_e, 200), 'color', lines_(4,:));
+plot(time_resampled, input.yaw, 'color', lines_(5,:));
+legend('w_n opt', 'w_n opt filtered', 'w_e opt', 'w_e opt filtered', 'yaw');
 ylabel('speeds | angles [m/s | deg]');
 
 validation_plots(2) = subplot(2,1,2); hold on; grid on; box on;
 plot(time_resampled, out.wind_d, 'color', lines_(1,:));
-plot(time_resampled, input.gspd, 'color', lines_(2,:));
-plot(time_resampled, rad2deg(input.pitch), 'color', lines_(3,:));
+plot(time_resampled, movmean(out.wind_d, 200), 'color', lines_(2,:));
+plot(time_resampled, input.gspd, 'color', lines_(3,:));
+plot(time_resampled, rad2deg(input.pitch), 'color', lines_(4,:));
 ylabel('[m/s | deg | m]');
-legend('w_d opt','groundspeed down','pitch');
+legend('w_d opt', 'w_d opt filtered', 'groundspeed down', 'pitch');
 
 
 xlabel('Time [s]');
@@ -231,95 +233,30 @@ out = struct();
 
 % current solution
 num_windows = length(config.t_ends);
-sf = x(1);
-if config.calibration_function == 0
-    baP0 = x(2);
-    baP1 = x(3);
-    bsA = x(4);
-    bsB = x(5);
-    bsC = x(6);
-    start_idx_wind = 7;
-    
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * (1 + g_load);
-    b_slip = bsA * tanh(bsB * input.roll) + bsC;
-elseif config.calibration_function == 1
-    baP0 = x(2);
-    baP1 = x(3);
-    baP2 = x(4);
-    bsP0 = x(5);
-    bsP1 = x(6);
-    bsP2 = x(7);
-    start_idx_wind = 8;
-
-    b_aoa = baP0 + baP1 * input.aoa + baP2 * input.aoa .* input.aoa;
-    b_slip = bsP0 + bsP1 * input.slip + bsP2 * input.slip .* input.slip;
-elseif config.calibration_function == 2
-    sfPdp = x(2);
-    sfPgyrz = x(3);
-    
-    baP0 = x(4);
-    baP1 = x(5);
-    baP2 = x(6);
-    baP3 = x(7);
-    baP4 = x(8);
-    baP5 = x(9);
-    baP6 = x(10);
-
-    bsP0 = x(11);
-    bsP1 = x(12);
-    bsP2 = x(13);
-    bsP3 = x(14);
-    bsP4 = x(15);
-    bsP5 = x(16);
-    bsP6 = x(17);
-    bsP7 = x(18);
-    bsP8 = x(19);
-    start_idx_wind = 20;
-    
-    config.sfPdp = sfPdp;
-    config.sfPgyrz = sfPgyrz;
-
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * tanh(baP2 * input.aoa) + baP3 * tanh(baP4 * input.gyro_y) + baP5 * tanh(baP6 * (1 + g_load));
-    b_slip = bsP0 + bsP1 * tanh(bsP2 * input.slip) + bsP3 * tanh(bsP4 * input.gyro_y) + bsP5 * tanh(bsP6 * input.gyro_z) + bsP7 * tanh(bsP8 *(1 + g_load));
-elseif config.calibration_function == 3
-    config.sfPgyrz = x(2);
-    config.sfPslip = x(3);
-    
-    baP0 = x(4);
-    baP1 = x(5);
-    bsA = x(6);
-    bsB = x(7);
-    bsC = x(8);
-    bsD = x(9);
-    start_idx_wind = 10;
-
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * (1 + g_load);
-    b_slip = bsA * tanh(bsB * input.roll) + bsC + bsD * (1 + g_load);
-
-elseif config.calibration_function == 4
-    config.sfPgyrz = x(2);
-    config.sfAslip = x(3);
-    config.sfBslip = x(4);
-    config.sfCslip = x(5);
-    
-    baP0 = x(6);
-    baP1 = x(7);
-    bsA = x(8);
-    bsB = x(9);
-    bsC = x(10);
-    bsD = x(11);
-    start_idx_wind = 12;
-
-    g_load = input.acc_z / 9.81;
-    b_aoa = baP0 + baP1 * (1 + g_load);
-    b_slip = bsA * tanh(bsB * input.roll) + bsC + bsD * (1 + g_load);
+config.airspeed_scale_factor = x(1);
+if config.airspeed_scale_dynamic
+    config.sfPaspd = x(2);
+    config.sfPgyrz = x(3);
+    start_idx = 4;
 else
-    error('Unknown calibration function')
+    start_idx = 2;
 end
 
+% calculate the airspeed from the raw dp measurements
+[out.airspeed_true, ~] = CalculateAirspeed(input.dp, input.baro, input.temp, input.gyro_z, config);
+
+% calculate the airflow angle biases
+input.airspeed = out.airspeed_true;
+[b_aoa, b_slip, start_idx_wind] = getAirflowAngleBias(x, config, input, start_idx);
+
+% optionally correct for the measurement of the pitot tube
+if config.airspeed_angle_correction
+    airflow_angle_dist = rad2deg(sqrt((input.slip - b_slip).^2 + (input.aoa - b_aoa).^2));
+    dv = (0.15 * airflow_angle_dist - 0.0044 * airflow_angle_dist .^2);
+    out.airspeed_true = out.airspeed_true - dv;
+end
+
+% extract the wind params
 out.wn = GenerateWind(x(start_idx_wind:start_idx_wind+num_windows-1), input.window_lengths);
 out.we = GenerateWind(x(start_idx_wind+num_windows:start_idx_wind+2*num_windows-1), input.window_lengths);
 if config.force_zero_wd
@@ -327,10 +264,6 @@ if config.force_zero_wd
 else
     out.wd = GenerateWind(x(start_idx_wind+2*num_windows:start_idx_wind+3*num_windows-1), input.window_lengths); 
 end
-
-config.airspeed_scale_factor = sf;
-
-[out.airspeed_true, ~] = CalculateAirspeed(input.dp, input.baro, input.temp, input.gyro_z, input.slip - b_slip, config);
 
 u = out.airspeed_true + input.gyro_z * config.airspeed_offset_y - input.gyro_y * config.airspeed_offset_z;
 v_air_body = [ ...
@@ -363,6 +296,68 @@ if config.use_accz_weighting
    f = f .* [input.weights;input.weights;input.weights]; 
 end
 
+end
+
+function [aoa_bias, slip_bias, start_idx_wind] = getAirflowAngleBias(x, config, input, start_idx_bias)
+if config.calibration_function == 0
+    P0_aoa = x(start_idx_bias+0);
+    P1_aoa = x(start_idx_bias+1);
+    A_slip = x(start_idx_bias+2);
+    B_slip = x(start_idx_bias+3);
+    C_slip = x(start_idx_bias+4);
+    D_slip = x(start_idx_bias+5);
+    
+    start_idx_wind = start_idx_bias+5;
+    
+    aoa_bias = P0_aoa + P1_aoa * (1 + input.acc_z / 9.81);
+    slip_bias = A_slip * tanh(B_slip * (input.roll - C_slip)) + D_slip;
+elseif config.calibration_function == 1
+    P0_aoa = x(start_idx_bias+0);
+    P1_aoa = x(start_idx_bias+1);
+    P2_aoa = x(start_idx_bias+2);
+    P3_aoa = x(start_idx_bias+3);
+    P4_aoa = x(start_idx_bias+4);
+    P5_aoa = x(start_idx_bias+5);
+
+    P0_slip = x(start_idx_bias+6);
+    P1_slip = x(start_idx_bias+7);
+    P2_slip = x(start_idx_bias+8);
+    P3_slip = x(start_idx_bias+9);
+    P4_slip = x(start_idx_bias+10);
+    P5_slip = x(start_idx_bias+11);
+    P6_slip = x(start_idx_bias+12);
+    
+    aoa_bias = P0_aoa + P1_aoa * input.aoa + P2_aoa * (input.aoa + P3_aoa) .* (input.airspeed + P4_aoa) + P5_aoa * input.throttle;
+    slip_bias = P0_slip + P1_slip * (P2_slip * input.airspeed - P3_slip) .* (1.0 + tanh(P4_slip * (input.aoa - P5_slip))) + P6_slip * input.slip;
+
+    start_idx_wind = start_idx_bias+13;
+
+elseif config.calibration_function == 2
+    P0_aoa = x(start_idx_bias+0);
+    P1_aoa = x(start_idx_bias+1);
+    P2_aoa = x(start_idx_bias+2);
+    P3_aoa = x(start_idx_bias+3);
+    P4_aoa = x(start_idx_bias+4);
+    P5_aoa = x(start_idx_bias+5);
+
+    P0_slip = x(start_idx_bias+6);
+    P1_slip = x(start_idx_bias+7);
+    P2_slip = x(start_idx_bias+8);
+    P3_slip = x(start_idx_bias+9);
+    P4_slip = x(start_idx_bias+10);
+    P5_slip = x(start_idx_bias+11);
+    P6_slip = x(start_idx_bias+12);
+    P7_slip = x(start_idx_bias+13);
+    P8_slip = x(start_idx_bias+14);
+    P9_slip = x(start_idx_bias+15);
+    
+    aoa_bias = P0_aoa + P1_aoa * input.aoa + P2_aoa * (input.aoa + P3_aoa) .* (input.airspeed + P4_aoa) + P5_aoa * input.throttle;
+    slip_bias = P0_slip + P1_slip * (P2_slip * input.airspeed - P3_slip) .* (1.0 + tanh(P4_slip * (input.aoa - P5_slip))) + P6_slip * input.slip + P7_slip * tanh(P8_slip * (input.roll - P9_slip));
+
+    start_idx_wind = start_idx_bias+16;
+else
+    error('Unknown calibration function')
+end
 end
 
 end
