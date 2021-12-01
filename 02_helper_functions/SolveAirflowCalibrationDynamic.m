@@ -318,6 +318,10 @@ elseif config.calibration_function == 1
     P3_aoa = x(start_idx_bias+3);
     P4_aoa = x(start_idx_bias+4);
     P5_aoa = x(start_idx_bias+5);
+    if ~config.calibration_use_throttle
+        P5_aoa = 0.0;
+        x(start_idx_bias+5) = 0.0;
+    end
 
     P0_slip = x(start_idx_bias+6);
     P1_slip = x(start_idx_bias+7);
@@ -339,6 +343,10 @@ elseif config.calibration_function == 2
     P3_aoa = x(start_idx_bias+3);
     P4_aoa = x(start_idx_bias+4);
     P5_aoa = x(start_idx_bias+5);
+    if ~config.calibration_use_throttle
+        P5_aoa = 0.0;
+        x(start_idx_bias+5) = 0.0;
+    end
 
     P0_slip = x(start_idx_bias+6);
     P1_slip = x(start_idx_bias+7);

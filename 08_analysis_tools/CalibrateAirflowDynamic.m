@@ -52,6 +52,10 @@ config.verbose = false;
 %    b_slip = P0 + P1 * (P2 * airspeed - P3) * (1 + tanh(P4 * (aoa - P5)) + P6 * slip + P7 * tanh(P8 * (roll - P9));
 config.calibration_function = 2;
 
+% If true the throttle value might be used in any calibration function,
+% else the respective param is force to being 0
+config.calibration_use_throttle = false;
+
 % Allow a dynamic airspeed scale
 % False: scale = P0
 % True: scale = P0 + P1 * gyro_z + P2 * airspeed
@@ -79,11 +83,25 @@ config.pitot_type = 1;             % pitot type (drotek pitot = 0; custom pitot 
 config.mount_location = 1;         % 0 = wing (2D cylinder assumption), 1 = nose (3D sphere assumption)
 
 %% Airflow Angles Config
+% config.cal_hall_aoa_rev = 1;
+% config.cal_hall_aoa_p0 = -143564503;
+% config.cal_hall_aoa_p1 = -29512516;
+% config.cal_hall_aoa_p2 = -31953;
+% config.cal_hall_aoa_p3 = -27419;
+% config.cal_hall_aoa_id = 50;
+% config.cal_hall_slip_rev = 1;
+% config.cal_hall_slip_p0 = 36081038;
+% config.cal_hall_slip_p1 = 29965695;
+% config.cal_hall_slip_p2 = 141878;
+% config.cal_hall_slip_p3 = 19035;
+% config.cal_hall_slip_id = 48;
+
+% EZG3 Config 2
 config.cal_hall_aoa_rev = 1;
-config.cal_hall_aoa_p0 = -143564503;
-config.cal_hall_aoa_p1 = -29512516;
-config.cal_hall_aoa_p2 = -31953;
-config.cal_hall_aoa_p3 = -27419;
+config.cal_hall_aoa_p0 = 106825944;
+config.cal_hall_aoa_p1 = -27144586;
+config.cal_hall_aoa_p2 = -45294;
+config.cal_hall_aoa_p3 = 1557;
 config.cal_hall_aoa_id = 50;
 config.cal_hall_slip_rev = 1;
 config.cal_hall_slip_p0 = 36081038;
@@ -91,6 +109,34 @@ config.cal_hall_slip_p1 = 29965695;
 config.cal_hall_slip_p2 = 141878;
 config.cal_hall_slip_p3 = 19035;
 config.cal_hall_slip_id = 48;
+
+% EZG5
+% config.cal_hall_aoa_rev = 1;
+% config.cal_hall_aoa_p0 = 42662393;
+% config.cal_hall_aoa_p1 = 51695989;
+% config.cal_hall_aoa_p2 = 76009;
+% config.cal_hall_aoa_p3 = 117747;
+% config.cal_hall_aoa_id = 50;
+% config.cal_hall_slip_rev = 1;
+% config.cal_hall_slip_p0 = 67376245;
+% config.cal_hall_slip_p1 = 33273923;
+% config.cal_hall_slip_p2 = 55112;
+% config.cal_hall_slip_p3 = 28187;
+% config.cal_hall_slip_id = 48;
+
+% EZG6
+% config.cal_hall_aoa_rev = 1;
+% config.cal_hall_aoa_p0 = 62943722;
+% config.cal_hall_aoa_p1 = -29432471;
+% config.cal_hall_aoa_p2 = 57698;
+% config.cal_hall_aoa_p3 = -10655;
+% config.cal_hall_aoa_id = 49;
+% config.cal_hall_slip_rev = 1;
+% config.cal_hall_slip_p0 = 48716976;
+% config.cal_hall_slip_p1 = 33793644;
+% config.cal_hall_slip_p2 = 26796;
+% config.cal_hall_slip_p3 = 13161;
+% config.cal_hall_slip_id = 50;
 
 config.use_airflow_angles = true; % must be true for this script
 
@@ -104,7 +150,7 @@ config.airspeed_offset_y = -0.25;       % airspeed sensor y offset with respect 
 config.airspeed_offset_z = 0.05;        % airspeed sensor z offset with respect to the body frame [m]
 config.t_movmean = 2;                   % time window for the movmean filter for the imu data [s]
 config.weighting_sigma = 0.05;
-config.segment_length = 100;
+config.segment_length = 50;
 config.global_search = false;
 config.global_search_num_points = 50;
 
@@ -323,6 +369,10 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         disp(['slip bias (State Estimate Frame), B = ',num2str(xopt(start_idx+3))]);
         disp(['slip bias (State Estimate Frame), C = ',num2str(xopt(start_idx+4))]);
         disp(['slip bias (State Estimate Frame), D = ',num2str(xopt(start_idx+5))]);
+
+        disp('Bias param array:')
+        disp(num2str(xopt(start_idx:start_idx+5)', '% -8.4f'))
+
         if (params.sens_board_y_off.logged)
             disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
         end
@@ -344,6 +394,9 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         disp(['slip bias (State Estimate Frame), P4 = ',num2str(xopt(start_idx+10))]);
         disp(['slip bias (State Estimate Frame), P5 = ',num2str(xopt(start_idx+11))]);
         disp(['slip bias (State Estimate Frame), P6 = ',num2str(xopt(start_idx+12))]);
+
+        disp('Bias param array:')
+        disp(num2str(xopt(start_idx:start_idx+12)', '% -8.4f'))
 
         if (params.sens_board_y_off.logged)
             disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
@@ -369,6 +422,9 @@ if (topics.differential_pressure.logged && topics.sensor_baro.logged && ...
         disp(['slip bias (State Estimate Frame), P7 = ',num2str(xopt(start_idx+13))]);
         disp(['slip bias (State Estimate Frame), P8 = ',num2str(xopt(start_idx+14))]);
         disp(['slip bias (State Estimate Frame), P9 = ',num2str(xopt(start_idx+15))]);
+        
+        disp('Bias param array:')
+        disp(num2str(xopt(start_idx:start_idx+15)', '% -8.4f'))
 
         if (params.sens_board_y_off.logged)
             disp(['aoa bias (IMU Frame), P0 = ',num2str(xopt(start_idx+0) - deg2rad(paramvector.sens_board_y_off.Data(1)))]);
