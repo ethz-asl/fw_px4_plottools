@@ -47,9 +47,10 @@ q_2 = resample(sysvector.vehicle_attitude_0.q_2, time_resampled);
 q_3 = resample(sysvector.vehicle_attitude_0.q_3, time_resampled);
 input.rotm = quat2rotm([q_0.Data, q_1.Data, q_2.Data, q_3.Data]);
 [pitch, roll, yaw] = QuaternionToEuler(q_0, q_1, q_2, q_3);
+input.rotm = eul2rotm([yaw.Data + deg2rad(config.magnetic_declination_deg), pitch.Data, roll.Data], 'ZYX');
 input.pitch = pitch.data;
 input.roll = roll.data;
-input.yaw = yaw.data;
+input.yaw = yaw.data + deg2rad(config.magnetic_declination_deg);
 input.gspn = ResampleData(sysvector.vehicle_local_position_0.vx, time_resampled);
 input.gspe = ResampleData(sysvector.vehicle_local_position_0.vy, time_resampled);
 input.gspd = ResampleData(sysvector.vehicle_local_position_0.vz, time_resampled);
@@ -159,6 +160,7 @@ optimization_data.va_d = out.va_d;
 % Output function / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 lines_ = lines(7);
 plot_opacity = 0.5;
+time_resampled = time_resampled / 60;
 
 figure('color','w');
 
@@ -185,6 +187,34 @@ ylabel('speeds [m/s]');
 xlabel('Time [s]');
 linkaxes(result_plots(:),'x');
 xlim(result_plots(:), time_resampled([1 end]));
+
+
+figure('color','w');
+
+tmp_plots(1) = subplot(3,1,1); hold on; grid on; box on;
+plot(time_resampled, out_before.wind_n);
+plot(time_resampled, out_before.wind_e);
+plot(time_resampled, out_before.wind_d);
+legend('w_n','w_e', 'w_d');
+ylabel('Wind Speed [m/s]');
+
+tmp_plots(2) = subplot(3,1,2); hold on; grid on; box on;
+plot(time_resampled, out.wn);
+plot(time_resampled, out.we);
+plot(time_resampled, out.wind_d);
+legend('w_n','w_e', 'w_d');
+ylabel('Wind Speed [m/s]');
+
+tmp_plots(3) = subplot(3,1,3); hold on; grid on; box on;
+plot(time_resampled, out.wind_n);
+plot(time_resampled, out.wind_e);
+plot(time_resampled, out.wind_d);
+legend('w_n','w_e', 'w_d');
+ylabel('Wind Speed [m/s]');
+
+xlabel('Time [s]');
+linkaxes(tmp_plots(:),'x');
+xlim(tmp_plots(:), time_resampled([1 end]));
 
 figure('color','w');
 validation_plots(1) = subplot(2,1,1); hold on; grid on; box on;
