@@ -16,8 +16,8 @@ clc
 %% General Optimization Configuration
 
 % start and end times of the data used
-config.t_st_cal = 0;
-config.t_ed_cal = 10000;
+config.t_st_cal = 560;
+config.t_ed_cal = 2380;
 
 % load tube diameter and length from logs (implies these parameters have
 % been previously measured and set to the airframe for the given flight)
@@ -45,7 +45,7 @@ config.verbose = false;
 
 % Different function definitions for the aoa and slip bias
 % 0: b_aoa = P0 + P1 * (1 + g_load)
-%    b_slip = A * tanh(B * roll) + C
+%    b_slip = A * tanh(B * (roll - C)) + D
 % 1: b_aoa = P0 + P1 * aoa + P2 * (aoa + P3) * (airspeed + P4) + P5 * throttle
 %    b_slip = P0 + P1 * (P2 * airspeed - P3) * (1 + tanh(P4 * (aoa - P5)) + P6 * slip
 % 2: b_aoa = P0 + P1 * aoa + P2 * (aoa + P3) * (airspeed + P4) + P5 * throttle
@@ -66,6 +66,9 @@ config.airspeed_scale_dynamic = true;
 % dv = (0.15 * angles_norm - 0.0044 * angles_norm .^2)
 config.airspeed_angle_correction = false;
 
+
+config.magnetic_declination_deg = 0.0;
+
 %% Pitot Tube Configuration
 % select airframe / pitot configuration (see AirframePitotConfig.m):
 % - 'manual-input'
@@ -83,25 +86,11 @@ config.pitot_type = 1;             % pitot type (drotek pitot = 0; custom pitot 
 config.mount_location = 1;         % 0 = wing (2D cylinder assumption), 1 = nose (3D sphere assumption)
 
 %% Airflow Angles Config
-% config.cal_hall_aoa_rev = 1;
-% config.cal_hall_aoa_p0 = -143564503;
-% config.cal_hall_aoa_p1 = -29512516;
-% config.cal_hall_aoa_p2 = -31953;
-% config.cal_hall_aoa_p3 = -27419;
-% config.cal_hall_aoa_id = 50;
-% config.cal_hall_slip_rev = 1;
-% config.cal_hall_slip_p0 = 36081038;
-% config.cal_hall_slip_p1 = 29965695;
-% config.cal_hall_slip_p2 = 141878;
-% config.cal_hall_slip_p3 = 19035;
-% config.cal_hall_slip_id = 48;
-
-% EZG3 Config 2
 config.cal_hall_aoa_rev = 1;
-config.cal_hall_aoa_p0 = 106825944;
-config.cal_hall_aoa_p1 = -27144586;
-config.cal_hall_aoa_p2 = -45294;
-config.cal_hall_aoa_p3 = 1557;
+config.cal_hall_aoa_p0 = -143564503;
+config.cal_hall_aoa_p1 = -29512516;
+config.cal_hall_aoa_p2 = -31953;
+config.cal_hall_aoa_p3 = -27419;
 config.cal_hall_aoa_id = 50;
 config.cal_hall_slip_rev = 1;
 config.cal_hall_slip_p0 = 36081038;
@@ -109,6 +98,20 @@ config.cal_hall_slip_p1 = 29965695;
 config.cal_hall_slip_p2 = 141878;
 config.cal_hall_slip_p3 = 19035;
 config.cal_hall_slip_id = 48;
+
+% EZG3 Config 2
+% config.cal_hall_aoa_rev = 1;
+% config.cal_hall_aoa_p0 = 106825944;
+% config.cal_hall_aoa_p1 = -27144586;
+% config.cal_hall_aoa_p2 = -45294;
+% config.cal_hall_aoa_p3 = 1557;
+% config.cal_hall_aoa_id = 50;
+% config.cal_hall_slip_rev = 1;
+% config.cal_hall_slip_p0 = 36081038;
+% config.cal_hall_slip_p1 = 29965695;
+% config.cal_hall_slip_p2 = 141878;
+% config.cal_hall_slip_p3 = 19035;
+% config.cal_hall_slip_id = 48;
 
 % EZG5
 % config.cal_hall_aoa_rev = 1;
@@ -142,12 +145,12 @@ config.use_airflow_angles = true; % must be true for this script
 
 %% Optimization Config
 config.force_zero_wd = true;            % if true wd is optimized to equal zero instead of a nonzero constant value
-config.aoa_offset_x = 0.170;            % aoa vane x offset with respect to the body frame [m]
-config.aoa_offset_y = 0.225;            % aoa vane y offset with respect to the body frame [m]
-config.slip_offset_x = 0.170;           % slip vane x offset with respect to the body frame [m]
-config.slip_offset_z = -0.03;           % slip vane z offset with respect to the body frame [m]
+config.aoa_offset_x = 0.165;            % aoa vane x offset with respect to the body frame [m]
+config.aoa_offset_y = 0.315;            % aoa vane y offset with respect to the body frame [m]
+config.slip_offset_x = 0.165;           % slip vane x offset with respect to the body frame [m]
+config.slip_offset_z = -0.025;           % slip vane z offset with respect to the body frame [m]
 config.airspeed_offset_y = -0.25;       % airspeed sensor y offset with respect to the body frame [m]
-config.airspeed_offset_z = 0.05;        % airspeed sensor z offset with respect to the body frame [m]
+config.airspeed_offset_z = -0.03;        % airspeed sensor z offset with respect to the body frame [m]
 config.t_movmean = 2;                   % time window for the movmean filter for the imu data [s]
 config.weighting_sigma = 0.05;
 config.segment_length = 50;
@@ -304,8 +307,8 @@ elseif config.calibration_function == 1
     ub_params = [ 0.2;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30];
 elseif config.calibration_function == 2
     init_params = [0; 0; 0; 0; 0; 0; 0; 1; 0; 0; 1; 0; 0; 0; 1; 0];
-    lb_params = [-0.2; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -30; -30; -30; -30; -30; -30];
-    ub_params = [ 0.2;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  30;  30;  30;  30;  30;  30];
+    lb_params = [-0.2; -30; -30; -30; -30; -30; -0.2; -30; -30; -30; -50; -30; -30; -30; -30; -30];
+    ub_params = [ 0.2;  30;  30;  30;  30;  30;  0.2;  30;  30;  30;  50;  30;  30;  30;  30;  30];
 else
     error('Unknown calibration function')
 end
