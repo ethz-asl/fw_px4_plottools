@@ -26,6 +26,7 @@ addpath(genpath('05_csv_files'));
 addpath(genpath('06_mat_files'));
 addpath(genpath('07_kmz_files'));
 addpath(genpath('08_analysis_tools'));
+addpath(genpath('08_analysis_tools/TestDataScripts'));
 
 % ************************************************************************
 % SETTINGS (modify necessary parameter)
@@ -37,7 +38,7 @@ fileName = 'log001';
 % The log file location, only required when converting a .ulg file. All
 % .csv files are supposed to be in 05_csv_files, and all .mat files are
 % supposed to be in 06_mat_files
-fileLocation = '04_log_files';
+fileLocation = '04_log_files/';
 
 % the source from which the data is imported
 % 0: converting the ulog to csv files and then parsing the csv files
@@ -68,6 +69,9 @@ pathDelimiter = '/';
 % indicates if the plots should be generated. If set to false the log file
 % is only converted to the sysvector.
 generatePlots = true;
+
+% Timestamp offset [s]
+timeOffset = 0;
 
 % only plot the logged data from t_start to t_end. If one of them is set to
 % NaN all the logged data is plotted [s].
@@ -120,7 +124,7 @@ plotvector.linkAxes = false;
 % 3: Colored by the GPS velocity
 % 4: Colored by the filtered airspeed
 % Default: Colored by altitude
-plotvector.colorModeGPS = 0;
+plotvector.colorModeGPS = 4;
 
 
 % *********************
@@ -132,7 +136,7 @@ plotvector.colorModeGPS = 0;
 % 2: Colored by altitude, not in Google Earth
 % 3: Colored by the estimated ground velocity, not in Google Earth
 % 4: Colored by the filtered airspeed, not in Google Earth
-plotvector.colorModeGlobalPosition = 4;
+plotvector.colorModeGlobalPosition = 0;
 
 % Indicates if the GPS position should be plot as a reference
 plotvector.plotGPSReference = true;
@@ -206,7 +210,7 @@ else
         ImportPX4LogData(fileName, fileLocation, '05_csv_files', ...
                          '06_mat_files', loadingMode, pathDelimiter, ...
                          fconv_timestamp, loadingVerbose, saveMatlabData, ...
-                         deleteCSVFiles);
+                         deleteCSVFiles, timeOffset);
 end
 
 % ******************

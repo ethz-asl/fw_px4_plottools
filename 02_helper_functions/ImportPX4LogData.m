@@ -1,7 +1,7 @@
 function [sysvector, topics, paramvector, params] = ...
     ImportPX4LogData(fileName, fileLocation, csvLocation, matLocation, ...
                      loadingMode, pathDelimiter, fconv_timestamp, ...
-                     loadingVerbose, saveMatlabData, deleteCSVFiles)
+                     loadingVerbose, saveMatlabData, deleteCSVFiles, timeOffset)
 %IMPORTPX4LOGDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -69,7 +69,7 @@ function [sysvector, topics, paramvector, params] = ...
                         field_name = lower(field_name);
 
                         ts = timeseries(table2array(csv_data(:, idx)), ...
-                            table2array(csv_data(:, 1))*fconv_timestamp, ...
+                            table2array(csv_data(:, 1))*fconv_timestamp - timeOffset, ...
                             'Name', [topic_fields{idx_topics} '.' char(field_name)]);
                         ts.DataInfo.Interpolation = tsdata.interpolation('zoh');
 
@@ -98,12 +98,14 @@ function [sysvector, topics, paramvector, params] = ...
     % manually add a value for the commander state with the timestamp of
     % the latest global position estimate as they are used together
     if topics.commander_state.logged && topics.vehicle_global_position.logged
-       ts_temp = append(sysvector.commander_state_0.main_state,...
-           timeseries(sysvector.commander_state_0.main_state.Data(end),...
-           sysvector.vehicle_global_position_0.lon.Time(end)));
-       ts_temp.DataInfo.Interpolation = tsdata.interpolation('zoh');
-       ts_temp.Name = 'commander_state_0.main_state';
-       sysvector.commander_state_0.main_state = ts_temp;
+       if sysvector.commander_state_0.main_state.Time(end) < sysvector.vehicle_global_position_0.lon.Time(end)
+           ts_temp = append(sysvector.commander_state_0.main_state,...
+               timeseries(sysvector.commander_state_0.main_state.Data(end),...
+               sysvector.vehicle_global_position_0.lon.Time(end)));
+           ts_temp.DataInfo.Interpolation = tsdata.interpolation('zoh');
+           ts_temp.Name = 'commander_state_0.main_state';
+           sysvector.commander_state_0.main_state = ts_temp;
+       end
     end
 
     time_csv_import = toc;
@@ -229,7 +231,7 @@ function [sysvector, topics, paramvector, params] = ...
                         temp_params = csv_numeric_data(idx_data:idx_data+1,:);
                         temp_params = temp_params(:,~isnan(temp_params(1,:)));
                         paramvector.(param_fields{idx_params}) = ...
-                            timeseries(temp_params(1,:)', temp_params(2,:)'*fconv_timestamp);
+                            timeseries(temp_params(1,:)', temp_params(2,:)'*fconv_timestamp - timeOffset);
                         % set logged
                         params.(param_fields{idx_params}).logged = true;
 
