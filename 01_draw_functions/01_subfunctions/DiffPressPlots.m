@@ -51,8 +51,13 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged && topics.differ
     title('Raw ambient pressure [mbar]');
 
     raw_corr(2) = subplot(3,1,2);
-    plot(sysvector.differential_pressure_0.differential_pressure_raw_pa.Time,...
-        sysvector.differential_pressure_0.differential_pressure_raw_pa.Data);
+    if isfield(sysvector.differential_pressure_0, 'differential_pressure_raw_pa')
+        plot(sysvector.differential_pressure_0.differential_pressure_raw_pa.Time,...
+            sysvector.differential_pressure_0.differential_pressure_raw_pa.Data);
+    else
+        plot(sysvector.differential_pressure_0.differential_pressure_pa.Time,...
+            sysvector.differential_pressure_0.differential_pressure_pa.Data);
+    end
     title('Raw differential pressure [pa]');
 
     raw_corr(3) = subplot(3,1,3);
@@ -66,8 +71,13 @@ if plotvector.doPressureCorrection && topics.sensor_baro.logged && topics.differ
     airspeed_available = true;
 else
     if topics.differential_pressure.logged
-        dp_raw = sysvector.differential_pressure_0.differential_pressure_raw_pa;
-        dp_filtered = sysvector.differential_pressure_0.differential_pressure_filtered_pa;
+        if isfield(sysvector.differential_pressure_0, 'differential_pressure_raw_pa')
+            dp_raw = sysvector.differential_pressure_0.differential_pressure_raw_pa;
+            dp_filtered = sysvector.differential_pressure_0.differential_pressure_filtered_pa;
+        else
+            dp_raw = sysvector.differential_pressure_0.differential_pressure_pa;
+            dp_filtered = sysvector.differential_pressure_0.differential_pressure_pa;
+        end
     end
     if topics.airspeed.logged
         airspeed_indicated = sysvector.airspeed_0.indicated_airspeed_m_s;
