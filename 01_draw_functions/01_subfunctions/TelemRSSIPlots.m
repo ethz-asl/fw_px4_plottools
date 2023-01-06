@@ -76,7 +76,11 @@ if telem_data_available
    hold on;
    legend_entries = {};
     for i = 0:num_instances-1
-        plot(telem_data(i+1).fixed.Time, telem_data(i+1).fixed.Data);
+        if isfield(telem_data(i+1), 'fixed')
+            plot(telem_data(i+1).fixed.Time, telem_data(i+1).fixed.Data);
+        else
+            plot(telem_data(i+1).fix.Time, telem_data(i+1).fix.Data);
+        end
         plot(telem_data(i+1).rxerrors.Time, telem_data(i+1).rxerrors.Data);
         legend_entries = [legend_entries; {'TEL' + string(i) + ' Fixed RX packets'; 'TEL' + string(i) + ' Lost RX packets'}];
     end
