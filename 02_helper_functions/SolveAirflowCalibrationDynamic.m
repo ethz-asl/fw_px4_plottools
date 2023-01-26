@@ -21,6 +21,9 @@ for i = 1:length(config.t_ends)
     time_resampled = [time_resampled time]; 
 end
 
+pos_x = ResampleData(sysvector.vehicle_local_position_0.x, time_resampled);
+pos_y = ResampleData(sysvector.vehicle_local_position_0.y, time_resampled);
+
 acc_x = resample(sysvector.sensor_accel_0.x, time_resampled(1):dt_rs:time_resampled(end));
 acc_y = resample(sysvector.sensor_accel_0.y, time_resampled(1):dt_rs:time_resampled(end));
 acc_z = resample(sysvector.sensor_accel_0.z, time_resampled(1):dt_rs:time_resampled(end));
@@ -114,7 +117,9 @@ mean_wind_d = mean(out.wind_d);
 
 %% Get loiter characteristics
 optimization_data.time = time_resampled;
+optimization_data.window_lengths = input.window_lengths;
 optimization_data.roll = input.roll;
+optimization_data.yaw = input.yaw;
 optimization_data.airspeed_total = sqrt(out.va_n.^2+out.va_e.^2+out.va_d.^2);
 optimization_data.airspeed = out.airspeed_true;
 optimization_data.g_load = input.acc_z/9.81;
@@ -155,6 +160,8 @@ optimization_data.gspd = input.gspd;
 optimization_data.va_n = out.va_n;
 optimization_data.va_e = out.va_e;
 optimization_data.va_d = out.va_d;
+optimization_data.pos_x = pos_x;
+optimization_data.pos_y = pos_y;
 
 %% / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / 
 % Output function / / / / / / / / / / / / / / / / / / / / / / / / / / / / /

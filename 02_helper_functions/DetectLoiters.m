@@ -64,7 +64,11 @@ for i=1:size(x_segments,2)
                 end
             end
         end
-        
+
+        if ~loiter_active
+            current_airspeed = avg_airspeed(i);
+        end
+
         if current_segment_loiter
             if config.only_use_auto_loiter
                 if ~all(commander_state_segments(:,i) == 3)
@@ -73,6 +77,12 @@ for i=1:size(x_segments,2)
                     if config.verbose
                         disp('Loiter rejected because not in auto mode')
                     end
+                end
+            end
+            if  abs(current_airspeed -  avg_airspeed(i)) > config.max_airspeed_change
+                current_segment_loiter = false;
+                if config.verbose
+                    disp('Loiter rejected because airspeed changed: ' + num2str(current_airspeed -  avg_airspeed(i)))
                 end
             end
         end
@@ -90,7 +100,7 @@ for i=1:size(x_segments,2)
                             ', radius: ', num2str(current_radius), ' and duration: ', num2str(current_t_end-current_t_start), ...
                             ' [', num2str(current_t_start), '->', num2str(current_t_end), ']']) 
                     elseif config.verbose
-                        disp(['Segment rejected because too few full loiters: ', num2str(n_loiters)])
+                        disp(['Segment rejected because too few loiters: ', num2str(n_loiters)])
                     end
                     
                     % reset the times since this is still detected as a

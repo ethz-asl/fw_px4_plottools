@@ -38,7 +38,7 @@ config.use_accz_weighting = true;
 
 % If true loiters are automatically detected and an individual bias and
 % scale parameter is estimated for each detected loiter
-config.auto_loiter_detections = false;
+config.auto_loiter_detections = true;
 
 % If true activates additional outputs and plots
 config.verbose = false;
@@ -162,12 +162,12 @@ config.window_size = 10;                % Window size to check if the segment is
 config.overlap = 0.8;                   % Overlap between the windows [fraction]
 config.min_radius = 15;                 % Min allowed loiter radius [m]                 
 config.max_radius = 150;                % Max allowed loiter radius [m]
-config.max_circle_fit_error = 15;       % Max allowed circle fit error [m]
+config.max_circle_fit_error = 10;       % Max allowed circle fit error [m]
 config.min_airspeed = 8;                % Min airspeed to consider it a valid loiter [m/s]
-config.max_airspeed_std = 0.75;         % Max airspeed std at the start of a loiter [m^2/s^2]
-config.max_altitude_std = 2.0;          % Max airspeed std at the start of a loiter [m^2/s^2]
-config.max_airspeed_change = 1.0;       % Max allowed airspeed change between a loiter [m/s]
-config.max_radius_change = 0.1;         % Max allowed fraction change of the loiter radius
+config.max_airspeed_std = 0.7;         % Max airspeed std at the start of a loiter [m^2/s^2]
+config.max_altitude_std = 3.0;          % Max airspeed std at the start of a loiter [m^2/s^2]
+config.max_airspeed_change = 1.5;       % Max allowed airspeed change between a loiter [m/s]
+config.max_radius_change = 0.15;         % Max allowed fraction change of the loiter radius
 config.only_use_auto_loiter = true;     % Only use the loiters in auto mode, requires commander state being logged
 config.n_loiters_required = 1.0;        % Number of loiters required, can be a fraction
 
@@ -525,3 +525,106 @@ plot(optimization_data.throttle, wd_filt, 'o')
 legend('w_n', 'w_e', 'w_d')
 xlabel('throttle [-]')
 ylabel('wind estimate [m/s]')
+
+%% Compute the correlation between the wind and loiter position
+% options
+loiter_plots = true;
+dt_resampled = 0.001;
+filter_time = 1;
+cutoff_frequency = 0.5;
+
+
+idx = 1;
+corr_wn = zeros(length(config.t_starts), 1);
+corr_we = zeros(length(config.t_starts), 1);
+corr_wn_raw = zeros(length(config.t_starts), 1);
+corr_we_raw = zeros(length(config.t_starts), 1);
+
+for i=1:length(config.t_starts)
+    window_size = optimization_data.window_lengths(i);
+    ts = optimization_data.time(idx:idx+window_size-1);
+    t_resampled = ts(1):dt_resampled:ts(end);
+    window_time = interp1(ts, optimization_data.time(idx:idx+window_size-1), t_resampled, 'linear');
+    window_pos_x =  interp1(ts, optimization_data.pos_x(idx:idx+window_size-1), t_resampled, 'linear');
+    window_wn =  movmean(interp1(ts, optimization_data.wn(idx:idx+window_size-1), t_resampled, 'linear'),  filter_time/dt_resampled);
+    window_we = movmean(interp1(ts, optimization_data.we(idx:idx+window_size-1), t_resampled, 'linear'),  filter_time/dt_resampled);
+    window_wn_raw = movmean(interp1(ts, optimization_data.wn_raw(idx:idx+window_size-1), t_resampled, 'linear'),  filter_time/dt_resampled);
+    window_we_raw = movmean(interp1(ts, optimization_data.we_raw(idx:idx+window_size-1), t_resampled, 'linear'),  filter_time/dt_resampled);
+    
+    window_size = length(t_resampled);
+
+    Y = fft(window_pos_x - mean(window_pos_x));
+    P2 = abs(Y/window_size);
+    pos_P1 = P2(1:window_size/2+1);
+    pos_P1(2:end-1) = 2*pos_P1(2:end-1);
+    Y = fft(window_wn - mean(window_wn));
+    P2 = abs(Y/window_size);
+    wn_P1 = P2(1:window_size/2+1);
+    wn_P1(2:end-1) = 2*wn_P1(2:end-1);
+    Y = fft(window_we - mean(window_we));
+    P2 = abs(Y/window_size);
+    we_P1 = P2(1:window_size/2+1);
+    we_P1(2:end-1) = 2*we_P1(2:end-1);
+
+    Y = fft(window_wn_raw - mean(window_wn_raw));
+    P2 = abs(Y/window_size);
+    wn_raw_P1 = P2(1:window_size/2+1);
+    wn_raw_P1(2:end-1) = 2*wn_raw_P1(2:end-1);
+    Y = fft(window_we_raw - mean(window_we_raw));
+    P2 = abs(Y/window_size);
+    we_raw_P1 = P2(1:window_size/2+1);
+    we_raw_P1(2:end-1) = 2*we_raw_P1(2:end-1);
+
+    if loiter_plots
+        figure('color','w');
+        subplot(3,1,1); hold on; grid on; box on;
+        plot(window_time, window_pos_x)
+        xlabel('time [s]')
+        ylabel('position [m]')
+        subplot(3,1,2); hold on; grid on; box on;
+        plot(window_time, window_wn)
+        plot(window_time, window_we)
+        plot(window_time, window_wn_raw)
+        plot(window_time, window_we_raw)
+        legend('wn', 'we', 'wn raw', 'we raw')
+        xlabel('time [s]')
+        ylabel('wind [m/s]')
+
+        f = 1/diff(window_time(1:2))*(0:(window_size/2))/window_size;
+        subplot(3,1,3); hold on; grid on; box on;
+        plot(f, pos_P1/max(pos_P1))
+        plot(f, wn_P1/max(wn_P1))
+        plot(f, we_P1/max(we_P1))
+        plot(f, wn_raw_P1/max(wn_raw_P1))
+        plot(f, we_raw_P1/max(we_raw_P1))
+        xlim([0 cutoff_frequency])
+        xlabel('f [Hz]')
+        ylabel('fft magnitude [-]')
+        legend('pos x', 'wn', 'we', 'wn raw', 'we raw')
+    end
+
+    idx_cutoff = ceil(cutoff_frequency*diff(window_time(1:2))*window_size);
+    R_we = corrcoef(pos_P1(1:idx_cutoff),we_P1(1:idx_cutoff));
+    R_wn = corrcoef(pos_P1(1:idx_cutoff),wn_P1(1:idx_cutoff));
+    R_we_raw = corrcoef(pos_P1(1:idx_cutoff),we_raw_P1(1:idx_cutoff));
+    R_wn_raw = corrcoef(pos_P1(1:idx_cutoff),wn_raw_P1(1:idx_cutoff));
+    corr_we(i) = R_we(1,2);
+    corr_wn(i) = R_wn(1,2);
+    corr_we_raw(i) = R_we_raw(1,2);
+    corr_wn_raw(i) = R_wn_raw(1,2);
+    idx = idx + optimization_data.window_lengths(i);
+end
+
+figure('color','w');
+hold on; grid on; box on;
+plot(1:length(config.t_starts), corr_we)
+plot(1:length(config.t_starts), corr_wn)
+plot(1:length(config.t_starts), corr_we_raw)
+plot(1:length(config.t_starts), corr_wn_raw)
+xlabel('loiter idx')
+ylabel('correlation [-]')
+legend('corr we', 'corr wn', 'corr we raw', 'corr wn raw')
+disp(['Avg. correlation we: ', num2str(mean(corr_we))])
+disp(['Avg. correlation wn: ', num2str(mean(corr_wn))])
+disp(['Avg. correlation we raw: ', num2str(mean(corr_we_raw))])
+disp(['Avg. correlation wn raw: ', num2str(mean(corr_wn_raw))])
